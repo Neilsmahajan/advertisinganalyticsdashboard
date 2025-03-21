@@ -11,6 +11,7 @@ import {
   Clock,
   Users,
 } from "lucide-react";
+import SignInButton from "./SignInButton";
 
 export default function Home() {
   return (
@@ -38,9 +39,7 @@ export default function Home() {
               <Button variant="outline" size="lg">
                 <Play className="mr-2 h-4 w-4" /> Watch Video
               </Button>
-              <Button variant="secondary" size="lg">
-                <Search className="mr-2 h-4 w-4" /> View your Queries
-              </Button>
+              <SignInButton />
             </div>
           </div>
         </div>
@@ -147,13 +146,7 @@ export default function Home() {
                   Explore Services <ChevronRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="bg-transparent border-white hover:bg-white hover:text-primary"
-              >
-                <Search className="mr-2 h-4 w-4" /> View your Queries
-              </Button>
+              <SignInButton />
             </div>
           </div>
         </div>
