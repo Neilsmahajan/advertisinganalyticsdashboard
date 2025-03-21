@@ -147,7 +147,9 @@ export default function DashboardSidebar() {
               height={24}
               className="rounded-md"
             />
-            <span className="font-bold text-sm">Advertising Analytics Dashboard</span>
+            <span className="font-bold text-sm">
+              Advertising Analytics Dashboard
+            </span>
           </Link>
         </div>
       </div>
