@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import { Facebook, Instagram, Linkedin } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -24,28 +24,21 @@ export default function Footer() {
             </p>
             <div className="flex gap-4">
               <Link
-                href="#"
+                href="https://www.facebook.com/advertisinganalyticsdashboard/"
                 className="text-muted-foreground hover:text-primary"
               >
                 <Facebook className="h-5 w-5" />
                 <span className="sr-only">Facebook</span>
               </Link>
               <Link
-                href="#"
-                className="text-muted-foreground hover:text-primary"
-              >
-                <Twitter className="h-5 w-5" />
-                <span className="sr-only">Twitter</span>
-              </Link>
-              <Link
-                href="#"
+                href="https://www.instagram.com/advertisinganalyticsdashboard/"
                 className="text-muted-foreground hover:text-primary"
               >
                 <Instagram className="h-5 w-5" />
                 <span className="sr-only">Instagram</span>
               </Link>
               <Link
-                href="#"
+                href="https://www.linkedin.com/company/advertisinganalyticsdashboard/"
                 className="text-muted-foreground hover:text-primary"
               >
                 <Linkedin className="h-5 w-5" />
@@ -136,38 +129,42 @@ export default function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="mb-4 text-sm font-medium">Support</h3>
+            <h3 className="mb-4 text-sm font-medium">Socials</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  href="#"
-                  className="text-muted-foreground hover:text-primary"
+                  href="https://www.facebook.com/advertisinganalyticsdashboard/"
+                  className="flex items-center gap-2 text-muted-foreground hover:text-primary"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  Help Center
+                  <Facebook className="h-5 w-5" />
+                  <span className="sr-only">Facebook</span>
+                  Facebook
                 </Link>
               </li>
               <li>
                 <Link
-                  href="#"
-                  className="text-muted-foreground hover:text-primary"
+                  href="https://www.instagram.com/advertisinganalyticsdashboard/"
+                  className="flex items-center gap-2 text-muted-foreground hover:text-primary"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  Documentation
+                  <Instagram className="h-5 w-5" />
+                  <span className="sr-only">Instagram</span>
+                  Instagram
                 </Link>
               </li>
               <li>
                 <Link
-                  href="#"
-                  className="text-muted-foreground hover:text-primary"
+                  href="https://www.linkedin.com/company/advertisinganalyticsdashboard/"
+                  className="flex items-center gap-2 text-muted-foreground hover:text-primary"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  API Reference
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-muted-foreground hover:text-primary"
-                >
-                  Status
+                  <Linkedin className="h-5 w-5" />
+                  <span className="sr-only">LinkedIn</span>
+                  LinkedIn
                 </Link>
               </li>
             </ul>
