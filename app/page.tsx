@@ -32,7 +32,7 @@ export default function Home() {
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button asChild size="lg">
-                <Link href="/services">
+                <Link href="/dashboard">
                   Explore Services <ChevronRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -142,7 +142,7 @@ export default function Home() {
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button asChild size="lg" variant="secondary">
-                <Link href="/services">
+                <Link href="/dashboard">
                   Explore Services <ChevronRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
