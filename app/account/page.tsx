@@ -16,9 +16,15 @@ import {
   Megaphone,
   Mail,
 } from "lucide-react";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import SignOutButton from "./SignOutButton";
 
-export default function AccountPage() {
+export default async function AccountPage() {
+  const session = await getServerSession();
+  if (!session) {
+    return redirect("api/auth/signin");
+  }
   return (
     <div className="container px-4 py-12 md:px-6 md:py-20">
       <div className="mx-auto max-w-5xl space-y-8">
@@ -27,7 +33,7 @@ export default function AccountPage() {
             MY ACCOUNT
           </h1>
           <p className="text-gray-500 dark:text-gray-400 md:text-lg">
-            Welcome, Neil Mahajan!
+            Welcome, {session.user.name}!
           </p>
           <p className="text-gray-500 dark:text-gray-400">
             Manage your profile information and saved queries here.
@@ -44,13 +50,13 @@ export default function AccountPage() {
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Name:
                 </p>
-                <p className="font-medium">Neil Mahajan</p>
+                <p className="font-medium">{session.user.name}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Email:
                 </p>
-                <p className="font-medium">neilsmahajan@gmail.com</p>
+                <p className="font-medium">{session.user.email}</p>
               </div>
               <SignOutButton />
             </CardContent>

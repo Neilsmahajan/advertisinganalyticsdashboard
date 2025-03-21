@@ -7,7 +7,7 @@ import { LogOut } from "lucide-react";
 export default function SignOutButton() {
   return (
     <Button
-      onClick={() => signOut()}
+      onClick={() => signOut({ callbackUrl: "/" })}
       variant="destructive"
       className="w-full mt-4"
     >

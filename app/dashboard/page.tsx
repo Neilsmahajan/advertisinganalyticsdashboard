@@ -14,8 +14,15 @@ import {
   TrendingUp,
   Clock,
 } from "lucide-react";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const session = await getServerSession();
+  console.log(session);
+  if (!session) {
+    return redirect("../api/auth/signin");
+  }
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
