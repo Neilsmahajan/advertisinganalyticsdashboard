@@ -29,7 +29,7 @@ export default function Navbar() {
               className="rounded-md"
             />
             <span className="hidden font-bold sm:inline-block">
-              Advertising Analytics
+              Advertising Analytics Dashboard
             </span>
           </Link>
         </div>

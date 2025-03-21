@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,7 +8,6 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  LogOut,
   Search,
   BarChart3,
   LineChart,
@@ -19,21 +16,9 @@ import {
   Megaphone,
   Mail,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { toast } from "@/components/ui/use-toast";
+import SignOutButton from "./SignOutButton";
 
 export default function AccountPage() {
-  const router = useRouter();
-
-  const handleSignOut = () => {
-    // In a real application, you would handle sign out logic here
-    toast({
-      title: "Signed out",
-      description: "You have been signed out successfully.",
-    });
-    router.push("/");
-  };
-
   return (
     <div className="container px-4 py-12 md:px-6 md:py-20">
       <div className="mx-auto max-w-5xl space-y-8">
@@ -67,13 +52,7 @@ export default function AccountPage() {
                 </p>
                 <p className="font-medium">neilsmahajan@gmail.com</p>
               </div>
-              <Button
-                onClick={handleSignOut}
-                variant="destructive"
-                className="w-full mt-4"
-              >
-                <LogOut className="mr-2 h-4 w-4" /> Sign Out
-              </Button>
+              <SignOutButton />
             </CardContent>
           </Card>
 

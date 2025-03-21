@@ -16,7 +16,7 @@ export default function Footer() {
                 height={40}
                 className="rounded-md"
               />
-              <span className="font-bold">Advertising Analytics</span>
+              <span className="font-bold">Advertising Analytics Dashboard</span>
             </Link>
             <p className="text-sm text-muted-foreground">
               Manage and analyze all your advertising campaigns in one unified
