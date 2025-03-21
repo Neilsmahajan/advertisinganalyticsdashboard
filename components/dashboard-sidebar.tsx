@@ -17,11 +17,12 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useSession } from "next-auth/react";
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-
+  const { data: session } = useSession();
   const routes = [
     {
       name: "Dashboard",
@@ -97,12 +98,24 @@ export default function DashboardSidebar() {
       <div className="mt-auto border-t p-4">
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-            <span className="text-xs font-medium">NM</span>
+            {session?.user.image ? (
+              <Image
+                src={session.user.image}
+                alt={session.user.name}
+                width={32}
+                height={32}
+                className="rounded-full"
+              />
+            ) : (
+              <span className="text-sm font-bold text-muted-foreground">
+                {session?.user.name[0]}
+              </span>
+            )}
           </div>
           <div>
-            <p className="text-xs font-medium">Neil Mahajan</p>
+            <p className="text-xs font-medium">{session?.user.name}</p>
             <p className="text-xs text-muted-foreground">
-              neilsmahajan@gmail.com
+              {session?.user.email}
             </p>
           </div>
         </div>
@@ -134,7 +147,7 @@ export default function DashboardSidebar() {
               height={24}
               className="rounded-md"
             />
-            <span className="font-bold text-sm">Advertising Analytics</span>
+            <span className="font-bold text-sm">Advertising Analytics Dashboard</span>
           </Link>
         </div>
       </div>
