@@ -1,48 +1,64 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { CalendarIcon, PlayCircle, Save, Eye } from "lucide-react"
-import { format } from "date-fns"
-import { cn } from "@/lib/utils"
-import { toast } from "@/components/ui/use-toast"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon, PlayCircle, Save, Eye } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { toast } from "@/components/ui/use-toast";
 
 export default function GoogleAdsPage() {
   const [formData, setFormData] = useState({
     queryName: "",
     customerId: "",
-  })
-  const [selectedQuery, setSelectedQuery] = useState("")
-  const [startDate, setStartDate] = useState<Date | undefined>()
-  const [endDate, setEndDate] = useState<Date | undefined>()
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [results, setResults] = useState<null | any>(null)
+  });
+  const [selectedQuery, setSelectedQuery] = useState("");
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [results, setResults] = useState<null | any>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSelectChange = (value: string) => {
-    setSelectedQuery(value)
+    setSelectedQuery(value);
     // In a real app, you would load the saved query data here
     if (value === "previous-query-1") {
       setFormData({
         queryName: "Main Google Ads Campaign",
         customerId: "683-961-6266",
-      })
-      setStartDate(new Date(2023, 0, 1))
-      setEndDate(new Date(2023, 0, 31))
+      });
+      setStartDate(new Date(2023, 0, 1));
+      setEndDate(new Date(2023, 0, 31));
     }
-  }
+  };
 
   const handleSaveQuery = () => {
     if (!formData.queryName) {
@@ -50,15 +66,15 @@ export default function GoogleAdsPage() {
         title: "Error",
         description: "Please enter a query name",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     toast({
       title: "Query Saved",
       description: `Query "${formData.queryName}" has been saved.`,
-    })
-  }
+    });
+  };
 
   const handleAnalyze = () => {
     if (!formData.customerId || !startDate || !endDate) {
@@ -66,15 +82,15 @@ export default function GoogleAdsPage() {
         title: "Error",
         description: "Please fill in all required fields",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    setIsAnalyzing(true)
+    setIsAnalyzing(true);
 
     // Simulate API call
     setTimeout(() => {
-      setIsAnalyzing(false)
+      setIsAnalyzing(false);
       setResults({
         impressions: 543210,
         clicks: 12345,
@@ -83,46 +99,83 @@ export default function GoogleAdsPage() {
         conversions: 543,
         costPerConversion: "$7.96",
         campaigns: [
-          { name: "Brand Awareness", impressions: 123456, clicks: 3456, cost: "$1,234.56" },
-          { name: "Retargeting", impressions: 98765, clicks: 2345, cost: "$987.65" },
-          { name: "Product Launch", impressions: 87654, clicks: 1234, cost: "$876.54" },
-          { name: "Holiday Special", impressions: 76543, clicks: 987, cost: "$765.43" },
-          { name: "Competitor Keywords", impressions: 65432, clicks: 876, cost: "$654.32" },
+          {
+            name: "Brand Awareness",
+            impressions: 123456,
+            clicks: 3456,
+            cost: "$1,234.56",
+          },
+          {
+            name: "Retargeting",
+            impressions: 98765,
+            clicks: 2345,
+            cost: "$987.65",
+          },
+          {
+            name: "Product Launch",
+            impressions: 87654,
+            clicks: 1234,
+            cost: "$876.54",
+          },
+          {
+            name: "Holiday Special",
+            impressions: 76543,
+            clicks: 987,
+            cost: "$765.43",
+          },
+          {
+            name: "Competitor Keywords",
+            impressions: 65432,
+            clicks: 876,
+            cost: "$654.32",
+          },
         ],
-      })
+      });
 
       toast({
         title: "Analysis Complete",
         description: "Google Ads data has been retrieved.",
-      })
-    }, 2000)
-  }
+      });
+    }, 2000);
+  };
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Google Ads</h1>
-        <p className="text-muted-foreground">Connect to your Google Ads account to view your campaign performance.</p>
+        <p className="text-muted-foreground">
+          Connect to your Google Ads account to view your campaign performance.
+        </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Instructions</CardTitle>
-            <CardDescription>Follow these steps to use this application with your Google Ads data</CardDescription>
+            <CardDescription>
+              Follow these steps to use this application with your Google Ads
+              data
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <ol className="list-decimal list-inside space-y-2 text-sm">
               <li>
-                Click Connect with Google Ads and select your Google account associated with your Google Ads account. If
-                the pop-up is blocked, click the pop-up icon on the next to the address bar.
+                Click Connect with Google Ads and select your Google account
+                associated with your Google Ads account. If the pop-up is
+                blocked, click the pop-up icon on the next to the address bar.
               </li>
-              <li>Log in to Google Ads Dashboard and select your Google Ads Account.</li>
               <li>
-                Get your Customer ID from the top right (e.g., 683-961-6266) for the account that you would like to
-                fetch data from.
+                Log in to Google Ads Dashboard and select your Google Ads
+                Account.
               </li>
-              <li>Enter your customer ID below, along with the desired date range, and click Analyze.</li>
+              <li>
+                Get your Customer ID from the top right (e.g., 683-961-6266) for
+                the account that you would like to fetch data from.
+              </li>
+              <li>
+                Enter your customer ID below, along with the desired date range,
+                and click Analyze.
+              </li>
             </ol>
 
             <Button variant="outline" className="gap-2 mt-4">
@@ -132,14 +185,21 @@ export default function GoogleAdsPage() {
             <div className="space-y-4 pt-4">
               <div className="space-y-2">
                 <Label>Previous Queries</Label>
-                <Select value={selectedQuery} onValueChange={handleSelectChange}>
+                <Select
+                  value={selectedQuery}
+                  onValueChange={handleSelectChange}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a previous query or create new" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="new">Create New Query</SelectItem>
-                    <SelectItem value="previous-query-1">Main Google Ads Campaign</SelectItem>
-                    <SelectItem value="previous-query-2">Product Launch Campaign</SelectItem>
+                    <SelectItem value="previous-query-1">
+                      Main Google Ads Campaign
+                    </SelectItem>
+                    <SelectItem value="previous-query-2">
+                      Product Launch Campaign
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -193,7 +253,12 @@ export default function GoogleAdsPage() {
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" selected={startDate} onSelect={setStartDate} initialFocus />
+                      <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={setStartDate}
+                        initialFocus
+                      />
                     </PopoverContent>
                   </Popover>
                 </div>
@@ -214,13 +279,22 @@ export default function GoogleAdsPage() {
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" selected={endDate} onSelect={setEndDate} initialFocus />
+                      <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={setEndDate}
+                        initialFocus
+                      />
                     </PopoverContent>
                   </Popover>
                 </div>
               </div>
 
-              <Button className="w-full" onClick={handleAnalyze} disabled={isAnalyzing}>
+              <Button
+                className="w-full"
+                onClick={handleAnalyze}
+                disabled={isAnalyzing}
+              >
                 {isAnalyzing ? "Analyzing..." : "Analyze"}
               </Button>
             </div>
@@ -230,13 +304,16 @@ export default function GoogleAdsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Results</CardTitle>
-            <CardDescription>Google Ads data for the selected period</CardDescription>
+            <CardDescription>
+              Google Ads data for the selected period
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {!results && !isAnalyzing && (
               <div className="flex items-center justify-center h-[400px] bg-muted/20 rounded-md">
                 <p className="text-muted-foreground">
-                  Enter your Customer ID and date range, then click Analyze to see results
+                  Enter your Customer ID and date range, then click Analyze to
+                  see results
                 </p>
               </div>
             )}
@@ -244,7 +321,9 @@ export default function GoogleAdsPage() {
             {isAnalyzing && (
               <div className="flex flex-col items-center justify-center h-[400px] bg-muted/20 rounded-md">
                 <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                <p className="mt-4 text-muted-foreground">Fetching Google Ads data...</p>
+                <p className="mt-4 text-muted-foreground">
+                  Fetching Google Ads data...
+                </p>
               </div>
             )}
 
@@ -253,11 +332,15 @@ export default function GoogleAdsPage() {
                 <div className="grid grid-cols-3 gap-4">
                   <div className="bg-muted/20 p-4 rounded-md">
                     <p className="text-sm text-muted-foreground">Impressions</p>
-                    <p className="text-2xl font-bold">{results.impressions.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">
+                      {results.impressions.toLocaleString()}
+                    </p>
                   </div>
                   <div className="bg-muted/20 p-4 rounded-md">
                     <p className="text-sm text-muted-foreground">Clicks</p>
-                    <p className="text-2xl font-bold">{results.clicks.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">
+                      {results.clicks.toLocaleString()}
+                    </p>
                   </div>
                   <div className="bg-muted/20 p-4 rounded-md">
                     <p className="text-sm text-muted-foreground">CTR</p>
@@ -273,7 +356,9 @@ export default function GoogleAdsPage() {
                   </div>
                   <div className="bg-muted/20 p-4 rounded-md">
                     <p className="text-sm text-muted-foreground">Cost/Conv</p>
-                    <p className="text-2xl font-bold">{results.costPerConversion}</p>
+                    <p className="text-2xl font-bold">
+                      {results.costPerConversion}
+                    </p>
                   </div>
                 </div>
 
@@ -287,7 +372,9 @@ export default function GoogleAdsPage() {
                           <span>{campaign.cost}</span>
                         </div>
                         <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                          <span>{campaign.impressions.toLocaleString()} impressions</span>
+                          <span>
+                            {campaign.impressions.toLocaleString()} impressions
+                          </span>
                           <span>{campaign.clicks.toLocaleString()} clicks</span>
                         </div>
                       </div>
@@ -296,7 +383,9 @@ export default function GoogleAdsPage() {
                 </div>
 
                 <div className="h-[150px] bg-muted/20 rounded-md flex items-center justify-center">
-                  <p className="text-muted-foreground">Campaign performance chart will appear here</p>
+                  <p className="text-muted-foreground">
+                    Campaign performance chart will appear here
+                  </p>
                 </div>
               </div>
             )}
@@ -304,6 +393,5 @@ export default function GoogleAdsPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
-

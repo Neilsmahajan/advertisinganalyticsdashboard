@@ -1,17 +1,26 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { LayoutDashboard, Search, BarChart3, LineChart, PieChart, BarChart, ChevronRight, Menu } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  LayoutDashboard,
+  Search,
+  BarChart3,
+  LineChart,
+  PieChart,
+  BarChart,
+  ChevronRight,
+  Menu,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export default function DashboardSidebar() {
-  const pathname = usePathname()
-  const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const pathname = usePathname();
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const routes = [
     {
@@ -44,7 +53,7 @@ export default function DashboardSidebar() {
       href: "/dashboard/microsoft-ads",
       icon: BarChart,
     },
-  ]
+  ];
 
   const SidebarContent = () => (
     <div className="flex h-full flex-col gap-2">
@@ -69,12 +78,16 @@ export default function DashboardSidebar() {
               onClick={() => setIsMobileOpen(false)}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:text-primary",
-                pathname === route.href ? "bg-muted font-medium text-primary" : "text-muted-foreground",
+                pathname === route.href
+                  ? "bg-muted font-medium text-primary"
+                  : "text-muted-foreground",
               )}
             >
               <route.icon className="h-4 w-4" />
               {route.name}
-              {pathname === route.href && <ChevronRight className="ml-auto h-4 w-4" />}
+              {pathname === route.href && (
+                <ChevronRight className="ml-auto h-4 w-4" />
+              )}
             </Link>
           ))}
         </nav>
@@ -86,12 +99,14 @@ export default function DashboardSidebar() {
           </div>
           <div>
             <p className="text-xs font-medium">Neil Mahajan</p>
-            <p className="text-xs text-muted-foreground">neilsmahajan@gmail.com</p>
+            <p className="text-xs text-muted-foreground">
+              neilsmahajan@gmail.com
+            </p>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 
   return (
     <>
@@ -127,6 +142,5 @@ export default function DashboardSidebar() {
         <SidebarContent />
       </div>
     </>
-  )
+  );
 }
-

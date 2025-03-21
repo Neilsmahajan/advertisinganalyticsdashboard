@@ -1,6 +1,16 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { ChevronRight, Play, Search, BarChart3, LineChart, PieChart, LayoutDashboard, Clock, Users } from "lucide-react"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  ChevronRight,
+  Play,
+  Search,
+  BarChart3,
+  LineChart,
+  PieChart,
+  LayoutDashboard,
+  Clock,
+  Users,
+} from "lucide-react";
 
 export default function Home() {
   return (
@@ -14,8 +24,9 @@ export default function Home() {
                 ADVERTISING ANALYTICS DASHBOARD
               </h1>
               <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
-                Manage and analyze all your advertising campaigns in one unified dashboard. Gain insights, track
-                performance, and optimize results effortlessly.
+                Manage and analyze all your advertising campaigns in one unified
+                dashboard. Gain insights, track performance, and optimize
+                results effortlessly.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -40,8 +51,12 @@ export default function Home() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Key Features</h2>
-              <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">Why Use This Tool?</p>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                Key Features
+              </h2>
+              <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
+                Why Use This Tool?
+              </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-8">
               <div className="flex flex-col items-center space-y-2 border p-6 rounded-lg shadow-sm">
@@ -55,19 +70,23 @@ export default function Home() {
                 <LayoutDashboard className="h-12 w-12 text-primary" />
                 <h3 className="text-xl font-bold">Unified Dashboard</h3>
                 <p className="text-gray-500 dark:text-gray-400">
-                  Fetch data from Google, Meta, Microsoft, and more in one interface.
+                  Fetch data from Google, Meta, Microsoft, and more in one
+                  interface.
                 </p>
               </div>
               <div className="flex flex-col items-center space-y-2 border p-6 rounded-lg shadow-sm">
                 <Clock className="h-12 w-12 text-primary" />
                 <h3 className="text-xl font-bold">Real-Time Data</h3>
-                <p className="text-gray-500 dark:text-gray-400">Multi-platform tracking with real-time insights.</p>
+                <p className="text-gray-500 dark:text-gray-400">
+                  Multi-platform tracking with real-time insights.
+                </p>
               </div>
               <div className="flex flex-col items-center space-y-2 border p-6 rounded-lg shadow-sm">
                 <Users className="h-12 w-12 text-primary" />
                 <h3 className="text-xl font-bold">Multiple Accounts</h3>
                 <p className="text-gray-500 dark:text-gray-400">
-                  Save multiple ad accounts and switch between saved metrics seamlessly.
+                  Save multiple ad accounts and switch between saved metrics
+                  seamlessly.
                 </p>
               </div>
             </div>
@@ -80,7 +99,9 @@ export default function Home() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Supported Platforms</h2>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                Supported Platforms
+              </h2>
               <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
                 Seamlessly Track Data And Integrate With:
               </p>
@@ -138,6 +159,5 @@ export default function Home() {
         </div>
       </section>
     </div>
-  )
+  );
 }
-

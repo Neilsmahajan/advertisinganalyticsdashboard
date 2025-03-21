@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { toast } from "@/components/ui/use-toast"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/use-toast";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -15,37 +15,42 @@ export default function ContactPage() {
     email: "",
     phone: "",
     message: "",
-  })
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // In a real application, you would send this data to your backend
-    console.log("Form submitted:", formData)
+    console.log("Form submitted:", formData);
     toast({
       title: "Message Sent",
       description: "We've received your message and will get back to you soon.",
-    })
+    });
     // Reset form
     setFormData({
       name: "",
       email: "",
       phone: "",
       message: "",
-    })
-  }
+    });
+  };
 
   return (
     <div className="container px-4 py-12 md:px-6 md:py-20">
       <div className="mx-auto max-w-2xl space-y-8">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">CONTACT US</h1>
+          <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+            CONTACT US
+          </h1>
           <p className="text-gray-500 dark:text-gray-400 md:text-lg">
-            Have Questions? Contact Us To See How We Can Help Your Business Thrive
+            Have Questions? Contact Us To See How We Can Help Your Business
+            Thrive
           </p>
         </div>
 
@@ -112,6 +117,5 @@ export default function ContactPage() {
         </form>
       </div>
     </div>
-  )
+  );
 }
-

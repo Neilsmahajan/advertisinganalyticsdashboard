@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { BarChart3, Clock, Zap } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { BarChart3, Clock, Zap } from "lucide-react";
 
 export default function AboutPage() {
   return (
@@ -11,9 +11,11 @@ export default function AboutPage() {
             ABOUT ADVERTISING ANALYTICS DASHBOARD
           </h1>
           <p className="text-gray-500 dark:text-gray-400 md:text-lg">
-            At Advertising Analytics Dashboard, our mission is to simplify the way businesses manage and optimize their
-            advertising campaigns. Whether you're a small business owner or part of a large enterprise, we provide the
-            tools you need to track performance, gain insights, and maximize the impact of your marketing strategies.
+            At Advertising Analytics Dashboard, our mission is to simplify the
+            way businesses manage and optimize their advertising campaigns.
+            Whether you're a small business owner or part of a large enterprise,
+            we provide the tools you need to track performance, gain insights,
+            and maximize the impact of your marketing strategies.
           </p>
         </div>
 
@@ -58,9 +60,13 @@ export default function AboutPage() {
 
         <div className="space-y-4">
           <h2 className="text-2xl font-bold">Why Choose Us?</h2>
-          <p className="text-gray-500 dark:text-gray-400">With Advertising Analytics Dashboard, You Can:</p>
+          <p className="text-gray-500 dark:text-gray-400">
+            With Advertising Analytics Dashboard, You Can:
+          </p>
           <ul className="list-disc pl-6 space-y-2 text-gray-500 dark:text-gray-400">
-            <li>Save time by managing all your campaigns from a single interface.</li>
+            <li>
+              Save time by managing all your campaigns from a single interface.
+            </li>
             <li>Gain a competitive edge with actionable insights.</li>
             <li>Focus on growth while we handle the data.</li>
           </ul>
@@ -69,8 +75,9 @@ export default function AboutPage() {
         <div className="space-y-4">
           <h2 className="text-2xl font-bold">Our Vision</h2>
           <p className="text-gray-500 dark:text-gray-400">
-            We Aim To Empower Businesses With Advanced Analytics And Intuitive Tools That Unlock The Full Potential Of
-            Their Advertising Efforts. By Bridging Technology And Marketing, We Help You Reach New Heights.
+            We Aim To Empower Businesses With Advanced Analytics And Intuitive
+            Tools That Unlock The Full Potential Of Their Advertising Efforts.
+            By Bridging Technology And Marketing, We Help You Reach New Heights.
           </p>
         </div>
 
@@ -84,6 +91,5 @@ export default function AboutPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-
