@@ -61,7 +61,7 @@ export default function AboutPage() {
         <div className="space-y-4">
           <h2 className="text-2xl font-bold">Why Choose Us?</h2>
           <p className="text-gray-500 dark:text-gray-400">
-            With Advertising Analytics Dashboard, You Can:
+            With Advertising Analytics Dashboard, you can:
           </p>
           <ul className="list-disc pl-6 space-y-2 text-gray-500 dark:text-gray-400">
             <li>
@@ -75,9 +75,9 @@ export default function AboutPage() {
         <div className="space-y-4">
           <h2 className="text-2xl font-bold">Our Vision</h2>
           <p className="text-gray-500 dark:text-gray-400">
-            We Aim To Empower Businesses With Advanced Analytics And Intuitive
-            Tools That Unlock The Full Potential Of Their Advertising Efforts.
-            By Bridging Technology And Marketing, We Help You Reach New Heights.
+            We aim to empower businesses with advanced analytics and intuitive
+            tools that unlock the full potential of their advertising efforts.
+            By bridging technology and marketing, we help you reach new heights.
           </p>
         </div>
 
@@ -86,7 +86,7 @@ export default function AboutPage() {
             <Link href="/contact">Contact Us</Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href="/services">Explore Services</Link>
+            <Link href="/dashboard">Explore Services</Link>
           </Button>
         </div>
       </div>
