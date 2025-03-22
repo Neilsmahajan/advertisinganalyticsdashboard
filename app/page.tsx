@@ -106,26 +106,36 @@ export default function Home() {
               </p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mt-8">
-              <div className="flex flex-col items-center space-y-2 p-6">
-                <Search className="h-16 w-16 text-primary" />
-                <h3 className="text-lg font-medium">Tracking Data</h3>
-              </div>
-              <div className="flex flex-col items-center space-y-2 p-6">
-                <BarChart3 className="h-16 w-16 text-primary" />
-                <h3 className="text-lg font-medium">Google Analytics</h3>
-              </div>
-              <div className="flex flex-col items-center space-y-2 p-6">
-                <LineChart className="h-16 w-16 text-primary" />
-                <h3 className="text-lg font-medium">Google Ads</h3>
-              </div>
-              <div className="flex flex-col items-center space-y-2 p-6">
-                <PieChart className="h-16 w-16 text-primary" />
-                <h3 className="text-lg font-medium">Meta Ads</h3>
-              </div>
-              <div className="flex flex-col items-center space-y-2 p-6">
-                <BarChart3 className="h-16 w-16 text-primary" />
-                <h3 className="text-lg font-medium">Microsoft Ads</h3>
-              </div>
+              <Link href="/dashboard/tracking-data">
+                <div className="flex flex-col items-center space-y-2 p-6">
+                  <Search className="h-16 w-16 text-primary" />
+                  <h3 className="text-lg font-medium">Tracking Data</h3>
+                </div>
+              </Link>
+              <Link href="/dashboard/google-analytics">
+                <div className="flex flex-col items-center space-y-2 p-6">
+                  <BarChart3 className="h-16 w-16 text-primary" />
+                  <h3 className="text-lg font-medium">Google Analytics</h3>
+                </div>
+              </Link>
+              <Link href="/dashboard/google-ads">
+                <div className="flex flex-col items-center space-y-2 p-6">
+                  <LineChart className="h-16 w-16 text-primary" />
+                  <h3 className="text-lg font-medium">Google Ads</h3>
+                </div>
+              </Link>
+              <Link href="/dashboard/meta-ads">
+                <div className="flex flex-col items-center space-y-2 p-6">
+                  <PieChart className="h-16 w-16 text-primary" />
+                  <h3 className="text-lg font-medium">Meta Ads</h3>
+                </div>
+              </Link>
+              <Link href="/dashboard/microsoft-ads">
+                <div className="flex flex-col items-center space-y-2 p-6">
+                  <BarChart3 className="h-16 w-16 text-primary" />
+                  <h3 className="text-lg font-medium">Microsoft Ads</h3>
+                </div>
+              </Link>
             </div>
           </div>
         </div>
