@@ -129,24 +129,6 @@ export default async function AccountPage() {
                       View
                     </Button>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <div className="flex items-center">
-                      <Megaphone className="h-5 w-5 text-primary mr-2" />
-                      <span>X Ads</span>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      View
-                    </Button>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <div className="flex items-center">
-                      <Mail className="h-5 w-5 text-primary mr-2" />
-                      <span>Mailchimp</span>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      View
-                    </Button>
-                  </div>
                 </TabsContent>
               </Tabs>
             </CardContent>
