@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   if (!process.env.EMAIL_PASSWORD) {
     return NextResponse.json(
       { error: "Email password is not configured." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     console.error("Email send error:", error);
     return NextResponse.json(
       { error: "Failed to send email." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

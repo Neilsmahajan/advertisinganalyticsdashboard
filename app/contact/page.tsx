@@ -15,6 +15,7 @@ export default function ContactPage() {
     phone: "",
     message: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -25,6 +26,7 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     // Send form data to our API route
     try {
       const response = await fetch("/api/contact", {
@@ -37,7 +39,8 @@ export default function ContactPage() {
       }
       toast({
         title: "Message Sent",
-        description: "We've received your message and will get back to you soon.",
+        description:
+          "We've received your message and will get back to you soon.",
       });
       // Reset form
       setFormData({
@@ -52,6 +55,8 @@ export default function ContactPage() {
         title: "Error",
         description: "There was an error sending your message.",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -125,8 +130,8 @@ export default function ContactPage() {
             />
           </div>
 
-          <Button type="submit" className="w-full">
-            Send
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Sending..." : "Send"}
           </Button>
         </form>
       </div>
