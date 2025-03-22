@@ -28,9 +28,9 @@ export default function Navbar() {
               height={40}
               className="rounded-md"
             />
-            <span className="hidden font-bold sm:inline-block">
+            {/* <span className="hidden font-bold sm:inline-block">
               Advertising Analytics Dashboard
-            </span>
+            </span> */}
           </Link>
         </div>
 
