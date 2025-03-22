@@ -102,14 +102,14 @@ export default function DashboardSidebar() {
               {session?.user.image ? (
                 <Image
                   src={session.user.image}
-                  alt={session.user.name}
+                  alt={session.user.name ?? "User"}
                   width={32}
                   height={32}
                   className="rounded-full"
                 />
               ) : (
                 <span className="text-sm font-bold text-muted-foreground">
-                  {session?.user.name[0]}
+                  {session?.user.name?.[0] ?? ""}
                 </span>
               )}
             </div>

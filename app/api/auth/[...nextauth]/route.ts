@@ -1,13 +1,11 @@
 import NextAuth from "next-auth";
+import { DefaultSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 declare module "next-auth" {
   interface Session {
     user: {
-      id: string;
-      name: string;
-      email: string;
-      image: string;
-    };
+      refreshToken?: string;
+    } & DefaultSession["user"];
   }
 }
 
