@@ -8,6 +8,15 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          scope:
+            "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/adwords openid",
+          access_type: "offline",
+          prompt: "consent",
+          response_type: "code",
+        },
+      },
     }),
   ],
   adapter: PrismaAdapter(prisma),
@@ -16,4 +25,23 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   jwt: {},
+  callbacks: {
+    async jwt({ token, account }) {
+      // When signing in, persist the refreshToken if available.
+      if (account) {
+        token.accessToken = account.access_token;
+        if (account.refresh_token) {
+          token.refreshToken = account.refresh_token;
+        }
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // Optionally expose the refresh token on the session if needed.
+      if (session.user) {
+        session.user.refreshToken = token.refreshToken as string;
+      }
+      return session;
+    },
+  },
 };
