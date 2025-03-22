@@ -32,4 +32,3 @@ Thumbs.db
 
 # Prisma
 /prisma/.prisma/client
-/prisma/migrations/
