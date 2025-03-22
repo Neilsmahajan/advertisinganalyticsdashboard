@@ -70,67 +70,53 @@ export default async function AccountPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="tracking">
-                <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-4">
-                  <TabsTrigger value="tracking">Tracking</TabsTrigger>
-                  <TabsTrigger value="google">Google</TabsTrigger>
-                  <TabsTrigger value="meta">Meta</TabsTrigger>
-                  <TabsTrigger value="other">Other</TabsTrigger>
-                </TabsList>
-                <TabsContent value="tracking" className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <div className="flex items-center">
-                      <Search className="h-5 w-5 text-primary mr-2" />
-                      <span>Tracking Data</span>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      View
-                    </Button>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                  <div className="flex items-center">
+                    <Search className="h-5 w-5 text-primary mr-2" />
+                    <span>Tracking Data</span>
                   </div>
-                </TabsContent>
-                <TabsContent value="google" className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <div className="flex items-center">
-                      <BarChart3 className="h-5 w-5 text-primary mr-2" />
-                      <span>Google Analytics</span>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      View
-                    </Button>
+                  <Button variant="ghost" size="sm">
+                    View
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                  <div className="flex items-center">
+                    <BarChart3 className="h-5 w-5 text-primary mr-2" />
+                    <span>Google Analytics</span>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <div className="flex items-center">
-                      <LineChart className="h-5 w-5 text-primary mr-2" />
-                      <span>Google Ads</span>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      View
-                    </Button>
+                  <Button variant="ghost" size="sm">
+                    View
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                  <div className="flex items-center">
+                    <LineChart className="h-5 w-5 text-primary mr-2" />
+                    <span>Google Ads</span>
                   </div>
-                </TabsContent>
-                <TabsContent value="meta" className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <div className="flex items-center">
-                      <PieChart className="h-5 w-5 text-primary mr-2" />
-                      <span>Meta Ads</span>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      View
-                    </Button>
+                  <Button variant="ghost" size="sm">
+                    View
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                  <div className="flex items-center">
+                    <PieChart className="h-5 w-5 text-primary mr-2" />
+                    <span>Meta Ads</span>
                   </div>
-                </TabsContent>
-                <TabsContent value="other" className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <div className="flex items-center">
-                      <BarChart className="h-5 w-5 text-primary mr-2" />
-                      <span>Microsoft Ads</span>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      View
-                    </Button>
+                  <Button variant="ghost" size="sm">
+                    View
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                  <div className="flex items-center">
+                    <BarChart className="h-5 w-5 text-primary mr-2" />
+                    <span>Microsoft Ads</span>
                   </div>
-                </TabsContent>
-              </Tabs>
+                  <Button variant="ghost" size="sm">
+                    View
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
