@@ -95,31 +95,33 @@ export default function DashboardSidebar() {
           ))}
         </nav>
       </div>
-      <div className="mt-auto border-t p-4">
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-            {session?.user.image ? (
-              <Image
-                src={session.user.image}
-                alt={session.user.name}
-                width={32}
-                height={32}
-                className="rounded-full"
-              />
-            ) : (
-              <span className="text-sm font-bold text-muted-foreground">
-                {session?.user.name[0]}
-              </span>
-            )}
-          </div>
-          <div>
-            <p className="text-xs font-medium">{session?.user.name}</p>
-            <p className="text-xs text-muted-foreground">
-              {session?.user.email}
-            </p>
+      <Link href="/account" onClick={() => setIsMobileOpen(false)}>
+        <div className="mt-auto border-t p-4">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+              {session?.user.image ? (
+                <Image
+                  src={session.user.image}
+                  alt={session.user.name}
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                />
+              ) : (
+                <span className="text-sm font-bold text-muted-foreground">
+                  {session?.user.name[0]}
+                </span>
+              )}
+            </div>
+            <div>
+              <p className="text-xs font-medium">{session?.user.name}</p>
+              <p className="text-xs text-muted-foreground">
+                {session?.user.email}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      </Link>
     </div>
   );
 
