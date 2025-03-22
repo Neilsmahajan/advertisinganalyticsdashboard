@@ -61,7 +61,7 @@ export default function DashboardSidebar() {
       <div className="flex h-14 items-center border-b px-4">
         <Link href="/" className="flex items-center gap-2">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/cropped-advertising-analytics-dashboard-logo-Yg1JRKxaA3ZMzwMaRVYnv8HDKk2Vcb.png"
+            src="/cropped-advertising-analytics-dashboard-logo.png"
             alt="Advertising Analytics Dashboard Logo"
             width={32}
             height={32}
@@ -141,7 +141,7 @@ export default function DashboardSidebar() {
         <div className="ml-4">
           <Link href="/" className="flex items-center gap-2">
             <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/cropped-advertising-analytics-dashboard-logo-Yg1JRKxaA3ZMzwMaRVYnv8HDKk2Vcb.png"
+              src="/cropped-advertising-analytics-dashboard-logo.png"
               alt="Advertising Analytics Dashboard Logo"
               width={24}
               height={24}

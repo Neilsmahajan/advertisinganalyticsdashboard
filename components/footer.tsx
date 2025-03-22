@@ -10,7 +10,7 @@ export default function Footer() {
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2">
               <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/cropped-advertising-analytics-dashboard-logo-Yg1JRKxaA3ZMzwMaRVYnv8HDKk2Vcb.png"
+                src="/cropped-advertising-analytics-dashboard-logo.png"
                 alt="Advertising Analytics Dashboard Logo"
                 width={40}
                 height={40}
