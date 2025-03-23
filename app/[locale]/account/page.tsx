@@ -6,24 +6,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Search,
-  BarChart3,
-  LineChart,
-  PieChart,
-  BarChart,
-  Megaphone,
-  Mail,
-} from "lucide-react";
+import { Search, BarChart3, LineChart, PieChart, BarChart } from "lucide-react";
 import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
+import { redirect } from "@/i18n/navigation";
+import { getLocale } from "next-intl/server";
 import SignOutButton from "./SignOutButton";
 
 export default async function AccountPage() {
   const session = await getServerSession();
   if (!session) {
-    return redirect("api/auth/signin");
+    return redirect({ href: "api/auth/signin", locale: await getLocale() });
   }
   return (
     <div className="container px-4 py-12 md:px-6 md:py-20">

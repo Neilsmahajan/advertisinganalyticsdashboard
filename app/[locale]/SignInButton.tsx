@@ -3,10 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { useSession, signIn } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { redirect } from "@/i18n/navigation";
+import { useLocale } from "next-intl";
 
 export default function SignOutButton() {
   const { data: session, status } = useSession();
+  const locale = useLocale();
   console.log(session, status);
   if (status === "loading") return null;
   if (status === "authenticated") {
@@ -14,7 +16,9 @@ export default function SignOutButton() {
       <Button
         variant="secondary"
         size="lg"
-        onClick={() => redirect("/account")}
+        onClick={() => {
+          redirect({ href: "/account", locale });
+        }}
       >
         <Search className="mr-2 h-4 w-4" /> View your Queries
       </Button>

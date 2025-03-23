@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useSession, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { LogOut } from "lucide-react";
 
 export default function SignOutButton() {

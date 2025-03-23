@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { BarChart3, Clock, Zap } from "lucide-react";
 
 export default function AboutPage() {

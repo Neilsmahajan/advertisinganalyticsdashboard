@@ -21,7 +21,7 @@ export default async function DashboardPage() {
   const session = await getServerSession();
   console.log(session);
   if (!session) {
-    return redirect("../api/auth/signin");
+    return redirect("/api/auth/signin");
   }
   return (
     <div className="space-y-8">
