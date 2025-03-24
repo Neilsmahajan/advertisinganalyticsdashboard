@@ -1,7 +1,26 @@
 {
   "Home": {
     "advertisingAnalyticsDashboard": "ADVERTISING ANALYTICS DASHBOARD",
-    "manageAndAnalyze": "Manage and analyze all your advertising campaigns in one unified dashboard. Gain insights, track performance, and optimize results effortlessly."
+    "manageAndAnalyze": "Manage and analyze all your advertising campaigns in one unified dashboard. Gain insights, track performance, and optimize results effortlessly.",
+    "exploreServices": "Explore Services",
+    "watchVideo": "Watch Video",
+    "keyFeatures": "Key Features",
+    "whyUseThisTool": "Why Use This Tool?",
+    "trackingDataTitle": "Tracking Data",
+    "trackingDataDescription": "Find all analytics tags and tracking services on any website.",
+    "unifiedDashboardTitle": "Unified Dashboard",
+    "unifiedDashboardDescription": "Fetch data from Google, Meta, Microsoft, and more in one interface.",
+    "realTimeDataTitle": "Real-Time Data",
+    "realTimeDataDescription": "Multi-platform tracking with real-time insights.",
+    "multipleAccountsTitle": "Multiple Accounts",
+    "multipleAccountsDescription": "Save multiple ad accounts and switch between saved metrics seamlessly.",
+    "supportedPlatformsTitle": "Supported Platforms",
+    "supportedPlatformsDescription": "Seamlessly Track Data And Integrate With:",
+    "googleAnalyticsTitle": "Google Analytics",
+    "googleAdsTitle": "Google Ads",
+    "metaAdsTitle": "Meta Ads",
+    "microsoftAdsTitle": "Microsoft Ads",
+    "ctaTitle": "Ready To Transform Your Advertising Strategy?"
   },
   "Navbar": {
     "language": "Language"
