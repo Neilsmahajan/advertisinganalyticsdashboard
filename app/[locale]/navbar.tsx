@@ -29,7 +29,7 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/cropped-advertising-analytics-dashboard-logo.png"
-              alt="Advertising Analytics Dashboard Logo"
+              alt={t("logoAlt")}
               width={40}
               height={40}
               className="rounded-md"
@@ -46,7 +46,7 @@ export default function Navbar() {
             href="/"
             className="text-sm font-medium transition-colors hover:text-primary"
           >
-            Home
+            {t("home")}
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -54,24 +54,26 @@ export default function Navbar() {
                 variant="link"
                 className="text-sm font-medium transition-colors hover:text-primary p-0"
               >
-                Services <ChevronDown className="h-4 w-4 ml-1" />
+                {t("services")} <ChevronDown className="h-4 w-4 ml-1" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>
-                <Link href="/dashboard/tracking-data">Tracking Data</Link>
+                <Link href="/dashboard/tracking-data">{t("trackingData")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/dashboard/google-analytics">Google Analytics</Link>
+                <Link href="/dashboard/google-analytics">
+                  {t("googleAnalytics")}
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/dashboard/google-ads">Google Ads</Link>
+                <Link href="/dashboard/google-ads">{t("googleAds")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/dashboard/meta-ads">Meta Ads</Link>
+                <Link href="/dashboard/meta-ads">{t("metaAds")}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/dashboard/microsoft-ads">Microsoft Ads</Link>
+                <Link href="/dashboard/microsoft-ads">{t("microsoftAds")}</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -79,19 +81,19 @@ export default function Navbar() {
             href="/about"
             className="text-sm font-medium transition-colors hover:text-primary"
           >
-            About
+            {t("about")}
           </Link>
           <Link
             href="/privacy"
             className="text-sm font-medium transition-colors hover:text-primary"
           >
-            Privacy
+            {t("privacy")}
           </Link>
           <Link
             href="/contact"
             className="text-sm font-medium transition-colors hover:text-primary"
           >
-            Contact
+            {t("contact")}
           </Link>
           {/* New Language Dropdown */}
           <DropdownMenu>
@@ -123,11 +125,11 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <Link href="/account">
             <Button variant="ghost" size="sm" className="hidden md:flex">
-              My Account
+              {t("myAccount")}
             </Button>
           </Link>
           <Link href="/dashboard">
-            <Button size="sm">Dashboard</Button>
+            <Button size="sm">{t("dashboard")}</Button>
           </Link>
 
           {/* Mobile Menu */}
@@ -135,7 +137,7 @@ export default function Navbar() {
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle menu</span>
+                <span className="sr-only">{t("toggleMenu")}</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
@@ -145,45 +147,45 @@ export default function Navbar() {
                   className="text-lg font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Home
+                  {t("home")}
                 </Link>
                 <div className="space-y-3">
-                  <p className="text-lg font-medium">Services</p>
+                  <p className="text-lg font-medium">{t("services")}</p>
                   <div className="flex flex-col gap-2 pl-4">
                     <Link
                       href="/dashboard/tracking-data"
                       className="text-sm"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Tracking Data
+                      {t("trackingData")}
                     </Link>
                     <Link
                       href="/dashboard/google-analytics"
                       className="text-sm"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Google Analytics
+                      {t("googleAnalytics")}
                     </Link>
                     <Link
                       href="/dashboard/google-ads"
                       className="text-sm"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Google Ads
+                      {t("googleAds")}
                     </Link>
                     <Link
                       href="/dashboard/meta-ads"
                       className="text-sm"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Meta Ads
+                      {t("metaAds")}
                     </Link>
                     <Link
                       href="/dashboard/microsoft-ads"
                       className="text-sm"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Microsoft Ads
+                      {t("microsoftAds")}
                     </Link>
                   </div>
                 </div>
@@ -192,39 +194,39 @@ export default function Navbar() {
                   className="text-lg font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  About
+                  {t("about")}
                 </Link>
                 <Link
                   href="/privacy"
                   className="text-lg font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Privacy
+                  {t("privacy")}
                 </Link>
                 <Link
                   href="/contact"
                   className="text-lg font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Contact
+                  {t("contact")}
                 </Link>
                 <Link
                   href="/account"
                   className="text-lg font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  My Account
+                  {t("myAccount")}
                 </Link>
                 <Link
                   href="/dashboard"
                   className="text-lg font-medium"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Dashboard
+                  {t("dashboard")}
                 </Link>
                 {/* New Mobile Language Section */}
                 <div className="space-y-3">
-                  <p className="text-lg font-medium">Language</p>
+                  <p className="text-lg font-medium">{t("language")}</p>
                   <div className="flex flex-col gap-2 pl-4">
                     {languages.map((lang, index) => (
                       <button

@@ -23,6 +23,20 @@
     "ctaTitle": "Ready To Transform Your Advertising Strategy?"
   },
   "Navbar": {
-    "language": "Language"
+    "language": "Language",
+    "logoAlt": "Advertising Analytics Dashboard Logo",
+    "home": "Home",
+    "services": "Services",
+    "trackingData": "Tracking Data",
+    "googleAnalytics": "Google Analytics",
+    "googleAds": "Google Ads",
+    "metaAds": "Meta Ads",
+    "microsoftAds": "Microsoft Ads",
+    "about": "About",
+    "privacy": "Privacy",
+    "contact": "Contact",
+    "myAccount": "My Account",
+    "dashboard": "Dashboard",
+    "toggleMenu": "Toggle menu"
   }
 }
