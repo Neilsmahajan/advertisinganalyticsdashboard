@@ -1,66 +1,69 @@
-export default function TermsPage() {
+import { getTranslations } from "next-intl/server";
+
+export default async function TermsPage() {
+  const t = await getTranslations("Terms");
   return (
     <div className="container px-4 py-12 md:px-6 md:py-20">
       <div className="mx-auto max-w-3xl space-y-8">
+        {/* Page header */}
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-            TERMS OF SERVICE
+            {t("pageTitle")}
           </h1>
           <p className="text-gray-500 dark:text-gray-400 md:text-lg">
-            Welcome to our Advertising Analytics Dashboard. Please review these
-            Terms of Service carefully before using our platform.
+            {t("introText")}
           </p>
         </div>
 
+        {/* Acceptance of Terms */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold">Acceptance of Terms</h2>
+          <h2 className="text-2xl font-bold">{t("acceptanceTitle")}</h2>
           <p className="text-gray-500 dark:text-gray-400">
-            By accessing and using our services, you agree to be bound by these
-            terms. If you do not agree, please refrain from using our platform.
+            {t("acceptanceDescription")}
           </p>
         </div>
 
+        {/* User Responsibilities */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold">User Responsibilities</h2>
+          <h2 className="text-2xl font-bold">
+            {t("userResponsibilitiesTitle")}
+          </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            You are responsible for maintaining the confidentiality of your
-            account information and for all activities that occur under your
-            account.
+            {t("userResponsibilitiesDescription")}
           </p>
         </div>
 
+        {/* Modifications to the Service */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold">Modifications to the Service</h2>
+          <h2 className="text-2xl font-bold">{t("modificationsTitle")}</h2>
           <p className="text-gray-500 dark:text-gray-400">
-            We reserve the right to modify or discontinue the service at any
-            time without prior notice.
+            {t("modificationsDescription")}
           </p>
         </div>
 
+        {/* Limitation of Liability */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold">Limitation of Liability</h2>
+          <h2 className="text-2xl font-bold">{t("limitationTitle")}</h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Our dashboard is provided on an "as is" basis. We are not liable for
-            any direct, indirect, incidental, or consequential damages arising
-            from the use of our services.
+            {t("limitationDescription")}
           </p>
         </div>
 
+        {/* Changes to These Terms */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold">Changes to These Terms</h2>
+          <h2 className="text-2xl font-bold">{t("changesTitle")}</h2>
           <p className="text-gray-500 dark:text-gray-400">
-            We may update these Terms of Service periodically. Continued use of
-            the service constitutes acceptance of the updated terms.
+            {t("changesDescription")}
           </p>
         </div>
 
+        {/* Contact Us */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold">Contact Us</h2>
+          <h2 className="text-2xl font-bold">{t("contactTitle")}</h2>
           <p className="text-gray-500 dark:text-gray-400">
-            If you have any questions about these Terms of Service, please
+            {t("contactDescription")}{" "}
             <a href="/contact" className="text-primary hover:underline">
-              {" "}
-              contact us
+              {t("contactLinkText")}
             </a>
             .
           </p>

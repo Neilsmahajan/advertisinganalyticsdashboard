@@ -125,5 +125,22 @@
     "sectionContactTitle": "Contact Us",
     "contactDescription": "If you have any questions about this Privacy Policy, please",
     "contactLinkText": "contact us"
+  },
+  "Terms": {
+    "pageTitle": "TERMS OF SERVICE",
+    "introText": "Welcome to our Advertising Analytics Dashboard. Please review these Terms of Service carefully before using our platform.",
+    "acceptanceTitle": "Acceptance of Terms",
+    "acceptanceDescription": "By accessing and using our services, you agree to be bound by these terms. If you do not agree, please refrain from using our platform.",
+    "userResponsibilitiesTitle": "User Responsibilities",
+    "userResponsibilitiesDescription": "You are responsible for maintaining the confidentiality of your account information and for all activities that occur under your account.",
+    "modificationsTitle": "Modifications to the Service",
+    "modificationsDescription": "We reserve the right to modify or discontinue the service at any time without prior notice.",
+    "limitationTitle": "Limitation of Liability",
+    "limitationDescription": "Our dashboard is provided on an 'as is' basis. We are not liable for any direct, indirect, incidental, or consequential damages arising from the use of our services.",
+    "changesTitle": "Changes to These Terms",
+    "changesDescription": "We may update these Terms of Service periodically. Continued use of the service constitutes acceptance of the updated terms.",
+    "contactTitle": "Contact Us",
+    "contactDescription": "If you have any questions about these Terms of Service, please",
+    "contactLinkText": "contact us"
   }
 }
