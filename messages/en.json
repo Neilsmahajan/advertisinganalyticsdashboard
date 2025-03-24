@@ -59,5 +59,9 @@
     "instagram": "Instagram",
     "linkedin": "LinkedIn",
     "rightsReserved": "© {year} Advertising Analytics Dashboard. All rights reserved."
+  },
+  "SignInButton": {
+    "viewYourQueries": "View your Queries",
+    "signIn": "Sign In"
   }
 }

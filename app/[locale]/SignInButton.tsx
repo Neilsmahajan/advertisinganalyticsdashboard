@@ -5,8 +5,10 @@ import { Search } from "lucide-react";
 import { useSession, signIn } from "next-auth/react";
 import { redirect } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 
 export default function SignOutButton() {
+  const t = useTranslations("SignInButton");
   const { data: session, status } = useSession();
   const locale = useLocale();
   console.log(session, status);
@@ -20,13 +22,13 @@ export default function SignOutButton() {
           redirect({ href: "/account", locale });
         }}
       >
-        <Search className="mr-2 h-4 w-4" /> View your Queries
+        <Search className="mr-2 h-4 w-4" /> {t("viewYourQueries")}
       </Button>
     );
   }
   return (
     <Button onClick={() => signIn()} variant="secondary" size="lg">
-      Sign In
+      {t("signIn")}
     </Button>
   );
 }
