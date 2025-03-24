@@ -38,5 +38,26 @@
     "myAccount": "My Account",
     "dashboard": "Dashboard",
     "toggleMenu": "Toggle menu"
+  },
+  "Footer": {
+    "logoAlt": "Advertising Analytics Dashboard Logo",
+    "companyName": "Advertising Analytics Dashboard",
+    "tagline": "Manage and analyze all your advertising campaigns in one unified dashboard.",
+    "servicesHeader": "Services",
+    "trackingData": "Tracking Data",
+    "googleAnalytics": "Google Analytics",
+    "googleAds": "Google Ads",
+    "metaAds": "Meta Ads",
+    "microsoftAds": "Microsoft Ads",
+    "companyHeader": "Company",
+    "about": "About",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "contact": "Contact",
+    "socialsHeader": "Socials",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "linkedin": "LinkedIn",
+    "rightsReserved": "© {year} Advertising Analytics Dashboard. All rights reserved."
   }
 }

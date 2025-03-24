@@ -1,8 +1,10 @@
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { Facebook, Instagram, Linkedin } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function Footer() {
+  const t = useTranslations("Footer");
   return (
     <footer className="bg-muted/40 border-t">
       <div className="container px-4 py-12 md:px-6 md:py-16">
@@ -11,50 +13,47 @@ export default function Footer() {
             <Link href="/" className="flex items-center gap-2">
               <Image
                 src="/cropped-advertising-analytics-dashboard-logo.png"
-                alt="Advertising Analytics Dashboard Logo"
+                alt={t("logoAlt")}
                 width={40}
                 height={40}
                 className="rounded-md"
               />
-              <span className="font-bold">Advertising Analytics Dashboard</span>
+              <span className="font-bold">{t("companyName")}</span>
             </Link>
-            <p className="text-sm text-muted-foreground">
-              Manage and analyze all your advertising campaigns in one unified
-              dashboard.
-            </p>
+            <p className="text-sm text-muted-foreground">{t("tagline")}</p>
             <div className="flex gap-4">
               <Link
                 href="https://www.facebook.com/advertisinganalyticsdashboard/"
                 className="text-muted-foreground hover:text-primary"
               >
                 <Facebook className="h-5 w-5" />
-                <span className="sr-only">Facebook</span>
+                <span className="sr-only">{t("facebook")}</span>
               </Link>
               <Link
                 href="https://www.instagram.com/advertisinganalyticsdashboard/"
                 className="text-muted-foreground hover:text-primary"
               >
                 <Instagram className="h-5 w-5" />
-                <span className="sr-only">Instagram</span>
+                <span className="sr-only">{t("instagram")}</span>
               </Link>
               <Link
                 href="https://www.linkedin.com/company/advertisinganalyticsdashboard/"
                 className="text-muted-foreground hover:text-primary"
               >
                 <Linkedin className="h-5 w-5" />
-                <span className="sr-only">LinkedIn</span>
+                <span className="sr-only">{t("linkedin")}</span>
               </Link>
             </div>
           </div>
           <div>
-            <h3 className="mb-4 text-sm font-medium">Services</h3>
+            <h3 className="mb-4 text-sm font-medium">{t("servicesHeader")}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/dashboard/tracking-data"
                   className="text-muted-foreground hover:text-primary"
                 >
-                  Tracking Data
+                  {t("trackingData")}
                 </Link>
               </li>
               <li>
@@ -62,7 +61,7 @@ export default function Footer() {
                   href="/dashboard/google-analytics"
                   className="text-muted-foreground hover:text-primary"
                 >
-                  Google Analytics
+                  {t("googleAnalytics")}
                 </Link>
               </li>
               <li>
@@ -70,7 +69,7 @@ export default function Footer() {
                   href="/dashboard/google-ads"
                   className="text-muted-foreground hover:text-primary"
                 >
-                  Google Ads
+                  {t("googleAds")}
                 </Link>
               </li>
               <li>
@@ -78,7 +77,7 @@ export default function Footer() {
                   href="/dashboard/meta-ads"
                   className="text-muted-foreground hover:text-primary"
                 >
-                  Meta Ads
+                  {t("metaAds")}
                 </Link>
               </li>
               <li>
@@ -86,20 +85,20 @@ export default function Footer() {
                   href="/dashboard/microsoft-ads"
                   className="text-muted-foreground hover:text-primary"
                 >
-                  Microsoft Ads
+                  {t("microsoftAds")}
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <h3 className="mb-4 text-sm font-medium">Company</h3>
+            <h3 className="mb-4 text-sm font-medium">{t("companyHeader")}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/about"
                   className="text-muted-foreground hover:text-primary"
                 >
-                  About
+                  {t("about")}
                 </Link>
               </li>
               <li>
@@ -107,7 +106,7 @@ export default function Footer() {
                   href="/privacy"
                   className="text-muted-foreground hover:text-primary"
                 >
-                  Privacy Policy
+                  {t("privacyPolicy")}
                 </Link>
               </li>
               <li>
@@ -115,7 +114,7 @@ export default function Footer() {
                   href="/terms"
                   className="text-muted-foreground hover:text-primary"
                 >
-                  Terms of Service
+                  {t("termsOfService")}
                 </Link>
               </li>
               <li>
@@ -123,13 +122,13 @@ export default function Footer() {
                   href="/contact"
                   className="text-muted-foreground hover:text-primary"
                 >
-                  Contact
+                  {t("contact")}
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <h3 className="mb-4 text-sm font-medium">Socials</h3>
+            <h3 className="mb-4 text-sm font-medium">{t("socialsHeader")}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
@@ -139,8 +138,8 @@ export default function Footer() {
                   rel="noopener noreferrer"
                 >
                   <Facebook className="h-5 w-5" />
-                  <span className="sr-only">Facebook</span>
-                  Facebook
+                  <span className="sr-only">{t("facebook")}</span>
+                  {t("facebook")}
                 </Link>
               </li>
               <li>
@@ -151,8 +150,8 @@ export default function Footer() {
                   rel="noopener noreferrer"
                 >
                   <Instagram className="h-5 w-5" />
-                  <span className="sr-only">Instagram</span>
-                  Instagram
+                  <span className="sr-only">{t("instagram")}</span>
+                  {t("instagram")}
                 </Link>
               </li>
               <li>
@@ -163,18 +162,15 @@ export default function Footer() {
                   rel="noopener noreferrer"
                 >
                   <Linkedin className="h-5 w-5" />
-                  <span className="sr-only">LinkedIn</span>
-                  LinkedIn
+                  <span className="sr-only">{t("linkedin")}</span>
+                  {t("linkedin")}
                 </Link>
               </li>
             </ul>
           </div>
         </div>
         <div className="mt-12 border-t pt-8 text-center text-sm text-muted-foreground">
-          <p>
-            © {new Date().getFullYear()} Advertising Analytics Dashboard. All
-            rights reserved.
-          </p>
+          <p>{t("rightsReserved", { year: new Date().getFullYear() })}</p>
         </div>
       </div>
     </footer>
