@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import DashboardSidebar from "@/components/dashboard-sidebar";
+import DashboardSidebar from "@/app/[locale]/dashboard/dashboard-sidebar";
 import { redirect } from "next/navigation";
 
 // This is a mock authentication check
