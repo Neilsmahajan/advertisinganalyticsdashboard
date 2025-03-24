@@ -32,3 +32,6 @@ Thumbs.db
 
 # Prisma
 /prisma/.prisma/client
+
+# Visual Studio Code
+.vscode/*
