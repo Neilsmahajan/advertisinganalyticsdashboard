@@ -33,7 +33,8 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button asChild size="lg">
                 <Link href="/dashboard">
-                  {t("exploreServices")} <ChevronRight className="ml-2 h-4 w-4" />
+                  {t("exploreServices")}{" "}
+                  <ChevronRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button variant="outline" size="lg">
@@ -67,7 +68,9 @@ export default function Home() {
               </div>
               <div className="flex flex-col items-center space-y-2 border p-6 rounded-lg shadow-sm">
                 <LayoutDashboard className="h-12 w-12 text-primary" />
-                <h3 className="text-xl font-bold">{t("unifiedDashboardTitle")}</h3>
+                <h3 className="text-xl font-bold">
+                  {t("unifiedDashboardTitle")}
+                </h3>
                 <p className="text-gray-500 dark:text-gray-400">
                   {t("unifiedDashboardDescription")}
                 </p>
@@ -81,7 +84,9 @@ export default function Home() {
               </div>
               <div className="flex flex-col items-center space-y-2 border p-6 rounded-lg shadow-sm">
                 <Users className="h-12 w-12 text-primary" />
-                <h3 className="text-xl font-bold">{t("multipleAccountsTitle")}</h3>
+                <h3 className="text-xl font-bold">
+                  {t("multipleAccountsTitle")}
+                </h3>
                 <p className="text-gray-500 dark:text-gray-400">
                   {t("multipleAccountsDescription")}
                 </p>
@@ -107,13 +112,17 @@ export default function Home() {
               <Link href="/dashboard/tracking-data">
                 <div className="flex flex-col items-center space-y-2 p-6">
                   <Search className="h-16 w-16 text-primary" />
-                  <h3 className="text-lg font-medium">{t("trackingDataTitle")}</h3>
+                  <h3 className="text-lg font-medium">
+                    {t("trackingDataTitle")}
+                  </h3>
                 </div>
               </Link>
               <Link href="/dashboard/google-analytics">
                 <div className="flex flex-col items-center space-y-2 p-6">
                   <BarChart3 className="h-16 w-16 text-primary" />
-                  <h3 className="text-lg font-medium">{t("googleAnalyticsTitle")}</h3>
+                  <h3 className="text-lg font-medium">
+                    {t("googleAnalyticsTitle")}
+                  </h3>
                 </div>
               </Link>
               <Link href="/dashboard/google-ads">
@@ -131,7 +140,9 @@ export default function Home() {
               <Link href="/dashboard/microsoft-ads">
                 <div className="flex flex-col items-center space-y-2 p-6">
                   <BarChart3 className="h-16 w-16 text-primary" />
-                  <h3 className="text-lg font-medium">{t("microsoftAdsTitle")}</h3>
+                  <h3 className="text-lg font-medium">
+                    {t("microsoftAdsTitle")}
+                  </h3>
                 </div>
               </Link>
             </div>
@@ -151,7 +162,8 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button asChild size="lg" variant="secondary">
                 <Link href="/dashboard">
-                  {t("exploreServices")} <ChevronRight className="ml-2 h-4 w-4" />
+                  {t("exploreServices")}{" "}
+                  <ChevronRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <SignInButton />
