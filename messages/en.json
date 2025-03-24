@@ -63,5 +63,21 @@
   "SignInButton": {
     "viewYourQueries": "View your Queries",
     "signIn": "Sign In"
+  },
+  "Account": {
+    "myAccount": "MY ACCOUNT",
+    "welcome": "Welcome, {name}!",
+    "accountInfoDescription": "Manage your profile information and saved queries here.",
+    "profileInformation": "Profile Information",
+    "labelName": "Name:",
+    "labelEmail": "Email:",
+    "savedQueries": "Saved Queries",
+    "savedQueriesDescription": "Access your saved queries for different services",
+    "trackingData": "Tracking Data",
+    "googleAnalytics": "Google Analytics",
+    "googleAds": "Google Ads",
+    "metaAds": "Meta Ads",
+    "microsoftAds": "Microsoft Ads",
+    "viewQuery": "View"
   }
 }
