@@ -97,5 +97,33 @@
     "successDescription": "We've received your message and will get back to you soon.",
     "errorTitle": "Error",
     "errorDescription": "There was an error sending your message."
+  },
+  "Privacy": {
+    "pageTitle": "PRIVACY POLICY",
+    "introText": "Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your personal information when you use our services.",
+    "sectionInformationTitle": "Information We Collect",
+    "informationPersonalInfo": "Personal Information: When you create an account, we collect details such as your name, email address, and any other data you provide during registration.",
+    "informationUsageData": "Usage Data: We track how you interact with our website, including the services you use, the pages you visit, and your preferences, to enhance your experience.",
+    "informationAdPlatformData": "Ad Platform Data: If you connect your ad accounts, we access campaign performance metrics, but we never modify or interact with your ad campaigns.",
+    "sectionUseInfoTitle": "How We Use Your Information",
+    "useInfoDescription": "We use your information to:",
+    "useInfoItem1": "Provide access to our platform and its features.",
+    "useInfoItem2": "Improve and personalize your experience.",
+    "useInfoItem3": "Communicate updates, promotional offers, and support-related information.",
+    "useInfoItem4": "Maintain the security and integrity of your data.",
+    "sectionDataProtectionTitle": "Data Protection",
+    "dataProtectionDescription": "We implement industry-standard security measures to safeguard your personal information and ad platform data. Your data is encrypted and stored securely, and we regularly update our systems to address emerging security risks.",
+    "sectionSharingTitle": "Sharing Your Information",
+    "sharingDescription": "We do not sell, trade, or rent your personal information to third parties. We may share your data with trusted third-party services only when necessary for operation, and these parties are required to maintain the confidentiality of your information.",
+    "sectionYourRightsTitle": "Your Rights",
+    "yourRightsDescription": "You have the right to:",
+    "rightItem1": "Access and update your personal information.",
+    "rightItem2": "Delete your account and associated data.",
+    "rightItem3": "Opt-out of marketing communications by updating your preferences.",
+    "sectionChangesTitle": "Changes To This Policy",
+    "changesDescription": "We may update this Privacy Policy periodically. Any changes will be posted on this page with an updated revision date.",
+    "sectionContactTitle": "Contact Us",
+    "contactDescription": "If you have any questions about this Privacy Policy, please",
+    "contactLinkText": "contact us"
   }
 }
