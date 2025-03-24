@@ -2,5 +2,8 @@
   "Home": {
     "advertisingAnalyticsDashboard": "ADVERTISING ANALYTICS DASHBOARD",
     "manageAndAnalyze": "Gérez et analysez toutes vos campagnes publicitaires dans un tableau de bord unifié. Obtenez de l'information, faites le suivi du rendement et optimisez les résultats sans effort."
+  },
+  "Navbar": {
+    "language": "Langue"
   }
 }

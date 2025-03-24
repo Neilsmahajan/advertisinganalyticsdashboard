@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -12,9 +13,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useTranslations } from "next-intl";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { locale } = useParams(); // retrieve current locale from URL
+  const t = useTranslations("Navbar");
+  const languages = ["English", "Français"];
+  const currentLangLabel = locale === "fr" ? "FR" : "EN";
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -87,6 +93,31 @@ export default function Navbar() {
           >
             Contact
           </Link>
+          {/* New Language Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center gap-1">
+                {t("language")} <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {languages.map((lang, index) => (
+                <DropdownMenuItem
+                  key={lang}
+                  onClick={() => {
+                    const pathWithoutLocale = window.location.pathname.replace(
+                      /^\/[a-z]{2}/,
+                      "",
+                    );
+                    const newLocale = index === 0 ? "en" : "fr";
+                    window.location.href = `/${newLocale}${pathWithoutLocale}`;
+                  }}
+                >
+                  {lang}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -191,6 +222,26 @@ export default function Navbar() {
                 >
                   Dashboard
                 </Link>
+                {/* New Mobile Language Section */}
+                <div className="space-y-3">
+                  <p className="text-lg font-medium">Language</p>
+                  <div className="flex flex-col gap-2 pl-4">
+                    {languages.map((lang, index) => (
+                      <button
+                        key={lang}
+                        className="text-sm text-left"
+                        onClick={() => {
+                          const pathWithoutLocale =
+                            window.location.pathname.replace(/^\/[a-z]{2}/, "");
+                          const newLocale = index === 0 ? "en" : "fr";
+                          window.location.href = `/${newLocale}${pathWithoutLocale}`;
+                        }}
+                      >
+                        {lang}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </SheetContent>
           </Sheet>
