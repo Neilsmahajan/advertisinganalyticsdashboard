@@ -79,5 +79,23 @@
     "metaAds": "Meta Ads",
     "microsoftAds": "Microsoft Ads",
     "viewQuery": "View"
+  },
+  "Contact": {
+    "pageTitle": "CONTACT US",
+    "introText": "Have questions? Contact us to see how we can help your business thrive.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Enter name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter email",
+    "phoneLabel": "Phone",
+    "phonePlaceholder": "Enter phone",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Enter message",
+    "sending": "Sending...",
+    "send": "Send",
+    "successTitle": "Message Sent",
+    "successDescription": "We've received your message and will get back to you soon.",
+    "errorTitle": "Error",
+    "errorDescription": "There was an error sending your message."
   }
 }

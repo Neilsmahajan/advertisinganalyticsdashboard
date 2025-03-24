@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
+import { useTranslations } from "next-intl";
 
 export default function ContactPage() {
+  const t = useTranslations("Contact");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -38,9 +40,8 @@ export default function ContactPage() {
         throw new Error("Failed to send message");
       }
       toast({
-        title: "Message Sent",
-        description:
-          "We've received your message and will get back to you soon.",
+        title: t("successTitle"),
+        description: t("successDescription"),
       });
       // Reset form
       setFormData({
@@ -52,8 +53,8 @@ export default function ContactPage() {
     } catch (error) {
       console.error(error);
       toast({
-        title: "Error",
-        description: "There was an error sending your message.",
+        title: t("errorTitle"),
+        description: t("errorDescription"),
       });
     } finally {
       setIsLoading(false);
@@ -65,23 +66,22 @@ export default function ContactPage() {
       <div className="mx-auto max-w-2xl space-y-8">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-            CONTACT US
+            {t("pageTitle")}
           </h1>
           <p className="text-gray-500 dark:text-gray-400 md:text-lg">
-            Have Questions? Contact Us To See How We Can Help Your Business
-            Thrive
+            {t("introText")}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="name">
-              Name <span className="text-red-500">*</span>
+              {t("nameLabel")} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="name"
               name="name"
-              placeholder="Enter name"
+              placeholder={t("namePlaceholder")}
               required
               value={formData.name}
               onChange={handleChange}
@@ -90,13 +90,13 @@ export default function ContactPage() {
 
           <div className="space-y-2">
             <Label htmlFor="email">
-              Email <span className="text-red-500">*</span>
+              {t("emailLabel")} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="email"
               name="email"
               type="email"
-              placeholder="Enter email"
+              placeholder={t("emailPlaceholder")}
               required
               value={formData.email}
               onChange={handleChange}
@@ -104,12 +104,12 @@ export default function ContactPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
+            <Label htmlFor="phone">{t("phoneLabel")}</Label>
             <Input
               id="phone"
               name="phone"
               type="tel"
-              placeholder="Enter phone"
+              placeholder={t("phonePlaceholder")}
               value={formData.phone}
               onChange={handleChange}
             />
@@ -117,12 +117,12 @@ export default function ContactPage() {
 
           <div className="space-y-2">
             <Label htmlFor="message">
-              Message <span className="text-red-500">*</span>
+              {t("messageLabel")} <span className="text-red-500">*</span>
             </Label>
             <Textarea
               id="message"
               name="message"
-              placeholder="Enter message"
+              placeholder={t("messagePlaceholder")}
               required
               className="min-h-[150px]"
               value={formData.message}
@@ -131,7 +131,7 @@ export default function ContactPage() {
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Sending..." : "Send"}
+            {isLoading ? t("sending") : t("send")}
           </Button>
         </form>
       </div>
