@@ -18,39 +18,41 @@ import {
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 
 export default function DashboardSidebar() {
+  const t = useTranslations("DashboardSidebar");
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const { data: session } = useSession();
   const routes = [
     {
-      name: "Dashboard",
+      name: t("routeDashboard"),
       href: "/dashboard",
       icon: LayoutDashboard,
     },
     {
-      name: "Tracking Data",
+      name: t("routeTrackingData"),
       href: "/dashboard/tracking-data",
       icon: Search,
     },
     {
-      name: "Google Analytics",
+      name: t("routeGoogleAnalytics"),
       href: "/dashboard/google-analytics",
       icon: BarChart3,
     },
     {
-      name: "Google Ads",
+      name: t("routeGoogleAds"),
       href: "/dashboard/google-ads",
       icon: LineChart,
     },
     {
-      name: "Meta Ads",
+      name: t("routeMetaAds"),
       href: "/dashboard/meta-ads",
       icon: PieChart,
     },
     {
-      name: "Microsoft Ads",
+      name: t("routeMicrosoftAds"),
       href: "/dashboard/microsoft-ads",
       icon: BarChart,
     },
@@ -62,14 +64,12 @@ export default function DashboardSidebar() {
         <Link href="/" className="flex items-center gap-2">
           <Image
             src="/cropped-advertising-analytics-dashboard-logo.png"
-            alt="Advertising Analytics Dashboard Logo"
+            alt={t("logoAlt")}
             width={32}
             height={32}
             className="rounded-md"
           />
-          <span className="font-bold text-sm">
-            Advertising Analytics Dashboard
-          </span>
+          <span className="font-bold text-sm">{t("logoText")}</span>
         </Link>
       </div>
       <div className="flex-1 overflow-auto py-2">
@@ -133,7 +133,7 @@ export default function DashboardSidebar() {
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon">
               <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle sidebar</span>
+              <span className="sr-only">{t("toggleSidebar")}</span>
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="p-0">
@@ -144,14 +144,12 @@ export default function DashboardSidebar() {
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/cropped-advertising-analytics-dashboard-logo.png"
-              alt="Advertising Analytics Dashboard Logo"
+              alt={t("logoAlt")}
               width={24}
               height={24}
               className="rounded-md"
             />
-            <span className="font-bold text-sm">
-              Advertising Analytics Dashboard
-            </span>
+            <span className="font-bold text-sm">{t("logoText")}</span>
           </Link>
         </div>
       </div>

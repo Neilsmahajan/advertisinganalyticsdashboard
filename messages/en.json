@@ -142,5 +142,40 @@
     "contactTitle": "Contact Us",
     "contactDescription": "If you have any questions about these Terms of Service, please",
     "contactLinkText": "contact us"
+  },
+  "Dashboard": {
+    "pageTitle": "Dashboard",
+    "welcomeText": "Welcome to your analytics dashboard",
+    "filterLast7Days": "Last 7 days",
+    "viewReports": "View Reports",
+    "totalImpressions": "Total Impressions",
+    "impressionsChange": "+20.1% from last month",
+    "totalClicks": "Total Clicks",
+    "clicksChange": "+12.3% from last month",
+    "ctr": "CTR",
+    "ctrValue": "2.1%",
+    "ctrChange": "+1.2% from last month",
+    "conversions": "Conversions",
+    "conversionsValue": "1,203",
+    "conversionsChange": "+4.5% from last month",
+    "performanceOverview": "Performance Overview",
+    "performanceChartPlaceholder": "Performance chart will appear here",
+    "topCampaigns": "Top Campaigns",
+    "campaignsDescription": "Your best performing campaigns this month",
+    "campaignSummerSale": "Summer Sale",
+    "campaignNewProductLaunch": "New Product Launch",
+    "campaignHolidaySpecial": "Holiday Special",
+    "campaignRetargeting": "Retargeting"
+  },
+  "DashboardSidebar": {
+    "logoAlt": "Advertising Analytics Dashboard Logo",
+    "logoText": "Advertising Analytics Dashboard",
+    "routeDashboard": "Dashboard",
+    "routeTrackingData": "Tracking Data",
+    "routeGoogleAnalytics": "Google Analytics",
+    "routeGoogleAds": "Google Ads",
+    "routeMetaAds": "Meta Ads",
+    "routeMicrosoftAds": "Microsoft Ads",
+    "toggleSidebar": "Toggle sidebar"
   }
 }
