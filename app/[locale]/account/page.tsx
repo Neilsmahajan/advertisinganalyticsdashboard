@@ -11,8 +11,10 @@ import { getServerSession } from "next-auth";
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import SignOutButton from "./SignOutButton";
+import { useTranslations } from "next-intl";
 
 export default async function AccountPage() {
+  const t = useTranslations("Account");
   const session = await getServerSession();
   if (!session) {
     return redirect({ href: "api/auth/signin", locale: await getLocale() });
@@ -22,31 +24,31 @@ export default async function AccountPage() {
       <div className="mx-auto max-w-5xl space-y-8">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-            MY ACCOUNT
+            {t("accountTitle")}
           </h1>
           <p className="text-gray-500 dark:text-gray-400 md:text-lg">
-            Welcome, {session.user.name}!
+            {t("welcomeMessage", { name: session.user.name ?? "User" })}
           </p>
           <p className="text-gray-500 dark:text-gray-400">
-            Manage your profile information and saved queries here.
+            {t("manageProfile")}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="md:col-span-1">
             <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
+              <CardTitle>{t("profileInformation")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Name:
+                  {t("nameLabel")}
                 </p>
                 <p className="font-medium">{session.user.name}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Email:
+                  {t("emailLabel")}
                 </p>
                 <p className="font-medium">{session.user.email}</p>
               </div>
@@ -56,56 +58,54 @@ export default async function AccountPage() {
 
           <Card className="md:col-span-2">
             <CardHeader>
-              <CardTitle>Saved Queries</CardTitle>
-              <CardDescription>
-                Access your saved queries for different services
-              </CardDescription>
+              <CardTitle>{t("savedQueriesTitle")}</CardTitle>
+              <CardDescription>{t("savedQueriesDescription")}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <div className="flex items-center">
                     <Search className="h-5 w-5 text-primary mr-2" />
-                    <span>Tracking Data</span>
+                    <span>{t("trackingData")}</span>
                   </div>
                   <Button variant="ghost" size="sm">
-                    View
+                    {t("viewQuery")}
                   </Button>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <div className="flex items-center">
                     <BarChart3 className="h-5 w-5 text-primary mr-2" />
-                    <span>Google Analytics</span>
+                    <span>{t("googleAnalytics")}</span>
                   </div>
                   <Button variant="ghost" size="sm">
-                    View
+                    {t("viewQuery")}
                   </Button>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <div className="flex items-center">
                     <LineChart className="h-5 w-5 text-primary mr-2" />
-                    <span>Google Ads</span>
+                    <span>{t("googleAds")}</span>
                   </div>
                   <Button variant="ghost" size="sm">
-                    View
+                    {t("viewQuery")}
                   </Button>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <div className="flex items-center">
                     <PieChart className="h-5 w-5 text-primary mr-2" />
-                    <span>Meta Ads</span>
+                    <span>{t("metaAds")}</span>
                   </div>
                   <Button variant="ghost" size="sm">
-                    View
+                    {t("viewQuery")}
                   </Button>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <div className="flex items-center">
                     <BarChart className="h-5 w-5 text-primary mr-2" />
-                    <span>Microsoft Ads</span>
+                    <span>{t("microsoftAds")}</span>
                   </div>
                   <Button variant="ghost" size="sm">
-                    View
+                    {t("viewQuery")}
                   </Button>
                 </div>
               </div>
