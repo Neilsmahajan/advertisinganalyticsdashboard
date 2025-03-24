@@ -5,3 +5,7 @@ import { routing } from "./routing";
 // APIs that consider the routing configuration
 export const { Link, redirect, usePathname, useRouter, getPathname } =
   createNavigation(routing);
+
+export function getOtherLocale(currentLocale: string): string {
+  return currentLocale === "en" ? "fr" : "en";
+}
