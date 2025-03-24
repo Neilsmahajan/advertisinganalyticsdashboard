@@ -1,6 +1,6 @@
 {
-  "HomePage": {
-    "title": "Hello world!",
-    "about": "Go to the about page"
+  "Home": {
+    "advertisingAnalyticsDashboard": "ADVERTISING ANALYTICS DASHBOARD",
+    "manageAndAnalyze": "Manage and analyze all your advertising campaigns in one unified dashboard. Gain insights, track performance, and optimize results effortlessly."
   }
 }
