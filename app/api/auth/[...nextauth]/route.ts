@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/authOptions";
 declare module "next-auth" {
   interface Session {
     user: {
+      id: string;
       refreshToken?: string;
     } & DefaultSession["user"];
   }
