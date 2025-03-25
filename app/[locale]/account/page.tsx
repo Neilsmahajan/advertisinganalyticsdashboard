@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import SignOutButton from "./SignOutButton";
 import { getServerSession } from "next-auth";
+import SignOutButton from "./SignOutButton";
 import {
   Card,
   CardContent,
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { BarChart, BarChart3, LineChart, PieChart, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import AccountQueries from "./AccountQueries"; // newly added
 
 export default async function AccountPage() {
   const session = await getServerSession();
@@ -111,6 +112,7 @@ export default async function AccountPage() {
             </CardContent>
           </Card>
         </div>
+        <AccountQueries />
       </div>
     </div>
   );
