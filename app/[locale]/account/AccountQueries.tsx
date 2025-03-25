@@ -130,13 +130,6 @@ export default function AccountQueries() {
                   </div>
                   <div className="flex space-x-2">
                     <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(service, q.id)}
-                    >
-                      Delete
-                    </Button>
-                    <Button
                       variant="outline"
                       size="sm"
                       onClick={() =>
@@ -144,6 +137,13 @@ export default function AccountQueries() {
                       }
                     >
                       Run
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDelete(service, q.id)}
+                    >
+                      Delete
                     </Button>
                   </div>
                 </div>

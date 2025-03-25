@@ -27,6 +27,7 @@ import { CalendarIcon, PlayCircle, Save, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
+import { useSearchParams } from "next/navigation";
 
 export default function GoogleAdsQueries() {
   const [formData, setFormData] = useState({ queryName: "", customerId: "" });
@@ -42,6 +43,7 @@ export default function GoogleAdsQueries() {
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState<null | any>(null);
+  const searchParams = useSearchParams();
 
   // Load saved queries via API on mount
   useEffect(() => {
@@ -54,6 +56,22 @@ export default function GoogleAdsQueries() {
     }
     loadQueries();
   }, []);
+
+  useEffect(() => {
+    const sel = searchParams.get("selectedQuery");
+    if (sel && sel !== "new" && savedQueries.length > 0) {
+      const query = savedQueries.find((q) => q.id === sel);
+      if (query) {
+        setSelectedQuery(sel);
+        setFormData({
+          queryName: query.queryName,
+          customerId: query.queryData.customerId.toString(),
+        });
+        setStartDate(new Date(query.queryData.startDate));
+        setEndDate(new Date(query.queryData.endDate));
+      }
+    }
+  }, [savedQueries, searchParams]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
