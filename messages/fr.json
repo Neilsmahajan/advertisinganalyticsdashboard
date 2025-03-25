@@ -80,6 +80,19 @@
     "microsoftAds": "Microsoft Ads",
     "viewQuery": "Voir"
   },
+  "AccountQueries": {
+    "loadingQueries": "Chargement des requêtes...",
+    "noSavedQueries": "Aucune requête sauvegardée.",
+    "deleteSuccessTitle": "Supprimé",
+    "deleteSuccessDescription": "Requête supprimée avec succès.",
+    "deleteErrorTitle": "Erreur",
+    "deleteErrorDescription": "Échec de la suppression de la requête.",
+    "runButton": "Exécuter",
+    "deleteButton": "Supprimer"
+  },
+  "SignOutButton": {
+    "signOut": "Se Déconnecter"
+  },
   "Contact": {
     "pageTitle": "CONTACTEZ-NOUS",
     "introText": "Vous avez des questions ? Contactez-nous pour voir comment nous pouvons aider votre entreprise à prospérer.",

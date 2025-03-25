@@ -80,6 +80,19 @@
     "microsoftAds": "Microsoft Ads",
     "viewQuery": "View"
   },
+  "AccountQueries": {
+    "loadingQueries": "Loading queries...",
+    "noSavedQueries": "No saved queries.",
+    "deleteSuccessTitle": "Deleted",
+    "deleteSuccessDescription": "Query deleted successfully.",
+    "deleteErrorTitle": "Error",
+    "deleteErrorDescription": "Failed to delete query.",
+    "runButton": "Run",
+    "deleteButton": "Delete"
+  },
+  "SignOutButton": {
+    "signOut": "Sign Out"
+  },
   "Contact": {
     "pageTitle": "CONTACT US",
     "introText": "Have questions? Contact us to see how we can help your business thrive.",

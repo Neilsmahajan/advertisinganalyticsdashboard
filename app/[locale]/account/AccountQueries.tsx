@@ -5,6 +5,7 @@ import { toast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
 import { redirect } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 
 interface Query {
   id: string;
@@ -25,6 +26,7 @@ const services = [
 ];
 
 export default function AccountQueries() {
+  const t = useTranslations("AccountQueries");
   const [queries, setQueries] = useState<ServiceQueries>({});
   const [loading, setLoading] = useState(true);
   const locale = useLocale(); // move the hook call here
@@ -74,15 +76,18 @@ export default function AccountQueries() {
   const handleDelete = async (service: string, id: string) => {
     const res = await fetch(`/api/queries/${id}`, { method: "DELETE" });
     if (res.ok) {
-      toast({ title: "Deleted", description: "Query deleted successfully." });
+      toast({
+        title: t("deleteSuccessTitle"),
+        description: t("deleteSuccessDescription"),
+      });
       setQueries((prev) => ({
         ...prev,
         [service]: prev[service].filter((q) => q.id !== id),
       }));
     } else {
       toast({
-        title: "Error",
-        description: "Failed to delete query.",
+        title: t("deleteErrorTitle"),
+        description: t("deleteErrorDescription"),
         variant: "destructive",
       });
     }
@@ -109,7 +114,7 @@ export default function AccountQueries() {
   return (
     <div className="space-y-6">
       {loading ? (
-        <p>Loading queries...</p>
+        <p>{t("loadingQueries")}</p>
       ) : (
         services.map((service) => (
           <details key={service} className="border rounded p-4">
@@ -136,20 +141,20 @@ export default function AccountQueries() {
                         redirect({ href: getRunUrl(service, q.id), locale })
                       }
                     >
-                      Run
+                      {t("runButton")}
                     </Button>
                     <Button
                       variant="destructive"
                       size="sm"
                       onClick={() => handleDelete(service, q.id)}
                     >
-                      Delete
+                      {t("deleteButton")}
                     </Button>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-gray-500">No saved queries.</p>
+              <p className="text-gray-500">{t("noSavedQueries")}</p>
             )}
           </details>
         ))
