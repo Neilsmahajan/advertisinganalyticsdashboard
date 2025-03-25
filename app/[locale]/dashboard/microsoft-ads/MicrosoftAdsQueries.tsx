@@ -1,8 +1,5 @@
 "use client";
-
-import type React from "react";
-
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,11 +34,35 @@ export default function MicrosoftAdsQueries() {
     accountId: "",
     customerId: "",
   });
-  const [selectedQuery, setSelectedQuery] = useState("");
+  const [selectedQuery, setSelectedQuery] = useState("new");
+  const [savedQueries, setSavedQueries] = useState<
+    {
+      id: string;
+      queryName: string;
+      queryData: {
+        accountId: number;
+        customerId: number;
+        startDate: string;
+        endDate: string;
+      };
+    }[]
+  >([]);
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState<null | any>(null);
+
+  // Load saved queries via API on mount
+  useEffect(() => {
+    async function loadQueries() {
+      const res = await fetch("/api/microsoft-ads/queries");
+      if (res.ok) {
+        const data = await res.json();
+        setSavedQueries(data.queries || []);
+      }
+    }
+    loadQueries();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -50,32 +71,93 @@ export default function MicrosoftAdsQueries() {
 
   const handleSelectChange = (value: string) => {
     setSelectedQuery(value);
-    // In a real app, you would load the saved query data here
-    if (value === "previous-query-1") {
-      setFormData({
-        queryName: "Main Microsoft Ads Campaign",
-        accountId: "138753866",
-        customerId: "253842102",
-      });
-      setStartDate(new Date(2023, 0, 1));
-      setEndDate(new Date(2023, 0, 31));
+    if (value !== "new") {
+      const query = savedQueries.find((q) => q.id === value);
+      if (query) {
+        setFormData({
+          queryName: query.queryName,
+          accountId: query.queryData.accountId.toString(),
+          customerId: query.queryData.customerId.toString(),
+        });
+        setStartDate(new Date(query.queryData.startDate));
+        setEndDate(new Date(query.queryData.endDate));
+      }
+    } else {
+      setFormData({ queryName: "", accountId: "", customerId: "" });
+      setStartDate(undefined);
+      setEndDate(undefined);
     }
   };
 
-  const handleSaveQuery = () => {
-    if (!formData.queryName) {
+  const refreshQueries = async () => {
+    const res = await fetch("/api/microsoft-ads/queries");
+    if (res.ok) {
+      const data = await res.json();
+      setSavedQueries(data.queries || []);
+    }
+  };
+
+  const handleSaveQuery = async () => {
+    if (
+      !formData.queryName ||
+      !formData.accountId ||
+      !formData.customerId ||
+      !startDate ||
+      !endDate
+    ) {
       toast({
         title: "Error",
-        description: "Please enter a query name",
+        description: "Fill in all fields",
         variant: "destructive",
       });
       return;
     }
+    const payload = {
+      service: "Microsoft Ads",
+      queryName: formData.queryName,
+      queryData: {
+        accountId: parseInt(formData.accountId),
+        customerId: parseInt(formData.customerId),
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      },
+    };
 
-    toast({
-      title: "Query Saved",
-      description: `Query "${formData.queryName}" has been saved.`,
-    });
+    let response;
+    if (selectedQuery === "new") {
+      response = await fetch("/api/microsoft-ads/queries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } else {
+      response = await fetch("/api/microsoft-ads/queries", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: selectedQuery, ...payload }),
+      });
+    }
+
+    if (response.ok) {
+      const result = await response.json();
+      const savedQuery = result.query;
+      toast({
+        title: "Success",
+        description:
+          selectedQuery === "new"
+            ? `New query "${formData.queryName}" saved.`
+            : `Query "${formData.queryName}" updated.`,
+      });
+      refreshQueries();
+      setSelectedQuery(savedQuery.id);
+      // Leave formData unchanged so fields remain visible.
+    } else {
+      toast({
+        title: "Error",
+        description: "Operation failed",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleAnalyze = () => {
@@ -87,9 +169,7 @@ export default function MicrosoftAdsQueries() {
       });
       return;
     }
-
     setIsAnalyzing(true);
-
     // Simulate API call
     setTimeout(() => {
       setIsAnalyzing(false);
@@ -133,7 +213,6 @@ export default function MicrosoftAdsQueries() {
           },
         ],
       });
-
       toast({
         title: "Analysis Complete",
         description: "Microsoft Ads data has been retrieved.",
@@ -147,52 +226,31 @@ export default function MicrosoftAdsQueries() {
         <CardHeader>
           <CardTitle>Instructions</CardTitle>
           <CardDescription>
-            Follow these steps to use this application with your Microsoft Ads
-            data
+            Enter your Account ID, Customer ID, select your date range and
+            create or select an existing query.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <ol className="list-decimal list-inside space-y-2 text-sm">
-            <li>
-              Click Connect with Microsoft Ads and select your Microsoft account
-              associated with your Microsoft Ads account. If the pop-up is
-              blocked, click the pop-up icon on the next to the address bar.
-            </li>
-            <li>
-              Log in to Microsoft Ads Dashboard and select your Microsoft Ads
-              Account.
-            </li>
-            <li>
-              Click the Campaigns tab on the left and get your Account ID (e.g.,
-              138753866) and your Customer ID (e.g., 253842102) listed in the
-              URL after 'aid=' and 'cid=' respectively along with the desired
-              date range, and click Analyze.
-            </li>
-          </ol>
-
-          <Button variant="outline" className="gap-2 mt-4">
+          <Button variant="outline" className="gap-2">
             <PlayCircle className="h-4 w-4" /> View Tutorial
           </Button>
-
           <div className="space-y-4 pt-4">
             <div className="space-y-2">
               <Label>Previous Queries</Label>
               <Select value={selectedQuery} onValueChange={handleSelectChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a previous query or create new" />
+                  <SelectValue placeholder="Select a saved query or create new" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="new">Create New Query</SelectItem>
-                  <SelectItem value="previous-query-1">
-                    Main Microsoft Ads Campaign
-                  </SelectItem>
-                  <SelectItem value="previous-query-2">
-                    Search Campaign
-                  </SelectItem>
+                  {savedQueries.map((q) => (
+                    <SelectItem key={q.id} value={q.id}>
+                      {q.queryName}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="queryName">Query Name</Label>
               <div className="flex gap-2">
@@ -208,39 +266,26 @@ export default function MicrosoftAdsQueries() {
                 </Button>
               </div>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="accountId">Account ID</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="accountId"
-                  name="accountId"
-                  placeholder="Enter Account ID"
-                  value={formData.accountId}
-                  onChange={handleChange}
-                />
-                <Button variant="outline">
-                  <Eye className="h-4 w-4" />
-                </Button>
-              </div>
+              <Input
+                id="accountId"
+                name="accountId"
+                placeholder="Enter Account ID"
+                value={formData.accountId}
+                onChange={handleChange}
+              />
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="customerId">Customer ID</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="customerId"
-                  name="customerId"
-                  placeholder="Enter Customer ID"
-                  value={formData.customerId}
-                  onChange={handleChange}
-                />
-                <Button variant="outline">
-                  <Eye className="h-4 w-4" />
-                </Button>
-              </div>
+              <Input
+                id="customerId"
+                name="customerId"
+                placeholder="Enter Customer ID"
+                value={formData.customerId}
+                onChange={handleChange}
+              />
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Start Date</Label>
@@ -267,7 +312,6 @@ export default function MicrosoftAdsQueries() {
                   </PopoverContent>
                 </Popover>
               </div>
-
               <div className="space-y-2">
                 <Label>End Date</Label>
                 <Popover>
@@ -294,7 +338,6 @@ export default function MicrosoftAdsQueries() {
                 </Popover>
               </div>
             </div>
-
             <Button
               className="w-full"
               onClick={handleAnalyze}
@@ -305,7 +348,6 @@ export default function MicrosoftAdsQueries() {
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle>Results</CardTitle>
@@ -322,7 +364,6 @@ export default function MicrosoftAdsQueries() {
               </p>
             </div>
           )}
-
           {isAnalyzing && (
             <div className="flex flex-col items-center justify-center h-[400px] bg-muted/20 rounded-md">
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -331,7 +372,6 @@ export default function MicrosoftAdsQueries() {
               </p>
             </div>
           )}
-
           {results && (
             <div className="space-y-6">
               <div className="grid grid-cols-3 gap-4">
