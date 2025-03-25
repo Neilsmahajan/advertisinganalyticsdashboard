@@ -1,7 +1,5 @@
 "use client";
-import type React from "react";
-
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,15 +29,31 @@ import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 
 export default function GoogleAdsQueries() {
-  const [formData, setFormData] = useState({
-    queryName: "",
-    customerId: "",
-  });
-  const [selectedQuery, setSelectedQuery] = useState("");
+  const [formData, setFormData] = useState({ queryName: "", customerId: "" });
+  const [selectedQuery, setSelectedQuery] = useState("new");
+  const [savedQueries, setSavedQueries] = useState<
+    {
+      id: string;
+      queryName: string;
+      queryData: { customerId: number; startDate: string; endDate: string };
+    }[]
+  >([]);
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState<null | any>(null);
+
+  // Load saved queries via API on mount
+  useEffect(() => {
+    async function loadQueries() {
+      const res = await fetch("/api/google-ads/queries");
+      if (res.ok) {
+        const data = await res.json();
+        setSavedQueries(data.queries || []);
+      }
+    }
+    loadQueries();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -48,31 +62,85 @@ export default function GoogleAdsQueries() {
 
   const handleSelectChange = (value: string) => {
     setSelectedQuery(value);
-    // In a real app, you would load the saved query data here
-    if (value === "previous-query-1") {
-      setFormData({
-        queryName: "Main Google Ads Campaign",
-        customerId: "683-961-6266",
-      });
-      setStartDate(new Date(2023, 0, 1));
-      setEndDate(new Date(2023, 0, 31));
+    if (value !== "new") {
+      const query = savedQueries.find((q) => q.id === value);
+      if (query) {
+        setFormData({
+          queryName: query.queryName,
+          customerId: query.queryData.customerId.toString(),
+        });
+        setStartDate(new Date(query.queryData.startDate));
+        setEndDate(new Date(query.queryData.endDate));
+      }
+    } else {
+      setFormData({ queryName: "", customerId: "" });
+      setStartDate(undefined);
+      setEndDate(undefined);
     }
   };
 
-  const handleSaveQuery = () => {
-    if (!formData.queryName) {
+  const refreshQueries = async () => {
+    const res = await fetch("/api/google-ads/queries");
+    if (res.ok) {
+      const data = await res.json();
+      setSavedQueries(data.queries || []);
+    }
+  };
+
+  const handleSaveQuery = async () => {
+    if (!formData.queryName || !formData.customerId || !startDate || !endDate) {
       toast({
         title: "Error",
-        description: "Please enter a query name",
+        description: "Fill in all fields",
         variant: "destructive",
       });
       return;
     }
+    const payload = {
+      service: "Google Ads",
+      queryName: formData.queryName,
+      queryData: {
+        customerId: parseInt(formData.customerId),
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      },
+    };
 
-    toast({
-      title: "Query Saved",
-      description: `Query "${formData.queryName}" has been saved.`,
-    });
+    let response;
+    if (selectedQuery === "new") {
+      response = await fetch("/api/google-ads/queries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } else {
+      response = await fetch("/api/google-ads/queries", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: selectedQuery, ...payload }),
+      });
+    }
+
+    if (response.ok) {
+      const result = await response.json();
+      const savedQuery = result.query;
+      toast({
+        title: "Success",
+        description:
+          selectedQuery === "new"
+            ? `New query "${formData.queryName}" saved.`
+            : `Query "${formData.queryName}" updated.`,
+      });
+      refreshQueries();
+      setSelectedQuery(savedQuery.id);
+      // Leave formData intact so the fields remain visible.
+    } else {
+      toast({
+        title: "Error",
+        description: "Operation failed",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleAnalyze = () => {
@@ -84,9 +152,7 @@ export default function GoogleAdsQueries() {
       });
       return;
     }
-
     setIsAnalyzing(true);
-
     // Simulate API call
     setTimeout(() => {
       setIsAnalyzing(false);
@@ -130,65 +196,44 @@ export default function GoogleAdsQueries() {
           },
         ],
       });
-
       toast({
         title: "Analysis Complete",
         description: "Google Ads data has been retrieved.",
       });
     }, 2000);
   };
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <Card>
         <CardHeader>
           <CardTitle>Instructions</CardTitle>
           <CardDescription>
-            Follow these steps to use this application with your Google Ads data
+            Enter your Customer ID, select your date range, and create or select
+            an existing query.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <ol className="list-decimal list-inside space-y-2 text-sm">
-            <li>
-              Click Connect with Google Ads and select your Google account
-              associated with your Google Ads account. If the pop-up is blocked,
-              click the pop-up icon on the next to the address bar.
-            </li>
-            <li>
-              Log in to Google Ads Dashboard and select your Google Ads Account.
-            </li>
-            <li>
-              Get your Customer ID from the top right (e.g., 683-961-6266) for
-              the account that you would like to fetch data from.
-            </li>
-            <li>
-              Enter your customer ID below, along with the desired date range,
-              and click Analyze.
-            </li>
-          </ol>
-
-          <Button variant="outline" className="gap-2 mt-4">
+          <Button variant="outline" className="gap-2">
             <PlayCircle className="h-4 w-4" /> View Tutorial
           </Button>
-
           <div className="space-y-4 pt-4">
             <div className="space-y-2">
               <Label>Previous Queries</Label>
               <Select value={selectedQuery} onValueChange={handleSelectChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a previous query or create new" />
+                  <SelectValue placeholder="Select a saved query or create new" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="new">Create New Query</SelectItem>
-                  <SelectItem value="previous-query-1">
-                    Main Google Ads Campaign
-                  </SelectItem>
-                  <SelectItem value="previous-query-2">
-                    Product Launch Campaign
-                  </SelectItem>
+                  {savedQueries.map((q) => (
+                    <SelectItem key={q.id} value={q.id}>
+                      {q.queryName}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="queryName">Query Name</Label>
               <div className="flex gap-2">
@@ -204,23 +249,16 @@ export default function GoogleAdsQueries() {
                 </Button>
               </div>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="customerId">Customer ID</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="customerId"
-                  name="customerId"
-                  placeholder="Enter Customer ID"
-                  value={formData.customerId}
-                  onChange={handleChange}
-                />
-                <Button variant="outline">
-                  <Eye className="h-4 w-4" />
-                </Button>
-              </div>
+              <Input
+                id="customerId"
+                name="customerId"
+                placeholder="Enter Customer ID"
+                value={formData.customerId}
+                onChange={handleChange}
+              />
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Start Date</Label>
@@ -247,7 +285,6 @@ export default function GoogleAdsQueries() {
                   </PopoverContent>
                 </Popover>
               </div>
-
               <div className="space-y-2">
                 <Label>End Date</Label>
                 <Popover>
@@ -274,7 +311,6 @@ export default function GoogleAdsQueries() {
                 </Popover>
               </div>
             </div>
-
             <Button
               className="w-full"
               onClick={handleAnalyze}
@@ -285,7 +321,6 @@ export default function GoogleAdsQueries() {
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle>Results</CardTitle>
@@ -302,7 +337,6 @@ export default function GoogleAdsQueries() {
               </p>
             </div>
           )}
-
           {isAnalyzing && (
             <div className="flex flex-col items-center justify-center h-[400px] bg-muted/20 rounded-md">
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -311,7 +345,6 @@ export default function GoogleAdsQueries() {
               </p>
             </div>
           )}
-
           {results && (
             <div className="space-y-6">
               <div className="grid grid-cols-3 gap-4">
@@ -331,22 +364,7 @@ export default function GoogleAdsQueries() {
                   <p className="text-sm text-muted-foreground">CTR</p>
                   <p className="text-2xl font-bold">{results.ctr}</p>
                 </div>
-                <div className="bg-muted/20 p-4 rounded-md">
-                  <p className="text-sm text-muted-foreground">Cost</p>
-                  <p className="text-2xl font-bold">{results.cost}</p>
-                </div>
-                <div className="bg-muted/20 p-4 rounded-md">
-                  <p className="text-sm text-muted-foreground">Conversions</p>
-                  <p className="text-2xl font-bold">{results.conversions}</p>
-                </div>
-                <div className="bg-muted/20 p-4 rounded-md">
-                  <p className="text-sm text-muted-foreground">Cost/Conv</p>
-                  <p className="text-2xl font-bold">
-                    {results.costPerConversion}
-                  </p>
-                </div>
               </div>
-
               <div>
                 <h3 className="font-medium mb-2">Top Campaigns</h3>
                 <div className="space-y-2">
@@ -365,12 +383,6 @@ export default function GoogleAdsQueries() {
                     </div>
                   ))}
                 </div>
-              </div>
-
-              <div className="h-[150px] bg-muted/20 rounded-md flex items-center justify-center">
-                <p className="text-muted-foreground">
-                  Campaign performance chart will appear here
-                </p>
               </div>
             </div>
           )}
