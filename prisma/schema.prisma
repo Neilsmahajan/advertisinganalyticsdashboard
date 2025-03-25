@@ -53,6 +53,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  queries       Query[]  // new relation to store user queries
 }
 
 model VerificationToken {
@@ -61,4 +62,17 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// New Query model to store query inputs for each service
+model Query {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  service    String
+  queryName  String
+  queryData  Json
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
 }
