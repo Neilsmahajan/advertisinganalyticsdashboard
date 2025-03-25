@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   const t = await getTranslations("Dashboard");
   const session = await getServerSession();
   if (!session) {
-    return redirect({ href: "api/auth/signin", locale: await getLocale() });
+    return redirect({ href: "api/auth/signin", locale: "" });
   }
   return (
     <div className="space-y-8">
