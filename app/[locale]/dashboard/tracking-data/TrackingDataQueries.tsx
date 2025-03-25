@@ -104,6 +104,8 @@ export default function TrackingDataQueries() {
     }
 
     if (response.ok) {
+      const result = await response.json();
+      const savedQuery = result.query;
       toast({
         title: "Success",
         description:
@@ -112,8 +114,8 @@ export default function TrackingDataQueries() {
             : `Query "${formData.queryName}" updated.`,
       });
       refreshQueries();
-      setSelectedQuery("new");
-      setFormData({ queryName: "", websiteUrl: "" });
+      setSelectedQuery(savedQuery.id); // set dropdown to saved query id
+      // Leave formData unchanged so fields remain visible.
     } else {
       toast({
         title: "Error",
