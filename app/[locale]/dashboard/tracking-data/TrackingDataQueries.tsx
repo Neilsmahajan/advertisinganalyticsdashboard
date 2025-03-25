@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { PlayCircle, Save } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { useSearchParams } from "next/navigation";
 
 export default function TrackingDataQueries() {
   const [formData, setFormData] = useState({ queryName: "", websiteUrl: "" });
@@ -28,8 +29,8 @@ export default function TrackingDataQueries() {
   >([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState(null);
+  const searchParams = useSearchParams();
 
-  // Load saved queries via API on mount
   useEffect(() => {
     async function loadQueries() {
       const res = await fetch("/api/tracking-data/queries");
@@ -41,6 +42,20 @@ export default function TrackingDataQueries() {
     loadQueries();
   }, []);
 
+  useEffect(() => {
+    const sel = searchParams.get("selectedQuery");
+    if (sel && sel !== "new" && savedQueries.length > 0) {
+      const query = savedQueries.find((q) => q.id === sel);
+      if (query) {
+        setSelectedQuery(sel);
+        setFormData({
+          queryName: query.queryName,
+          websiteUrl: query.queryData.websiteURL,
+        });
+      }
+    }
+  }, [savedQueries, searchParams]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -48,7 +63,6 @@ export default function TrackingDataQueries() {
 
   const handleSelectChange = (value: string) => {
     setSelectedQuery(value);
-    // If an existing query is selected, load its data into form
     if (value !== "new") {
       const query = savedQueries.find((q: any) => q.id === value);
       if (query) {
@@ -80,7 +94,6 @@ export default function TrackingDataQueries() {
       return;
     }
 
-    // Build payload (adjust the shape to your prisma schema)
     const payload = {
       service: "Tracking Data",
       queryName: formData.queryName,
@@ -95,7 +108,6 @@ export default function TrackingDataQueries() {
         body: JSON.stringify(payload),
       });
     } else {
-      // Update existing query. Assume id available in selectedQuery.
       response = await fetch("/api/tracking-data/queries", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -114,8 +126,7 @@ export default function TrackingDataQueries() {
             : `Query "${formData.queryName}" updated.`,
       });
       refreshQueries();
-      setSelectedQuery(savedQuery.id); // set dropdown to saved query id
-      // Leave formData unchanged so fields remain visible.
+      setSelectedQuery(savedQuery.id);
     } else {
       toast({
         title: "Error",

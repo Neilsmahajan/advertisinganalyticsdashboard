@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
+import { redirect } from "@/i18n/navigation";
+import { useLocale } from "next-intl";
 
 interface Query {
   id: string;
@@ -25,6 +27,7 @@ const services = [
 export default function AccountQueries() {
   const [queries, setQueries] = useState<ServiceQueries>({});
   const [loading, setLoading] = useState(true);
+  const locale = useLocale(); // move the hook call here
 
   useEffect(() => {
     async function fetchQueries() {
@@ -85,6 +88,24 @@ export default function AccountQueries() {
     }
   };
 
+  // Helper to derive the dashboard URL for a given service and query id
+  const getRunUrl = (service: string, id: string) => {
+    switch (service) {
+      case "Tracking Data":
+        return `/dashboard/tracking-data?selectedQuery=${id}`;
+      case "Google Analytics":
+        return `/dashboard/google-analytics?selectedQuery=${id}`;
+      case "Google Ads":
+        return `/dashboard/google-ads?selectedQuery=${id}`;
+      case "Meta Ads":
+        return `/dashboard/meta-ads?selectedQuery=${id}`;
+      case "Microsoft Ads":
+        return `/dashboard/microsoft-ads?selectedQuery=${id}`;
+      default:
+        return "/";
+    }
+  };
+
   return (
     <div className="space-y-6">
       {loading ? (
@@ -107,13 +128,24 @@ export default function AccountQueries() {
                       </p>
                     )}
                   </div>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDelete(service, q.id)}
-                  >
-                    Delete
-                  </Button>
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDelete(service, q.id)}
+                    >
+                      Delete
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        redirect({ href: getRunUrl(service, q.id), locale })
+                      }
+                    >
+                      Run
+                    </Button>
+                  </div>
                 </div>
               ))
             ) : (
