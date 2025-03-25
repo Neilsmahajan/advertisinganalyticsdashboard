@@ -2,15 +2,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getServerSession } from "next-auth";
 import SignOutButton from "./SignOutButton";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { BarChart, BarChart3, LineChart, PieChart, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AccountQueries from "./AccountQueries"; // newly added
 
 export default async function AccountPage() {
@@ -34,80 +26,33 @@ export default async function AccountPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="md:col-span-1">
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+          <Card className="md:col-span-1 shadow-lg rounded-lg">
             <CardHeader>
               <CardTitle>{t("profileInformation")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t("labelName")}
-                </p>
-                <p className="font-medium">{session.user.name}</p>
+              <div className="flex items-center space-x-4">
+                {session.user.image && (
+                  <img
+                    src={session.user.image}
+                    alt="Profile"
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                )}
+                <div className="grid grid-cols-1 gap-y-2">
+                  <div>
+                    <p className="text-sm text-gray-500">{t("labelName")}</p>
+                    <p className="font-medium text-lg">{session.user.name}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">{t("labelEmail")}</p>
+                    <p className="font-medium text-lg">{session.user.email}</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t("labelEmail")}
-                </p>
-                <p className="font-medium">{session.user.email}</p>
-              </div>
-              <SignOutButton />
-            </CardContent>
-          </Card>
-
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle>{t("savedQueries")}</CardTitle>
-              <CardDescription>{t("savedQueriesDescription")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                  <div className="flex items-center">
-                    <Search className="h-5 w-5 text-primary mr-2" />
-                    <span>{t("trackingData")}</span>
-                  </div>
-                  <Button variant="ghost" size="sm">
-                    {t("viewQuery")}
-                  </Button>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                  <div className="flex items-center">
-                    <BarChart3 className="h-5 w-5 text-primary mr-2" />
-                    <span>{t("googleAnalytics")}</span>
-                  </div>
-                  <Button variant="ghost" size="sm">
-                    {t("viewQuery")}
-                  </Button>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                  <div className="flex items-center">
-                    <LineChart className="h-5 w-5 text-primary mr-2" />
-                    <span>{t("googleAds")}</span>
-                  </div>
-                  <Button variant="ghost" size="sm">
-                    {t("viewQuery")}
-                  </Button>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                  <div className="flex items-center">
-                    <PieChart className="h-5 w-5 text-primary mr-2" />
-                    <span>{t("metaAds")}</span>
-                  </div>
-                  <Button variant="ghost" size="sm">
-                    {t("viewQuery")}
-                  </Button>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                  <div className="flex items-center">
-                    <BarChart className="h-5 w-5 text-primary mr-2" />
-                    <span>{t("microsoftAds")}</span>
-                  </div>
-                  <Button variant="ghost" size="sm">
-                    {t("viewQuery")}
-                  </Button>
-                </div>
+              <div className="mt-4">
+                <SignOutButton />
               </div>
             </CardContent>
           </Card>
