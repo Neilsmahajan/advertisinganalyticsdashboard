@@ -125,10 +125,7 @@ export default async function DashboardPage() {
                     {t("campaignSummerSale")}
                   </p>
                   <div className="h-2 w-full bg-muted mt-1 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary"
-                      style={{ width: "75%" }}
-                    ></div>
+                    <div className="h-full bg-primary w-[75%]"></div>
                   </div>
                 </div>
                 <div className="ml-4 text-right">
@@ -141,10 +138,7 @@ export default async function DashboardPage() {
                     {t("campaignNewProductLaunch")}
                   </p>
                   <div className="h-2 w-full bg-muted mt-1 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary"
-                      style={{ width: "63%" }}
-                    ></div>
+                    <div className="h-full bg-primary w-[63%]"></div>
                   </div>
                 </div>
                 <div className="ml-4 text-right">
@@ -157,10 +151,7 @@ export default async function DashboardPage() {
                     {t("campaignHolidaySpecial")}
                   </p>
                   <div className="h-2 w-full bg-muted mt-1 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary"
-                      style={{ width: "52%" }}
-                    ></div>
+                    <div className="h-full bg-primary w-[52%]"></div>
                   </div>
                 </div>
                 <div className="ml-4 text-right">
@@ -173,10 +164,7 @@ export default async function DashboardPage() {
                     {t("campaignRetargeting")}
                   </p>
                   <div className="h-2 w-full bg-muted mt-1 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary"
-                      style={{ width: "48%" }}
-                    ></div>
+                    <div className="h-full bg-primary w-[48%]"></div>
                   </div>
                 </div>
                 <div className="ml-4 text-right">
