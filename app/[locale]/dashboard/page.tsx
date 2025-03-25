@@ -15,14 +15,14 @@ import {
   Clock,
 } from "lucide-react";
 import { getServerSession } from "next-auth";
-import { redirect } from "@/i18n/navigation";
-import { getTranslations, getLocale } from "next-intl/server";
+import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 export default async function DashboardPage() {
   const t = await getTranslations("Dashboard");
   const session = await getServerSession();
   if (!session) {
-    return redirect({ href: "api/auth/signin", locale: "" });
+    return redirect("api/auth/signin");
   }
   return (
     <div className="space-y-8">

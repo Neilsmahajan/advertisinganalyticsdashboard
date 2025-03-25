@@ -1,4 +1,4 @@
-import { redirect } from "@/i18n/navigation";
+import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import SignOutButton from "./SignOutButton";
 import { getServerSession } from "next-auth";
@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 export default async function AccountPage() {
   const session = await getServerSession();
   if (!session) {
-    return redirect({ href: "api/auth/signin", locale: "" });
+    return redirect("api/auth/signin");
   }
   const t = await getTranslations("Account");
   return (
