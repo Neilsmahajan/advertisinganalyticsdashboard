@@ -20,9 +20,11 @@ import {
 import { PlayCircle, Save } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { useSearchParams } from "next/navigation";
-import TrackingDataResultsSection from "./TrackingDataResultsSection"; // new import
+import TrackingDataResultsSection from "./TrackingDataResultsSection";
+import { useTranslations } from "next-intl";
 
 export default function TrackingDataQueries() {
+  const t = useTranslations("TrackingDataQueries");
   const [formData, setFormData] = useState({ queryName: "", websiteUrl: "" });
   const [selectedQuery, setSelectedQuery] = useState("new");
   const [savedQueries, setSavedQueries] = useState<
@@ -183,25 +185,22 @@ export default function TrackingDataQueries() {
     <div className="grid gap-6 md:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle>Instructions</CardTitle>
-          <CardDescription>
-            Enter your website URL and select from your saved queries or create
-            one.
-          </CardDescription>
+          <CardTitle>{t("instructionsTitle")}</CardTitle>
+          <CardDescription>{t("instructionsDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button variant="outline" className="gap-2">
-            <PlayCircle className="h-4 w-4" /> View Tutorial
+            <PlayCircle className="h-4 w-4" /> {t("viewTutorial")}
           </Button>
           <div className="space-y-4 pt-4">
             <div className="space-y-2">
-              <Label>Previous Queries</Label>
+              <Label>{t("previousQueries")}</Label>
               <Select value={selectedQuery} onValueChange={handleSelectChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a saved query or create new" />
+                  <SelectValue placeholder={t("selectPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="new">Create New Query</SelectItem>
+                  <SelectItem value="new">{t("createNewQuery")}</SelectItem>
                   {savedQueries.map((q: any) => (
                     <SelectItem key={q.id} value={q.id}>
                       {q.queryName}
@@ -211,26 +210,26 @@ export default function TrackingDataQueries() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="queryName">Query Name</Label>
+              <Label htmlFor="queryName">{t("queryName")}</Label>
               <div className="flex gap-2">
                 <Input
                   id="queryName"
                   name="queryName"
-                  placeholder="Enter query name"
+                  placeholder={t("queryNamePlaceholder")}
                   value={formData.queryName}
                   onChange={handleChange}
                 />
                 <Button variant="outline" onClick={handleSaveQuery}>
-                  <Save className="h-4 w-4" />
+                  <Save className="h-4 w-4" /> {t("saveQuery")}
                 </Button>
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="websiteUrl">Website URL</Label>
+              <Label htmlFor="websiteUrl">{t("websiteUrl")}</Label>
               <Input
                 id="websiteUrl"
                 name="websiteUrl"
-                placeholder="Enter Website URL"
+                placeholder={t("websiteUrlPlaceholder")}
                 value={formData.websiteUrl}
                 onChange={handleChange}
               />
@@ -242,36 +241,32 @@ export default function TrackingDataQueries() {
                 isAnalyzing || !formData.queryName || !formData.websiteUrl
               }
             >
-              {isAnalyzing ? "Analyzing..." : "Analyze"}
+              {isAnalyzing ? t("analyzing") : t("analyze")}
             </Button>
           </div>
         </CardContent>
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Results</CardTitle>
-          <CardDescription>
-            Tracking services found on your website
-          </CardDescription>
+          <CardTitle>{t("resultsTitle")}</CardTitle>
+          <CardDescription>{t("resultsDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
           {!results && !isAnalyzing && (
             <div className="flex items-center justify-center h-[300px] bg-muted/20 rounded-md">
-              <p className="text-muted-foreground">
-                Enter a URL and click Analyze to see results
-              </p>
+              <p className="text-muted-foreground">{t("noResults")}</p>
             </div>
           )}
           {isAnalyzing && (
             <div className="flex flex-col items-center justify-center h-[300px] bg-muted/20 rounded-md">
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-              <p className="mt-4 text-muted-foreground">Analyzing website…</p>
+              <p className="mt-4 text-muted-foreground">{t("analyzing")}</p>
             </div>
           )}
           {results && (
             <TrackingDataResultsSection
               results={results}
-              userInfo={{ name: "John Doe", email: "john@example.com" }} // replace with real user info if available
+              userInfo={{ name: "John Doe", email: "john@example.com" }}
               queryInfo={{
                 service: "Tracking Data",
                 queryName: formData.queryName,

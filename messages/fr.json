@@ -190,5 +190,56 @@
     "routeMetaAds": "Meta Ads",
     "routeMicrosoftAds": "Microsoft Ads",
     "toggleSidebar": "Basculer la barre latérale"
+  },
+  "TrackingDataPage": {
+    "title": "Données de suivi",
+    "description": "Entrez l'URL de votre site web pour identifier toutes les balises de suivi et les services d'analyse sur votre site."
+  },
+  "TrackingDataQueries": {
+    "instructionsTitle": "Instructions",
+    "instructionsDescription": "Entrez l'URL de votre site web et sélectionnez parmi vos requêtes sauvegardées ou créez-en une nouvelle.",
+    "previousQueries": "Requêtes précédentes",
+    "selectPlaceholder": "Sélectionnez une requête sauvegardée ou créez-en une nouvelle",
+    "createNewQuery": "Créer une nouvelle requête",
+    "queryName": "Nom de la requête",
+    "queryNamePlaceholder": "Entrez le nom de la requête",
+    "saveQuery": "Sauvegarder la requête",
+    "websiteUrl": "URL du site web",
+    "websiteUrlPlaceholder": "Entrez l'URL du site web",
+    "analyze": "Analyser",
+    "analyzing": "Analyse en cours...",
+    "viewTutorial": "Voir le tutoriel",
+    "resultsTitle": "Résultats",
+    "resultsDescription": "Services de suivi trouvés sur votre site web",
+    "noResults": "Entrez une URL et cliquez sur Analyser pour voir les résultats"
+  },
+  "TrackingDataResultsSection": {
+    "downloadReport": "Télécharger le rapport",
+    "resultsWillAppear": "Les résultats apparaîtront ici une fois l'analyse terminée.",
+    "service": "Service",
+    "queryName": "Nom de la requête",
+    "queryData": "Données de la requête",
+    "tagDescriptions": {
+      "Google Site Tag": "Extrait de code Google Tag Manager",
+      "Google Analytics": "Code de suivi Google Analytics",
+      "Google Ads DoubleClick": "Balise de suivi DoubleClick",
+      "Facebook Pixel": "Pixel de suivi Facebook",
+      "Facebook SDK": "Intégration SDK Facebook",
+      "Bing Universal Event Tracking": "Balise de suivi Bing",
+      "Hotjar": "Analyse comportementale Hotjar",
+      "Amplitude": "Analyse utilisateur Amplitude",
+      "Twitter Analytics": "Extrait de suivi Twitter",
+      "LinkedIn Insight Tag": "Balise d'analyse LinkedIn",
+      "Quantcast": "Mesure Quantcast",
+      "AdRoll": "Pixel de suivi AdRoll",
+      "Shopify": "Intégration de suivi Shopify",
+      "Mailchimp": "Code de suivi Mailchimp",
+      "Bold Commerce": "Suivi Bold Commerce",
+      "Google Ads Conversion Tracking": "Balise de conversion Google Ads",
+      "Automizely": "Code de suivi Automizely"
+    },
+    "viewActiveGoogleAds": "Voir les annonces Google actives",
+    "viewActiveMetaAds": "Voir les annonces Meta actives",
+    "queryInformation": "Informations sur la requête"
   }
 }

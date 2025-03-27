@@ -191,5 +191,55 @@
     "routeMicrosoftAds": "Microsoft Ads",
     "toggleSidebar": "Toggle sidebar"
   },
-  "TrackingDataResultsSection": {}
+  "TrackingDataPage": {
+    "title": "Tracking Data",
+    "description": "Enter your website URL to identify all tracking tags and analytics services on your site."
+  },
+  "TrackingDataQueries": {
+    "instructionsTitle": "Instructions",
+    "instructionsDescription": "Enter your website URL and select from your saved queries or create one.",
+    "previousQueries": "Previous Queries",
+    "selectPlaceholder": "Select a saved query or create new",
+    "createNewQuery": "Create New Query",
+    "queryName": "Query Name",
+    "queryNamePlaceholder": "Enter query name",
+    "saveQuery": "Save Query",
+    "websiteUrl": "Website URL",
+    "websiteUrlPlaceholder": "Enter Website URL",
+    "analyze": "Analyze",
+    "analyzing": "Analyzing...",
+    "viewTutorial": "View Tutorial",
+    "resultsTitle": "Results",
+    "resultsDescription": "Tracking services found on your website",
+    "noResults": "Enter a URL and click Analyze to see results"
+  },
+  "TrackingDataResultsSection": {
+    "downloadReport": "Download Report",
+    "resultsWillAppear": "Results will appear here once analysis is complete.",
+    "service": "Service",
+    "queryName": "Query Name",
+    "queryData": "Query Data",
+    "tagDescriptions": {
+      "Google Site Tag": "Google Tag Manager snippet",
+      "Google Analytics": "Google Analytics tracking code",
+      "Google Ads DoubleClick": "DoubleClick tracking tag",
+      "Facebook Pixel": "Facebook tracking pixel",
+      "Facebook SDK": "Facebook SDK integration",
+      "Bing Universal Event Tracking": "Bing tracking tag",
+      "Hotjar": "Hotjar behavior analytics",
+      "Amplitude": "Amplitude user analytics",
+      "Twitter Analytics": "Twitter tracking snippet",
+      "LinkedIn Insight Tag": "LinkedIn analytics tag",
+      "Quantcast": "Quantcast measurement",
+      "AdRoll": "AdRoll tracking pixel",
+      "Shopify": "Shopify tracking integration",
+      "Mailchimp": "Mailchimp tracking code",
+      "Bold Commerce": "Bold Commerce tracking",
+      "Google Ads Conversion Tracking": "Google Ads conversion tag",
+      "Automizely": "Automizely tracking code"
+    },
+    "viewActiveGoogleAds": "View Active Google Ads",
+    "viewActiveMetaAds": "View Active Meta Ads",
+    "queryInformation": "Query Information"
+  }
 }
