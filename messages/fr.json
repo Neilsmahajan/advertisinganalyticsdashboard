@@ -241,5 +241,45 @@
     "viewActiveGoogleAds": "Voir les annonces Google actives",
     "viewActiveMetaAds": "Voir les annonces Meta actives",
     "queryInformation": "Informations sur la requête"
+  },
+  "GoogleAnalyticsPage": {
+    "title": "Google Analytics",
+    "description": "Connectez-vous à votre compte Google Analytics pour consulter les analyses de votre site web."
+  },
+  "GoogleAnalyticsQueries": {
+    "instructionsTitle": "Instructions",
+    "instructionsDescription": "Entrez votre ID de propriété, sélectionnez votre plage de dates et créez ou sélectionnez une requête existante.",
+    "previousQueries": "Requêtes précédentes",
+    "selectPlaceholder": "Sélectionnez une requête sauvegardée ou créez-en une nouvelle",
+    "createNewQuery": "Créer une nouvelle requête",
+    "queryName": "Nom de la requête",
+    "queryNamePlaceholder": "Entrez le nom de la requête",
+    "saveQuery": "Sauvegarder la requête",
+    "propertyId": "ID de propriété",
+    "propertyIdPlaceholder": "Entrez l'ID de propriété",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "pickDate": "Choisissez une date",
+    "analyze": "Analyser",
+    "analyzing": "Analyse en cours...",
+    "viewTutorial": "Voir le tutoriel",
+    "resultsTitle": "Résultats",
+    "resultsDescription": "Données Google Analytics pour la période sélectionnée",
+    "noResults": "Entrez votre ID de propriété et votre plage de dates, puis cliquez sur Analyser pour voir les résultats"
+  },
+  "GoogleAnalyticsResultsSection": {
+    "results": "Résultats",
+    "resultsWillAppear": "Les résultats apparaîtront ici une fois l'analyse terminée.",
+    "date": "Date",
+    "sessions": "Sessions",
+    "totalUsers": "Utilisateurs totaux",
+    "bounceRate": "Taux de rebond",
+    "avgSessionDuration": "Durée moyenne des sessions",
+    "purchaseRevenue": "Revenu des achats",
+    "transactions": "Transactions",
+    "queryInformation": "Informations sur la requête",
+    "service": "Service",
+    "queryName": "Nom de la requête",
+    "queryData": "Données de la requête"
   }
 }

@@ -241,5 +241,45 @@
     "viewActiveGoogleAds": "View Active Google Ads",
     "viewActiveMetaAds": "View Active Meta Ads",
     "queryInformation": "Query Information"
+  },
+  "GoogleAnalyticsPage": {
+    "title": "Google Analytics",
+    "description": "Connect to your Google Analytics account to view your website analytics."
+  },
+  "GoogleAnalyticsQueries": {
+    "instructionsTitle": "Instructions",
+    "instructionsDescription": "Enter your Property ID, select your date range and create or select an existing query.",
+    "previousQueries": "Previous Queries",
+    "selectPlaceholder": "Select a saved query or create new",
+    "createNewQuery": "Create New Query",
+    "queryName": "Query Name",
+    "queryNamePlaceholder": "Enter query name",
+    "saveQuery": "Save Query",
+    "propertyId": "Property ID",
+    "propertyIdPlaceholder": "Enter Property ID",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "pickDate": "Pick a date",
+    "analyze": "Analyze",
+    "analyzing": "Analyzing...",
+    "viewTutorial": "View Tutorial",
+    "resultsTitle": "Results",
+    "resultsDescription": "Google Analytics data for the selected period",
+    "noResults": "Enter your Property ID and date range, then click Analyze to see results"
+  },
+  "GoogleAnalyticsResultsSection": {
+    "results": "Results",
+    "resultsWillAppear": "Results will appear here once analysis is complete.",
+    "date": "Date",
+    "sessions": "Sessions",
+    "totalUsers": "Total Users",
+    "bounceRate": "Bounce Rate",
+    "avgSessionDuration": "Avg Session Duration",
+    "purchaseRevenue": "Purchase Revenue",
+    "transactions": "Transactions",
+    "queryInformation": "Query Information",
+    "service": "Service",
+    "queryName": "Query Name",
+    "queryData": "Query Data"
   }
 }

@@ -28,8 +28,10 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function GoogleAnalyticsQueries() {
+  const t = useTranslations("GoogleAnalyticsQueries");
   const [formData, setFormData] = useState({ queryName: "", propertyId: "" });
   const [selectedQuery, setSelectedQuery] = useState("new");
   const [savedQueries, setSavedQueries] = useState<
@@ -161,56 +163,72 @@ export default function GoogleAnalyticsQueries() {
     }
   };
 
-  const handleAnalyze = () => {
-    // if (!formData.propertyId || !startDate || !endDate) {
-    //   toast({ title: "Error", description: "Please fill in all required fields", variant: "destructive" });
-    //   return;
-    // }
-    // setIsAnalyzing(true);
-    // // Simulated API call
-    // setTimeout(() => {
-    //   setIsAnalyzing(false);
-    //   setResults({
-    //     users: 12453,
-    //     newUsers: 8765,
-    //     sessions: 23456,
-    //     bounceRate: "45.2%",
-    //     avgSessionDuration: "2m 34s",
-    //     topPages: [
-    //       { path: "/", pageviews: 12345 },
-    //       { path: "/products", pageviews: 5432 },
-    //       { path: "/about", pageviews: 3456 },
-    //       { path: "/contact", pageviews: 2345 },
-    //       { path: "/blog", pageviews: 1234 },
-    //     ],
-    //   });
-    //   toast({ title: "Analysis Complete", description: "Google Analytics data has been retrieved." });
-    // }, 2000);
+  const handleAnalyze = async () => {
+    if (!formData.propertyId || !startDate || !endDate) {
+      toast({
+        title: "Error",
+        description: "Fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsAnalyzing(true);
+    try {
+      const res = await fetch("/api/google-analytics/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          propertyId: formData.propertyId,
+          startDate: startDate.toISOString().split("T")[0],
+          endDate: endDate.toISOString().split("T")[0],
+        }),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        toast({
+          title: "Error",
+          description: error.error || "Operation failed",
+          variant: "destructive",
+        });
+      } else {
+        const data = await res.json();
+        setResults(data);
+        toast({
+          title: "Analysis Complete",
+          description: "Google Analytics data retrieved.",
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Operation failed",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle>Instructions</CardTitle>
-          <CardDescription>
-            Enter your Property ID, select your date range and create or select
-            an existing query.
-          </CardDescription>
+          <CardTitle>{t("instructionsTitle")}</CardTitle>
+          <CardDescription>{t("instructionsDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button variant="outline" className="gap-2">
-            <PlayCircle className="h-4 w-4" /> View Tutorial
+            <PlayCircle className="h-4 w-4" /> {t("viewTutorial")}
           </Button>
           <div className="space-y-4 pt-4">
             <div className="space-y-2">
-              <Label>Previous Queries</Label>
+              <Label>{t("previousQueries")}</Label>
               <Select value={selectedQuery} onValueChange={handleSelectChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a saved query or create new" />
+                  <SelectValue placeholder={t("selectPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="new">Create New Query</SelectItem>
+                  <SelectItem value="new">{t("createNewQuery")}</SelectItem>
                   {savedQueries.map((q) => (
                     <SelectItem key={q.id} value={q.id}>
                       {q.queryName}
@@ -220,12 +238,12 @@ export default function GoogleAnalyticsQueries() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="queryName">Query Name</Label>
+              <Label htmlFor="queryName">{t("queryName")}</Label>
               <div className="flex gap-2">
                 <Input
                   id="queryName"
                   name="queryName"
-                  placeholder="Enter query name"
+                  placeholder={t("queryNamePlaceholder")}
                   value={formData.queryName}
                   onChange={handleChange}
                 />
@@ -235,18 +253,18 @@ export default function GoogleAnalyticsQueries() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="propertyId">Property ID</Label>
+              <Label htmlFor="propertyId">{t("propertyId")}</Label>
               <Input
                 id="propertyId"
                 name="propertyId"
-                placeholder="Enter Property ID"
+                placeholder={t("propertyIdPlaceholder")}
                 value={formData.propertyId}
                 onChange={handleChange}
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Start Date</Label>
+                <Label>{t("startDate")}</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -257,7 +275,7 @@ export default function GoogleAnalyticsQueries() {
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {startDate ? format(startDate, "PPP") : "Pick a date"}
+                      {startDate ? format(startDate, "PPP") : t("pickDate")}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
@@ -271,7 +289,7 @@ export default function GoogleAnalyticsQueries() {
                 </Popover>
               </div>
               <div className="space-y-2">
-                <Label>End Date</Label>
+                <Label>{t("endDate")}</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -282,7 +300,7 @@ export default function GoogleAnalyticsQueries() {
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {endDate ? format(endDate, "PPP") : "Pick a date"}
+                      {endDate ? format(endDate, "PPP") : t("pickDate")}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
@@ -299,33 +317,30 @@ export default function GoogleAnalyticsQueries() {
             <Button
               className="w-full"
               onClick={handleAnalyze}
-              disabled={isAnalyzing}
+              disabled={
+                isAnalyzing || !formData.propertyId || !startDate || !endDate
+              }
             >
-              {isAnalyzing ? "Analyzing..." : "Analyze"}
+              {isAnalyzing ? t("analyzing") : t("analyze")}
             </Button>
           </div>
         </CardContent>
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Results</CardTitle>
-          <CardDescription>
-            Google Analytics data for the selected period
-          </CardDescription>
+          <CardTitle>{t("resultsTitle")}</CardTitle>
+          <CardDescription>{t("resultsDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
           {!results && !isAnalyzing && (
             <div className="flex items-center justify-center h-[300px] bg-muted/20 rounded-md">
-              <p className="text-muted-foreground">
-                Enter your Property ID and date range, then click Analyze to see
-                results
-              </p>
+              <p className="text-muted-foreground">{t("noResults")}</p>
             </div>
           )}
           {isAnalyzing && (
             <div className="flex flex-col items-center justify-center h-[300px] bg-muted/20 rounded-md">
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-              <p className="mt-4 text-muted-foreground">Analyzing...</p>
+              <p className="mt-4 text-muted-foreground">{t("analyzing")}</p>
             </div>
           )}
           {results && (

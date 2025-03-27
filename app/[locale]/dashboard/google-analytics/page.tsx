@@ -1,9 +1,11 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import GoogleAnalyticsQueries from "./GoogleAnalyticsQueries";
+import { getTranslations } from "next-intl/server";
 
-export default function GoogleAnalyticsPage() {
-  const session = getServerSession();
+export default async function GoogleAnalyticsPage() {
+  const t = await getTranslations("GoogleAnalyticsPage");
+  const session = await getServerSession();
   if (!session) {
     return redirect("api/auth/signin");
   }
@@ -11,11 +13,8 @@ export default function GoogleAnalyticsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Google Analytics</h1>
-        <p className="text-muted-foreground">
-          Connect to your Google Analytics account to view your website
-          analytics.
-        </p>
+        <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("description")}</p>
       </div>
       <GoogleAnalyticsQueries />
     </div>
