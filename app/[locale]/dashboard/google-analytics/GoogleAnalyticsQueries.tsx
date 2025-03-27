@@ -29,10 +29,12 @@ import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useSession } from "next-auth/react";
 import GoogleAnalyticsResultsSection from "./GoogleAnalyticsResultsSection"; // new import
 
 export default function GoogleAnalyticsQueries() {
   const t = useTranslations("GoogleAnalyticsQueries");
+  const session = useSession();
   const [formData, setFormData] = useState({ queryName: "", propertyId: "" });
   const [selectedQuery, setSelectedQuery] = useState("new");
   const [savedQueries, setSavedQueries] = useState<
@@ -347,7 +349,10 @@ export default function GoogleAnalyticsQueries() {
           {results && (
             <GoogleAnalyticsResultsSection
               results={results}
-              userInfo={{ name: "John Doe", email: "john@example.com" }}
+              userInfo={{
+                name: session.data?.user.name ?? "",
+                email: session.data?.user.email ?? "",
+              }}
               queryInfo={{
                 service: "Google Analytics",
                 queryName: formData.queryName,

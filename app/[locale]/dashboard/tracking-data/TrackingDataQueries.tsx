@@ -22,9 +22,11 @@ import { toast } from "@/components/ui/use-toast";
 import { useSearchParams } from "next/navigation";
 import TrackingDataResultsSection from "./TrackingDataResultsSection";
 import { useTranslations } from "next-intl";
+import { useSession } from "next-auth/react";
 
 export default function TrackingDataQueries() {
   const t = useTranslations("TrackingDataQueries");
+  const session = useSession();
   const [formData, setFormData] = useState({ queryName: "", websiteUrl: "" });
   const [selectedQuery, setSelectedQuery] = useState("new");
   const [savedQueries, setSavedQueries] = useState<
@@ -266,7 +268,10 @@ export default function TrackingDataQueries() {
           {results && (
             <TrackingDataResultsSection
               results={results}
-              userInfo={{ name: "John Doe", email: "john@example.com" }}
+              userInfo={{
+                name: session.data?.user.name ?? "",
+                email: session.data?.user.email ?? "",
+              }}
               queryInfo={{
                 service: "Tracking Data",
                 queryName: formData.queryName,

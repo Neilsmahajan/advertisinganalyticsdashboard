@@ -71,7 +71,7 @@ export default function GoogleAnalyticsResultsSection({
           className="bg-[#47adbf] hover:bg-[#47adbf]/90 text-white"
           onClick={handleDownloadReport}
         >
-          {t("downloadReport", "Download Report")}
+          {t("downloadReport")}
         </Button>
       </div>
       <div>
