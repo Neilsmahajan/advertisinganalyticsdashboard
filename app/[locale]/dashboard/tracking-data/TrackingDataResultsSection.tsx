@@ -96,7 +96,7 @@ export default function TrackingDataResultsSection({
       <div>
         <div className="bg-white/10 rounded-lg p-6">
           {results.analytics_tags ? (
-            <ul className="list-disc list-inside text-white/60">
+            <ul className="list-disc list-inside text-black/60">
               {results.analytics_tags.map((tag: string, index: number) => (
                 <li key={index} className="flex items-center gap-2">
                   {tagImages[tag] && (
@@ -110,7 +110,7 @@ export default function TrackingDataResultsSection({
                   )}
                   <div>
                     <span>{tag}</span>
-                    <p className="text-sm text-white/50">
+                    <p className="text-sm text-black/50">
                       {t(`tagDescriptions.${tag}`)}
                     </p>
                     {(tag === "Google Ads DoubleClick" ||
@@ -141,7 +141,7 @@ export default function TrackingDataResultsSection({
               ))}
             </ul>
           ) : (
-            <p className="text-white/60">{t("resultsWillAppear")}</p>
+            <p className="text-black/60">{t("resultsWillAppear")}</p>
           )}
         </div>
       </div>
@@ -157,7 +157,7 @@ export default function TrackingDataResultsSection({
           <p>
             <strong>{t("queryData")}</strong>
           </p>
-          <pre className="text-white/60">
+          <pre className="text-black/60">
             {JSON.stringify(queryInfo.queryData, null, 2)}
           </pre>
         </div>
