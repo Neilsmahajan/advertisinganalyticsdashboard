@@ -332,7 +332,9 @@ export default function GoogleAdsQueries() {
             <Button
               className="w-full"
               onClick={handleAnalyze}
-              disabled={isAnalyzing}
+              disabled={
+                isAnalyzing || !formData.customerId || !startDate || !endDate
+              }
             >
               {isAnalyzing ? "Analyzing..." : "Analyze"}
             </Button>
