@@ -20,6 +20,7 @@ import {
 import { PlayCircle, Save } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { useSearchParams } from "next/navigation";
+import TrackingDataResultsSection from "./TrackingDataResultsSection"; // new import
 
 export default function TrackingDataQueries() {
   const [formData, setFormData] = useState({ queryName: "", websiteUrl: "" });
@@ -136,17 +137,43 @@ export default function TrackingDataQueries() {
     }
   };
 
-  const handleAnalyze = () => {
-    // if (!formData.websiteUrl) {
-    //   toast({ title: "Error", description: "Please enter a website URL", variant: "destructive" });
-    //   return;
-    // }
-    // setIsAnalyzing(true);
-    // setTimeout(() => {
-    //   setIsAnalyzing(false);
-    //   setResults({ found: ["Google Analytics (GA4)", "Google Tag Manager", "Facebook Pixel", "LinkedIn Insight Tag", "HotJar"] });
-    //   toast({ title: "Analysis Complete", description: "We've found tracking services on this website." });
-    // }, 2000);
+  const handleAnalyze = async () => {
+    if (!formData.queryName || !formData.websiteUrl) {
+      toast({
+        title: "Error",
+        description: "Fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsAnalyzing(true);
+    try {
+      const res = await fetch("/api/tracking-data/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: formData.websiteUrl }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setResults(data);
+        toast({ title: "Analysis Complete", description: "Tracking data retrieved." });
+      } else {
+        const error = await res.json();
+        toast({
+          title: "Error",
+          description: error.error || "Operation failed",
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Operation failed",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   return (
@@ -155,8 +182,7 @@ export default function TrackingDataQueries() {
         <CardHeader>
           <CardTitle>Instructions</CardTitle>
           <CardDescription>
-            Enter your website URL and select from your saved queries or create
-            one.
+            Enter your website URL and select from your saved queries or create one.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -208,7 +234,7 @@ export default function TrackingDataQueries() {
             <Button
               className="w-full"
               onClick={handleAnalyze}
-              disabled={isAnalyzing}
+              disabled={isAnalyzing || !formData.queryName || !formData.websiteUrl}
             >
               {isAnalyzing ? "Analyzing..." : "Analyze"}
             </Button>
@@ -237,17 +263,15 @@ export default function TrackingDataQueries() {
             </div>
           )}
           {results && (
-            <div className="space-y-4">
-              {/* <p className="font-medium">Found {results.found.length} tracking services:</p>
-                <ul className="space-y-2">
-                  {results.found.map((service: string, index: number) => (
-                    <li key={index} className="flex items-center p-2 bg-muted/20 rounded-md">
-                      <span className="h-2 w-2 bg-primary rounded-full mr-2"></span>
-                      {service}
-                    </li>
-                  ))}
-                </ul> */}
-            </div>
+            <TrackingDataResultsSection
+              results={results}
+              userInfo={{ name: "John Doe", email: "john@example.com" }} // replace with real user info if available
+              queryInfo={{
+                service: "Tracking Data",
+                queryName: formData.queryName,
+                queryData: { websiteURL: formData.websiteUrl },
+              }}
+            />
           )}
         </CardContent>
       </Card>
