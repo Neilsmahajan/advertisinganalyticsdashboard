@@ -1,5 +1,6 @@
 "use client";
 import { useTranslations, useLocale } from "next-intl";
+import { Button } from "@/components/ui/button";
 import React from "react";
 
 interface GoogleAnalyticsResultsSectionProps {
@@ -33,8 +34,46 @@ export default function GoogleAnalyticsResultsSection({
   const t = useTranslations("GoogleAnalyticsResultsSection");
   const locale = useLocale();
 
+  const handleDownloadReport = async () => {
+    try {
+      const response = await fetch("/api/google-analytics/download_report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userInfo,
+          queryInfo,
+          results,
+          service: "Google Analytics",
+          locale,
+        }),
+      });
+      if (!response.ok) {
+        console.error("Failed to generate report");
+        return;
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "report.pdf");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("Error generating report:", error);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      <div className="flex gap-4">
+        <Button
+          className="bg-[#47adbf] hover:bg-[#47adbf]/90 text-white"
+          onClick={handleDownloadReport}
+        >
+          {t("downloadReport", "Download Report")}
+        </Button>
+      </div>
       <div>
         <h3 className="text-xl font-bold mb-4">{t("results")}</h3>
         <div className="overflow-x-auto">

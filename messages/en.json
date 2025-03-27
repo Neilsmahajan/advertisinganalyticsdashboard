@@ -268,6 +268,7 @@
     "noResults": "Enter your Property ID and date range, then click Analyze to see results"
   },
   "GoogleAnalyticsResultsSection": {
+    "downloadReport": "Download Report",
     "results": "Results",
     "resultsWillAppear": "Results will appear here once analysis is complete.",
     "date": "Date",
