@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { format, parse } from "date-fns";
+import { BetaAnalyticsDataClient } from "@google-analytics/data";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,32 +12,74 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Simulate Google Analytics report data.
-    const simulatedResponse = {
-      rows: [
+    const credentials = {
+      type: "service_account",
+      project_id: "advertisinganalytics-dashboard",
+      private_key_id:
+        process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PRIVATE_KEY_ID,
+      private_key: process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PRIVATE_KEY,
+      client_email:
+        "google-analytics@advertisinganalytics-dashboard.iam.gserviceaccount.com",
+      client_id: process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_CLIENT_ID,
+      auth_uri: "https://accounts.google.com/o/oauth2/auth",
+      token_uri: "https://oauth2.googleapis.com/token",
+      auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+      client_x509_cert_url:
+        "https://www.googleapis.com/robot/v1/metadata/x509/google-analytics%40advertisinganalytics-dashboard.iam.gserviceaccount.com",
+      universe_domain: "googleapis.com",
+    };
+
+    // Create the GA Data API client with proper credentials and scopes
+    const client = new BetaAnalyticsDataClient({ credentials });
+
+    // Build the report request.
+    const requestBody = {
+      property: `properties/${propertyId}`,
+      dateRanges: [
         {
-          date: "Jan 01, 2023",
-          sessions: 1234,
-          totalUsers: 567,
-          bounceRate: 45.6,
-          avgSessionDuration: "2m 30s",
-          purchaseRevenue: 789.0,
-          transactions: 12,
+          startDate,
+          endDate,
         },
-        {
-          date: "Jan 02, 2023",
-          sessions: 2345,
-          totalUsers: 678,
-          bounceRate: 42.1,
-          avgSessionDuration: "2m 45s",
-          purchaseRevenue: 890.0,
-          transactions: 15,
-        },
+      ],
+      dimensions: [{ name: "date" }],
+      metrics: [
+        { name: "sessions" },
+        { name: "totalUsers" },
+        { name: "bounceRate" },
+        { name: "averageSessionDuration" },
+        { name: "purchaseRevenue" },
+        { name: "transactions" },
       ],
     };
 
-    // In a real implementation, call the Google Analytics API here.
-    return NextResponse.json(simulatedResponse, { status: 200 });
+    const [response] = await client.runReport(requestBody);
+
+    const rows =
+      response.rows?.map((row) => {
+        // Parse date returned as YYYYMMDD and format as "MMM dd, yyyy"
+        const dateFormatted =
+          row.dimensionValues && row.dimensionValues[0]?.value
+            ? format(
+                parse(
+                  row.dimensionValues[0].value as string,
+                  "yyyyMMdd",
+                  new Date(),
+                ),
+                "MMM dd, yyyy",
+              )
+            : "Invalid Date";
+        return {
+          date: dateFormatted,
+          sessions: row.metricValues?.[0]?.value ?? "0",
+          totalUsers: row.metricValues?.[1]?.value ?? "0",
+          bounceRate: row.metricValues?.[2]?.value ?? "0",
+          avgSessionDuration: row.metricValues?.[3]?.value ?? "0",
+          purchaseRevenue: row.metricValues?.[4]?.value ?? "0",
+          transactions: row.metricValues?.[5]?.value ?? "0",
+        };
+      }) || [];
+
+    return NextResponse.json({ rows }, { status: 200 });
   } catch (error) {
     console.error("Error in GA analyze:", error);
     return NextResponse.json(
