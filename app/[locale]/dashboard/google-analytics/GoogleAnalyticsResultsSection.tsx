@@ -37,7 +37,7 @@ export default function GoogleAnalyticsResultsSection({
     <div className="space-y-6">
       <div>
         <h3 className="text-xl font-bold mb-4">{t("results")}</h3>
-        <div>
+        <div className="overflow-x-auto">
           {results.rows && results.rows.length > 0 ? (
             <table className="min-w-full divide-y divide-blue-200">
               <thead className="bg-[#47adbf]">
@@ -94,7 +94,7 @@ export default function GoogleAnalyticsResultsSection({
               </tbody>
             </table>
           ) : (
-            <p className="text-white/60">{t("resultsWillAppear")}</p>
+            <p className="text-black/60">{t("resultsWillAppear")}</p>
           )}
         </div>
       </div>
@@ -110,7 +110,7 @@ export default function GoogleAnalyticsResultsSection({
           <p>
             <strong>{t("queryData")}</strong>
           </p>
-          <pre className="text-white/60">
+          <pre className="text-black/60">
             {JSON.stringify(queryInfo.queryData, null, 2)}
           </pre>
         </div>
