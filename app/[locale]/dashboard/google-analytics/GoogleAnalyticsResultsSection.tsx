@@ -1,6 +1,5 @@
 "use client";
 import { useTranslations, useLocale } from "next-intl";
-import { Button } from "@/components/ui/button";
 import React from "react";
 
 interface GoogleAnalyticsResultsSectionProps {
@@ -39,7 +38,7 @@ export default function GoogleAnalyticsResultsSection({
       <div>
         <h3 className="text-xl font-bold mb-4">{t("results")}</h3>
         <div>
-          {results.rows ? (
+          {results.rows && results.rows.length > 0 ? (
             <table className="min-w-full divide-y divide-blue-200">
               <thead className="bg-[#47adbf]">
                 <tr>

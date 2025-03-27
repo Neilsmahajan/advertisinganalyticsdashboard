@@ -29,6 +29,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import GoogleAnalyticsResultsSection from "./GoogleAnalyticsResultsSection"; // new import
 
 export default function GoogleAnalyticsQueries() {
   const t = useTranslations("GoogleAnalyticsQueries");
@@ -344,7 +345,19 @@ export default function GoogleAnalyticsQueries() {
             </div>
           )}
           {results && (
-            <div className="space-y-4">{/* Render results here */}</div>
+            <GoogleAnalyticsResultsSection
+              results={results}
+              userInfo={{ name: "John Doe", email: "john@example.com" }}
+              queryInfo={{
+                service: "Google Analytics",
+                queryName: formData.queryName,
+                queryData: {
+                  propertyId: formData.propertyId,
+                  startDate,
+                  endDate,
+                },
+              }}
+            />
           )}
         </CardContent>
       </Card>
