@@ -156,7 +156,10 @@ export default function TrackingDataQueries() {
       if (res.ok) {
         const data = await res.json();
         setResults(data);
-        toast({ title: "Analysis Complete", description: "Tracking data retrieved." });
+        toast({
+          title: "Analysis Complete",
+          description: "Tracking data retrieved.",
+        });
       } else {
         const error = await res.json();
         toast({
@@ -182,7 +185,8 @@ export default function TrackingDataQueries() {
         <CardHeader>
           <CardTitle>Instructions</CardTitle>
           <CardDescription>
-            Enter your website URL and select from your saved queries or create one.
+            Enter your website URL and select from your saved queries or create
+            one.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -234,7 +238,9 @@ export default function TrackingDataQueries() {
             <Button
               className="w-full"
               onClick={handleAnalyze}
-              disabled={isAnalyzing || !formData.queryName || !formData.websiteUrl}
+              disabled={
+                isAnalyzing || !formData.queryName || !formData.websiteUrl
+              }
             >
               {isAnalyzing ? "Analyzing..." : "Analyze"}
             </Button>

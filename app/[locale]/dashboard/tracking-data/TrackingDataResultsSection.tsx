@@ -55,29 +55,21 @@ export default function TrackingDataResultsSection({
 
   const handleDownloadReport = async () => {
     try {
-      const response = await fetch(
-        "https://us-central1-advertisinganalytics-dashboard.cloudfunctions.net/generate_report_function",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userInfo,
-            queryInfo,
-            results: {
-              ...results,
-              tag_descriptions: results.analytics_tags?.reduce(
-                (acc, tag) => ({
-                  ...acc,
-                  [tag]: t(`tagDescriptions.${tag}`),
-                }),
-                {},
-              ),
-            },
-            service: queryInfo.service,
-            locale,
-          }),
-        }
-      );
+      const response = await fetch("/api/tracking-data/download_report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userInfo,
+          queryInfo,
+          results,
+          service: queryInfo.service,
+          locale,
+        }),
+      });
+      if (!response.ok) {
+        console.error("Failed to generate report");
+        return;
+      }
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");

@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     if (!res.ok) {
       return NextResponse.json(
         { error: `Request failed: ${res.statusText}` },
-        { status: res.status }
+        { status: res.status },
       );
     }
     const html = await res.text();
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "An error occurred: " + error },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
