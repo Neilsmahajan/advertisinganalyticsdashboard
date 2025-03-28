@@ -360,7 +360,13 @@ export default function MicrosoftAdsQueries() {
             <Button
               className="w-full"
               onClick={handleAnalyze}
-              disabled={isAnalyzing}
+              disabled={
+                isAnalyzing ||
+                !formData.accountId ||
+                !formData.customerId ||
+                !startDate ||
+                !endDate
+              } // updated condition
             >
               {isAnalyzing ? "Analyzing..." : "Analyze"}
             </Button>
