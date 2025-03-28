@@ -327,7 +327,7 @@ export default function GoogleAdsQueries() {
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>{t("resultsTitle")}</CardTitle>
+          <CardTitle>{t("results")}</CardTitle>
           <CardDescription>{t("resultsDescription")}</CardDescription>
         </CardHeader>
         <CardContent>

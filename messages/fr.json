@@ -313,7 +313,9 @@
     "operationFailed": "Échec de l'opération",
     "fillRequiredFields": "Veuillez remplir tous les champs obligatoires",
     "analysisCompleteTitle": "Analyse terminée",
-    "adsDataRetrieved": "Les données Google Ads ont été récupérées."
+    "adsDataRetrieved": "Les données Google Ads ont été récupérées.",
+    "results": "Résultats",
+    "resultsDescription": "Données Google Ads pour la période sélectionnée"
   },
   "GoogleAdsResultsSection": {
     "downloadReport": "Télécharger le rapport",
