@@ -28,8 +28,11 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import { useSearchParams } from "next/navigation";
+import GoogleAdsResultsSection from "./GoogleAdsResultsSection";
+import { useTranslations } from "next-intl";
 
 export default function GoogleAdsQueries() {
+  const t = useTranslations("GoogleAdsQueries");
   const [formData, setFormData] = useState({ queryName: "", customerId: "" });
   const [selectedQuery, setSelectedQuery] = useState("new");
   const [savedQueries, setSavedQueries] = useState<
@@ -108,8 +111,8 @@ export default function GoogleAdsQueries() {
   const handleSaveQuery = async () => {
     if (!formData.queryName || !formData.customerId || !startDate || !endDate) {
       toast({
-        title: "Error",
-        description: "Fill in all fields",
+        title: t("saveQueryErrorTitle"),
+        description: t("fillFields"),
         variant: "destructive",
       });
       return;
@@ -143,107 +146,88 @@ export default function GoogleAdsQueries() {
       const result = await response.json();
       const savedQuery = result.query;
       toast({
-        title: "Success",
+        title: t("saveQuerySuccessTitle"),
         description:
-          selectedQuery === "new"
-            ? `New query "${formData.queryName}" saved.`
-            : `Query "${formData.queryName}" updated.`,
+          selectedQuery === "new" ? t("newQuerySaved") : t("queryUpdated"),
       });
       refreshQueries();
       setSelectedQuery(savedQuery.id);
       // Leave formData intact so the fields remain visible.
     } else {
       toast({
-        title: "Error",
-        description: "Operation failed",
+        title: t("errorTitle"),
+        description: t("operationFailed"),
         variant: "destructive",
       });
     }
   };
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!formData.customerId || !startDate || !endDate) {
       toast({
-        title: "Error",
-        description: "Please fill in all required fields",
+        title: t("errorTitle"),
+        description: t("fillRequiredFields"),
         variant: "destructive",
       });
       return;
     }
     setIsAnalyzing(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      setResults({
-        impressions: 543210,
-        clicks: 12345,
-        ctr: "2.27%",
-        cost: "$4,321.50",
-        conversions: 543,
-        costPerConversion: "$7.96",
-        campaigns: [
-          {
-            name: "Brand Awareness",
-            impressions: 123456,
-            clicks: 3456,
-            cost: "$1,234.56",
-          },
-          {
-            name: "Retargeting",
-            impressions: 98765,
-            clicks: 2345,
-            cost: "$987.65",
-          },
-          {
-            name: "Product Launch",
-            impressions: 87654,
-            clicks: 1234,
-            cost: "$876.54",
-          },
-          {
-            name: "Holiday Special",
-            impressions: 76543,
-            clicks: 987,
-            cost: "$765.43",
-          },
-          {
-            name: "Competitor Keywords",
-            impressions: 65432,
-            clicks: 876,
-            cost: "$654.32",
-          },
-        ],
+    try {
+      const res = await fetch("/api/google-ads/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId: formData.customerId,
+          startDate: startDate.toISOString().split("T")[0],
+          endDate: endDate.toISOString().split("T")[0],
+        }),
       });
+      if (!res.ok) {
+        const error = await res.json();
+        toast({
+          title: t("errorTitle"),
+          description: error.error || t("operationFailed"),
+          variant: "destructive",
+        });
+      } else {
+        const data = await res.json();
+        setResults(data);
+        toast({
+          title: t("analysisCompleteTitle"),
+          description: t("adsDataRetrieved"),
+        });
+      }
+    } catch (err) {
       toast({
-        title: "Analysis Complete",
-        description: "Google Ads data has been retrieved.",
+        title: t("errorTitle"),
+        description: t("operationFailed"),
+        variant: "destructive",
       });
-    }, 2000);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle>Instructions</CardTitle>
-          <CardDescription>
-            Enter your Customer ID, select your date range, and create or select
-            an existing query.
-          </CardDescription>
+          <CardTitle>{t("instructionsTitle")}</CardTitle>
+          <CardDescription>{t("instructionsDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button variant="outline" className="gap-2">
-            <PlayCircle className="h-4 w-4" /> View Tutorial
+            <PlayCircle className="h-4 w-4" /> {t("viewTutorial")}
           </Button>
           <div className="space-y-4 pt-4">
             <div className="space-y-2">
-              <Label>Previous Queries</Label>
+              <Label>{t("previousQueries")}</Label>
               <Select value={selectedQuery} onValueChange={handleSelectChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a saved query or create new" />
+                  <SelectValue placeholder={t("selectPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="new">Create New Query</SelectItem>
+                  <SelectItem value="new">{t("createNewQuery")}</SelectItem>
                   {savedQueries.map((q) => (
                     <SelectItem key={q.id} value={q.id}>
                       {q.queryName}
@@ -253,12 +237,12 @@ export default function GoogleAdsQueries() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="queryName">Query Name</Label>
+              <Label htmlFor="queryName">{t("queryName")}</Label>
               <div className="flex gap-2">
                 <Input
                   id="queryName"
                   name="queryName"
-                  placeholder="Enter query name"
+                  placeholder={t("queryNamePlaceholder")}
                   value={formData.queryName}
                   onChange={handleChange}
                 />
@@ -268,18 +252,18 @@ export default function GoogleAdsQueries() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="customerId">Customer ID</Label>
+              <Label htmlFor="customerId">{t("customerId")}</Label>
               <Input
                 id="customerId"
                 name="customerId"
-                placeholder="Enter Customer ID"
+                placeholder={t("customerIdPlaceholder")}
                 value={formData.customerId}
                 onChange={handleChange}
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Start Date</Label>
+                <Label>{t("startDate")}</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -290,7 +274,7 @@ export default function GoogleAdsQueries() {
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {startDate ? format(startDate, "PPP") : "Pick a date"}
+                      {startDate ? format(startDate, "PPP") : t("pickDate")}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
@@ -304,7 +288,7 @@ export default function GoogleAdsQueries() {
                 </Popover>
               </div>
               <div className="space-y-2">
-                <Label>End Date</Label>
+                <Label>{t("endDate")}</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -315,7 +299,7 @@ export default function GoogleAdsQueries() {
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {endDate ? format(endDate, "PPP") : "Pick a date"}
+                      {endDate ? format(endDate, "PPP") : t("pickDate")}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
@@ -336,75 +320,41 @@ export default function GoogleAdsQueries() {
                 isAnalyzing || !formData.customerId || !startDate || !endDate
               }
             >
-              {isAnalyzing ? "Analyzing..." : "Analyze"}
+              {isAnalyzing ? t("analyzing") : t("analyze")}
             </Button>
           </div>
         </CardContent>
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Results</CardTitle>
-          <CardDescription>
-            Google Ads data for the selected period
-          </CardDescription>
+          <CardTitle>{t("resultsTitle")}</CardTitle>
+          <CardDescription>{t("resultsDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
           {!results && !isAnalyzing && (
             <div className="flex items-center justify-center h-[400px] bg-muted/20 rounded-md">
-              <p className="text-muted-foreground">
-                Enter your Customer ID and date range, then click Analyze to see
-                results
-              </p>
+              <p className="text-muted-foreground">{t("noResults")}</p>
             </div>
           )}
           {isAnalyzing && (
             <div className="flex flex-col items-center justify-center h-[400px] bg-muted/20 rounded-md">
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-              <p className="mt-4 text-muted-foreground">
-                Fetching Google Ads data...
-              </p>
+              <p className="mt-4 text-muted-foreground">{t("analyzing")}</p>
             </div>
           )}
           {results && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-muted/20 p-4 rounded-md">
-                  <p className="text-sm text-muted-foreground">Impressions</p>
-                  <p className="text-2xl font-bold">
-                    {results.impressions.toLocaleString()}
-                  </p>
-                </div>
-                <div className="bg-muted/20 p-4 rounded-md">
-                  <p className="text-sm text-muted-foreground">Clicks</p>
-                  <p className="text-2xl font-bold">
-                    {results.clicks.toLocaleString()}
-                  </p>
-                </div>
-                <div className="bg-muted/20 p-4 rounded-md">
-                  <p className="text-sm text-muted-foreground">CTR</p>
-                  <p className="text-2xl font-bold">{results.ctr}</p>
-                </div>
-              </div>
-              <div>
-                <h3 className="font-medium mb-2">Top Campaigns</h3>
-                <div className="space-y-2">
-                  {results.campaigns.map((campaign: any, index: number) => (
-                    <div key={index} className="p-2 bg-muted/20 rounded-md">
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium">{campaign.name}</span>
-                        <span>{campaign.cost}</span>
-                      </div>
-                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                        <span>
-                          {campaign.impressions.toLocaleString()} impressions
-                        </span>
-                        <span>{campaign.clicks.toLocaleString()} clicks</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <GoogleAdsResultsSection
+              results={results}
+              queryInfo={{
+                service: "Google Ads",
+                queryName: formData.queryName,
+                queryData: {
+                  customerId: formData.customerId,
+                  startDate,
+                  endDate,
+                },
+              }}
+            />
           )}
         </CardContent>
       </Card>
