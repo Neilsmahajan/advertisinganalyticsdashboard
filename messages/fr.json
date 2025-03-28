@@ -334,5 +334,11 @@
     "service": "Service",
     "queryName": "Nom de la requête",
     "queryData": "Données de la requête"
-  }
+  },
+  "MicrosoftAdsPage": {
+    "title": "Microsoft Ads",
+    "description": "Connect to your Microsoft Ads account to view your campaign performance."
+  },
+  "MicrosoftAdsQueries": {},
+  "MicrosoftAdsResultsSection": {}
 }
