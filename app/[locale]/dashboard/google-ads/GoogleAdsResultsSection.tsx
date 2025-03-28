@@ -3,6 +3,11 @@ import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import React from "react";
 
+interface UserInfo {
+  name: string;
+  email: string;
+}
+
 interface GoogleAdsResultsSectionProps {
   results: {
     impressions: number;
@@ -23,11 +28,13 @@ interface GoogleAdsResultsSectionProps {
     queryName: string;
     queryData: Record<string, unknown>;
   };
+  userInfo: UserInfo; // Added userInfo prop
 }
 
 export default function GoogleAdsResultsSection({
   results,
   queryInfo,
+  userInfo, // Destructure userInfo
 }: GoogleAdsResultsSectionProps) {
   const t = useTranslations("GoogleAdsResultsSection");
   const locale = useLocale();
@@ -38,6 +45,7 @@ export default function GoogleAdsResultsSection({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          userInfo, // Passing userInfo in the request
           queryInfo,
           results,
           service: "Google Ads",

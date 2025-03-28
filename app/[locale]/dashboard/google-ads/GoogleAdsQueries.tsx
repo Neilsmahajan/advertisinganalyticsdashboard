@@ -30,9 +30,11 @@ import { toast } from "@/components/ui/use-toast";
 import { useSearchParams } from "next/navigation";
 import GoogleAdsResultsSection from "./GoogleAdsResultsSection";
 import { useTranslations } from "next-intl";
+import { useSession } from "next-auth/react";
 
 export default function GoogleAdsQueries() {
   const t = useTranslations("GoogleAdsQueries");
+  const session = useSession();
   const [formData, setFormData] = useState({ queryName: "", customerId: "" });
   const [selectedQuery, setSelectedQuery] = useState("new");
   const [savedQueries, setSavedQueries] = useState<
@@ -345,6 +347,10 @@ export default function GoogleAdsQueries() {
           {results && (
             <GoogleAdsResultsSection
               results={results}
+              userInfo={{
+                name: session.data?.user.name ?? "",
+                email: session.data?.user.email ?? "",
+              }}
               queryInfo={{
                 service: "Google Ads",
                 queryName: formData.queryName,
