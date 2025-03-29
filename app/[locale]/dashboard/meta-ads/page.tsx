@@ -5,7 +5,7 @@ import MetaAdsQueries from "./MetaAdsQueries";
 export default async function MetaAdsPage() {
   const session = await getServerSession();
   if (!session) {
-    return redirect("api/auth/signin");
+    return redirect("../../api/auth/signin");
   }
 
   return (

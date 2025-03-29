@@ -7,7 +7,7 @@ export default async function GoogleAnalyticsPage() {
   const t = await getTranslations("GoogleAnalyticsPage");
   const session = await getServerSession();
   if (!session) {
-    return redirect("api/auth/signin");
+    return redirect("../../api/auth/signin");
   }
 
   return (

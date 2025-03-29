@@ -7,7 +7,7 @@ export default async function TrackingDataPage() {
   const t = await getTranslations("TrackingDataPage");
   const session = await getServerSession();
   if (!session) {
-    return redirect("api/auth/signin");
+    return redirect("../../api/auth/signin");
   }
 
   return (

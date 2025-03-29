@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   const t = await getTranslations("Dashboard");
   const session = await getServerSession();
   if (!session) {
-    return redirect("api/auth/signin");
+    return redirect("../api/auth/signin");
   }
   return (
     <div className="space-y-8">

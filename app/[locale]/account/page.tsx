@@ -8,7 +8,7 @@ import AccountQueries from "./AccountQueries"; // newly added
 export default async function AccountPage() {
   const session = await getServerSession();
   if (!session) {
-    return redirect("api/auth/signin");
+    return redirect("../api/auth/signin");
   }
   const t = await getTranslations("Account");
   return (

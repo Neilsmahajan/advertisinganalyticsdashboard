@@ -7,7 +7,7 @@ export default async function GoogleAdsPage() {
   const t = await getTranslations("GoogleAdsPage");
   const session = await getServerSession();
   if (!session) {
-    return redirect("api/auth/signin");
+    return redirect("../../api/auth/signin");
   }
 
   return (

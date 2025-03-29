@@ -7,7 +7,7 @@ export default async function MicrosoftAdsPage() {
   const t = await getTranslations("MicrosoftAdsPage");
   const session = await getServerSession();
   if (!session) {
-    return redirect("api/auth/signin");
+    return redirect("../../api/auth/signin");
   }
   return (
     <div className="space-y-8">
