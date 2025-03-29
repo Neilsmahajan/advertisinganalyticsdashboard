@@ -66,12 +66,20 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.sub as string;
         session.user.refreshToken = token.refreshToken as string;
-        session.microsoft = {
-          accessToken: token.microsoftAccessToken as string | undefined,
-          expiresIn: token.microsoftExpiresIn as number | undefined,
-          extExpiresIn: token.microsoftExtExpiresIn as number | undefined,
-          tokenType: token.microsoftTokenType as string | undefined,
-        };
+        // Check if an azure-ad account exists for this user
+        const azureAccount = await prisma.account.findFirst({
+          where: { userId: session.user.id, provider: "azure-ad" },
+        });
+        if (azureAccount) {
+          session.microsoft = {
+            accessToken: token.microsoftAccessToken as string | undefined,
+            expiresIn: token.microsoftExpiresIn as number | undefined,
+            extExpiresIn: token.microsoftExtExpiresIn as number | undefined,
+            tokenType: token.microsoftTokenType as string | undefined,
+          };
+        } else {
+          session.microsoft = undefined;
+        }
       }
       return session;
     },
