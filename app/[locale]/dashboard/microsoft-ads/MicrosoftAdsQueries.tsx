@@ -28,7 +28,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import { useSearchParams } from "next/navigation";
-import { useSession, signIn } from "next-auth/react";
+import { useSession, signIn, signOut } from "next-auth/react";
 import { useLocale } from "next-intl";
 
 export default function MicrosoftAdsQueries() {
@@ -58,7 +58,35 @@ export default function MicrosoftAdsQueries() {
   const [results, setResults] = useState<null | any>(null);
   const searchParams = useSearchParams();
 
-  // Load saved queries via API on mount
+  // Disconnect handler for Microsoft account
+  const handleDisconnectMicrosoft = async () => {
+    try {
+      const res = await fetch("/api/auth/disconnect/azure-ad", {
+        method: "POST",
+      });
+      if (res.ok) {
+        toast({
+          title: "Disconnected",
+          description: "Microsoft account disconnected successfully.",
+        });
+        location.reload();
+      } else {
+        toast({
+          title: "Error",
+          description: "Could not disconnect Microsoft account.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "An error occurred during disconnect.",
+        variant: "destructive",
+      });
+    }
+  };
+
   useEffect(() => {
     async function loadQueries() {
       const res = await fetch("/api/microsoft-ads/queries");
@@ -173,7 +201,6 @@ export default function MicrosoftAdsQueries() {
       });
       refreshQueries();
       setSelectedQuery(savedQuery.id);
-      // Leave formData unchanged so fields remain visible.
     } else {
       toast({
         title: "Error",
@@ -248,148 +275,165 @@ export default function MicrosoftAdsQueries() {
       <Card>
         <CardHeader>
           <CardTitle>Instructions</CardTitle>
-          <CardDescription>
-            Enter your Account ID, Customer ID, select your date range and
-            create or select an existing query.
-          </CardDescription>
-          {/* Display connect button only if Microsoft is not connected */}
-          {!session?.microsoft?.accessToken && (
-            <Button
-              variant="outline"
-              onClick={() =>
-                signIn("azure-ad", {
-                  callbackUrl: `/${locale}/dashboard/microsoft-ads`,
-                })
-              }
-              className="mt-4"
-            >
-              Connect Microsoft Account
-            </Button>
-          )}
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Button variant="outline" className="gap-2">
-            <PlayCircle className="h-4 w-4" /> View Tutorial
-          </Button>
-          <div className="space-y-4 pt-4">
-            <div className="space-y-2">
-              <Label>Previous Queries</Label>
-              <Select value={selectedQuery} onValueChange={handleSelectChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a saved query or create new" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="new">Create New Query</SelectItem>
-                  {savedQueries.map((q) => (
-                    <SelectItem key={q.id} value={q.id}>
-                      {q.queryName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="queryName">Query Name</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="queryName"
-                  name="queryName"
-                  placeholder="Enter query name"
-                  value={formData.queryName}
-                  onChange={handleChange}
-                />
-                <Button variant="outline" onClick={handleSaveQuery}>
-                  <Save className="h-4 w-4" />
+          {!session?.microsoft?.accessToken ? (
+            <>
+              <CardDescription>
+                Connect your Microsoft account to begin.
+              </CardDescription>
+              <Button
+                variant="outline"
+                onClick={() =>
+                  signIn("azure-ad", {
+                    callbackUrl: `/${locale}/dashboard/microsoft-ads`,
+                  })
+                }
+                className="mt-4"
+              >
+                Connect Microsoft Account
+              </Button>
+            </>
+          ) : (
+            <>
+              <CardDescription>
+                Enter your Account ID, Customer ID and date range then create or
+                update your query.
+              </CardDescription>
+              <div className="flex gap-2 mt-4">
+                <Button variant="outline" onClick={handleDisconnectMicrosoft}>
+                  Disconnect Microsoft Account
                 </Button>
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="accountId">Account ID</Label>
-              <Input
-                id="accountId"
-                name="accountId"
-                placeholder="Enter Account ID"
-                value={formData.accountId}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="customerId">Customer ID</Label>
-              <Input
-                id="customerId"
-                name="customerId"
-                placeholder="Enter Customer ID"
-                value={formData.customerId}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Start Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !startDate && "text-muted-foreground",
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {startDate ? format(startDate, "PPP") : "Pick a date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={startDate}
-                      onSelect={setStartDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="space-y-2">
-                <Label>End Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !endDate && "text-muted-foreground",
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {endDate ? format(endDate, "PPP") : "Pick a date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={setEndDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-            <Button
-              className="w-full"
-              onClick={handleAnalyze}
-              disabled={
-                isAnalyzing ||
-                !formData.accountId ||
-                !formData.customerId ||
-                !startDate ||
-                !endDate
-              } // updated condition
-            >
-              {isAnalyzing ? "Analyzing..." : "Analyze"}
+            </>
+          )}
+        </CardHeader>
+        {session?.microsoft?.accessToken && (
+          <CardContent className="space-y-4">
+            <Button variant="outline" className="gap-2">
+              <PlayCircle className="h-4 w-4" /> View Tutorial
             </Button>
-          </div>
-        </CardContent>
+            <div className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label>Previous Queries</Label>
+                <Select
+                  value={selectedQuery}
+                  onValueChange={handleSelectChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a saved query or create new" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="new">Create New Query</SelectItem>
+                    {savedQueries.map((q) => (
+                      <SelectItem key={q.id} value={q.id}>
+                        {q.queryName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="queryName">Query Name</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="queryName"
+                    name="queryName"
+                    placeholder="Enter query name"
+                    value={formData.queryName}
+                    onChange={handleChange}
+                  />
+                  <Button variant="outline" onClick={handleSaveQuery}>
+                    <Save className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="accountId">Account ID</Label>
+                <Input
+                  id="accountId"
+                  name="accountId"
+                  placeholder="Enter Account ID"
+                  value={formData.accountId}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="customerId">Customer ID</Label>
+                <Input
+                  id="customerId"
+                  name="customerId"
+                  placeholder="Enter Customer ID"
+                  value={formData.customerId}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Start Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !startDate && "text-muted-foreground",
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {startDate ? format(startDate, "PPP") : "Pick a date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={setStartDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div className="space-y-2">
+                  <Label>End Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !endDate && "text-muted-foreground",
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {endDate ? format(endDate, "PPP") : "Pick a date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={setEndDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+              <Button
+                className="w-full"
+                onClick={handleAnalyze}
+                disabled={
+                  isAnalyzing ||
+                  !formData.accountId ||
+                  !formData.customerId ||
+                  !startDate ||
+                  !endDate
+                }
+              >
+                {isAnalyzing ? "Analyzing..." : "Analyze"}
+              </Button>
+            </div>
+          </CardContent>
+        )}
       </Card>
       <Card>
         <CardHeader>
@@ -449,7 +493,6 @@ export default function MicrosoftAdsQueries() {
                   </p>
                 </div>
               </div>
-
               <div>
                 <h3 className="font-medium mb-2">Top Campaigns</h3>
                 <div className="space-y-2">
@@ -469,7 +512,6 @@ export default function MicrosoftAdsQueries() {
                   ))}
                 </div>
               </div>
-
               <div className="h-[150px] bg-muted/20 rounded-md flex items-center justify-center">
                 <p className="text-muted-foreground">
                   Campaign performance chart will appear here
