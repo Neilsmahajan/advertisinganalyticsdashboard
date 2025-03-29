@@ -1,13 +1,13 @@
 import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 import MicrosoftAdsQueries from "./MicrosoftAdsQueries";
 import { getTranslations } from "next-intl/server";
+import SignInButton from "@/components/SignInButton";
 
 export default async function MicrosoftAdsPage() {
   const t = await getTranslations("MicrosoftAdsPage");
   const session = await getServerSession();
   if (!session) {
-    return redirect("../../api/auth/signin");
+    return <SignInButton />;
   }
   return (
     <div className="space-y-8">

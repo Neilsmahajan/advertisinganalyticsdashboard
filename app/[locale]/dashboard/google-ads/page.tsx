@@ -1,13 +1,13 @@
 import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 import GoogleAdsQueries from "./GoogleAdsQueries";
 import { getTranslations } from "next-intl/server";
+import SignInButton from "@/components/SignInButton";
 
 export default async function GoogleAdsPage() {
   const t = await getTranslations("GoogleAdsPage");
   const session = await getServerSession();
   if (!session) {
-    return redirect("../../api/auth/signin");
+    return <SignInButton />;
   }
 
   return (

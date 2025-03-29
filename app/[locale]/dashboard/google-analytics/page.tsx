@@ -2,12 +2,13 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import GoogleAnalyticsQueries from "./GoogleAnalyticsQueries";
 import { getTranslations } from "next-intl/server";
+import SignInButton from "@/components/SignInButton";
 
 export default async function GoogleAnalyticsPage() {
   const t = await getTranslations("GoogleAnalyticsPage");
   const session = await getServerSession();
   if (!session) {
-    return redirect("../../api/auth/signin");
+    return <SignInButton />;
   }
 
   return (

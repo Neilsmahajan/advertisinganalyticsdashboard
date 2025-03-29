@@ -1,5 +1,6 @@
 import type { DefaultSession, NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import AzureADProvider from "next-auth/providers/azure-ad"; // <-- added
 import { prisma } from "@/lib/prisma";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
@@ -26,6 +27,14 @@ export const authOptions: NextAuthOptions = {
           response_type: "code",
         },
       },
+    }),
+    // Azure AD provider added for connecting Microsoft account.
+    // This provider will be used when the user clicks the connect button,
+    // while sign in remains with Google.
+    AzureADProvider({
+      clientId: process.env.AZURE_AD_CLIENT_ID!,
+      clientSecret: process.env.AZURE_AD_CLIENT_SECRET!,
+      tenantId: process.env.AZURE_AD_TENANT_ID,
     }),
   ],
   adapter: PrismaAdapter(prisma),

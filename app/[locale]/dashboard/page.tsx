@@ -15,14 +15,14 @@ import {
   Clock,
 } from "lucide-react";
 import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import SignInButton from "@/components/SignInButton";
 
 export default async function DashboardPage() {
   const t = await getTranslations("Dashboard");
   const session = await getServerSession();
   if (!session) {
-    return redirect("../api/auth/signin");
+    return <SignInButton />;
   }
   return (
     <div className="space-y-8">

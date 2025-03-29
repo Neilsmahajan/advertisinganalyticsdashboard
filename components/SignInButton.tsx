@@ -7,7 +7,7 @@ import { redirect } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
 import { useTranslations } from "next-intl";
 
-export default function SignOutButton() {
+export default function SignInButton() {
   const t = useTranslations("SignInButton");
   const { data: session, status } = useSession();
   const locale = useLocale();
@@ -27,7 +27,17 @@ export default function SignOutButton() {
     );
   }
   return (
-    <Button onClick={() => signIn()} variant="secondary" size="lg">
+    // Sign in with Google
+    <Button
+      onClick={() =>
+        signIn("google", {
+          callbackUrl: `/${locale}/dashboard`,
+          redirect: false,
+        })
+      }
+      variant="secondary"
+      size="lg"
+    >
       {t("signIn")}
     </Button>
   );

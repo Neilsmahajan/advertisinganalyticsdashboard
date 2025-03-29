@@ -1,11 +1,11 @@
 import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 import MetaAdsQueries from "./MetaAdsQueries";
+import SignInButton from "@/components/SignInButton";
 
 export default async function MetaAdsPage() {
   const session = await getServerSession();
   if (!session) {
-    return redirect("../../api/auth/signin");
+    return <SignInButton />;
   }
 
   return (

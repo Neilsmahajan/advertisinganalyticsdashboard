@@ -11,7 +11,7 @@ import {
   Clock,
   Users,
 } from "lucide-react";
-import SignInButton from "./SignInButton";
+import SignInButton from "../../components/SignInButton";
 import { useTranslations } from "next-intl";
 
 export default function Home() {

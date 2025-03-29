@@ -4,11 +4,12 @@ import { getServerSession } from "next-auth";
 import SignOutButton from "./SignOutButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AccountQueries from "./AccountQueries"; // newly added
+import SignInButton from "@/components/SignInButton";
 
 export default async function AccountPage() {
   const session = await getServerSession();
   if (!session) {
-    return redirect("../api/auth/signin");
+    return <SignInButton />;
   }
   const t = await getTranslations("Account");
   return (
