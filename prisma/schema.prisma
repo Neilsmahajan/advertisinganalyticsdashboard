@@ -29,6 +29,8 @@ model Account {
   scope              String?
   id_token           String?  @db.Text
   session_state      String?
+  expires_in         Int?        // Azure AD: token valid duration in seconds
+  ext_expires_in     Int?        // Azure AD: extended token valid duration
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
