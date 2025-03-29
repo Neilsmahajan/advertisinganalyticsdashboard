@@ -1,15 +1,22 @@
 import type { DefaultSession, NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import AzureADProvider from "next-auth/providers/azure-ad"; // <-- added
+import AzureADProvider from "next-auth/providers/azure-ad";
 import { prisma } from "@/lib/prisma";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
+// Extend session type to include Microsoft tokens.
 declare module "next-auth" {
   interface Session {
     user: {
-      id: string; // added property
+      id: string;
       refreshToken?: string;
     } & DefaultSession["user"];
+    microsoft?: {
+      accessToken?: string;
+      expiresIn?: number;
+      extExpiresIn?: number;
+      tokenType?: string;
+    };
   }
 }
 
@@ -29,8 +36,6 @@ export const authOptions: NextAuthOptions = {
       },
     }),
     // Azure AD provider added for connecting Microsoft account.
-    // This provider will be used when the user clicks the connect button,
-    // while sign in remains with Google.
     AzureADProvider({
       clientId: process.env.AZURE_AD_CLIENT_ID!,
       clientSecret: process.env.AZURE_AD_CLIENT_SECRET!,
@@ -40,23 +45,33 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET!,
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
   },
-  jwt: {},
   callbacks: {
-    async jwt({ token, account }) {
+    jwt: async ({ token, account }: { token: any; account?: any }) => {
       if (account) {
-        token.accessToken = account.access_token;
-        if (account.refresh_token) {
-          token.refreshToken = account.refresh_token;
+        if (account.provider === "google") {
+          token.accessToken = account.access_token;
+          if (account.refresh_token) token.refreshToken = account.refresh_token;
+        } else if (account.provider === "azure-ad") {
+          token.microsoftAccessToken = account.access_token;
+          token.microsoftExpiresIn = account.expires_in;
+          token.microsoftExtExpiresIn = account.ext_expires_in;
+          token.microsoftTokenType = account.token_type;
         }
       }
       return token;
     },
-    async session({ session, token }) {
+    session: async ({ session, token }) => {
       if (session.user) {
-        session.user.id = token.sub as string; // set user id from JWT sub
+        session.user.id = token.sub as string;
         session.user.refreshToken = token.refreshToken as string;
+        session.microsoft = {
+          accessToken: token.microsoftAccessToken as string | undefined,
+          expiresIn: token.microsoftExpiresIn as number | undefined,
+          extExpiresIn: token.microsoftExtExpiresIn as number | undefined,
+          tokenType: token.microsoftTokenType as string | undefined,
+        };
       }
       return session;
     },

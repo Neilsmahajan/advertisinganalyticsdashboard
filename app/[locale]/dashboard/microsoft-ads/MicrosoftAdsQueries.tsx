@@ -28,8 +28,12 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import { useSearchParams } from "next/navigation";
+import { useSession, signIn } from "next-auth/react";
+import { useLocale } from "next-intl";
 
 export default function MicrosoftAdsQueries() {
+  const { data: session } = useSession();
+  const locale = useLocale();
   const [formData, setFormData] = useState({
     queryName: "",
     accountId: "",
@@ -248,6 +252,20 @@ export default function MicrosoftAdsQueries() {
             Enter your Account ID, Customer ID, select your date range and
             create or select an existing query.
           </CardDescription>
+          {/* Display connect button only if Microsoft is not connected */}
+          {!session?.microsoft?.accessToken && (
+            <Button
+              variant="outline"
+              onClick={() =>
+                signIn("azure-ad", {
+                  callbackUrl: `/${locale}/dashboard/microsoft-ads`,
+                })
+              }
+              className="mt-4"
+            >
+              Connect Microsoft Account
+            </Button>
+          )}
         </CardHeader>
         <CardContent className="space-y-4">
           <Button variant="outline" className="gap-2">
