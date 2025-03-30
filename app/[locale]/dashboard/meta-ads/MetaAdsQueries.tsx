@@ -23,13 +23,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, PlayCircle, Save, Eye } from "lucide-react";
+import { CalendarIcon, PlayCircle, Save } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import { useSearchParams } from "next/navigation";
 import { useSession, signIn } from "next-auth/react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import MetaAdsResultsSection from "./MetaAdsResultsSection";
 
 export default function MetaAdsQueries() {
   const [formData, setFormData] = useState({
@@ -54,6 +55,7 @@ export default function MetaAdsQueries() {
   const [results, setResults] = useState<null | any>(null);
   const searchParams = useSearchParams();
   const { data: session } = useSession();
+  const t = useTranslations("MetaAdsQueries");
   const locale = useLocale();
 
   // Load saved Meta Ads queries on mount
@@ -125,7 +127,7 @@ export default function MetaAdsQueries() {
     ) {
       toast({
         title: "Error",
-        description: "Fill in all fields",
+        description: t("fillRequiredFields"),
         variant: "destructive",
       });
       return;
@@ -167,73 +169,67 @@ export default function MetaAdsQueries() {
       });
       refreshQueries();
       setSelectedQuery(savedQuery.id);
-      // Leave formData unchanged so fields remain visible.
     } else {
       toast({
         title: "Error",
-        description: "Operation failed",
+        description: t("operationFailed"),
         variant: "destructive",
       });
     }
   };
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!formData.adAccountId || !startDate || !endDate) {
       toast({
-        title: "Error",
-        description: "Fill in all required fields",
+        title: t("errorTitle"),
+        description: t("fillRequiredFields"),
         variant: "destructive",
       });
       return;
     }
     setIsAnalyzing(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      setResults({
-        reach: 876543,
-        impressions: 1234567,
-        clicks: 23456,
-        ctr: "1.9%",
-        spend: "$3,456.78",
-        campaigns: [
-          {
-            name: "Brand Awareness",
-            reach: 345678,
-            impressions: 456789,
-            spend: "$1,234.56",
-          },
-          {
-            name: "Lead Generation",
-            reach: 234567,
-            impressions: 345678,
-            spend: "$987.65",
-          },
-          {
-            name: "Conversion",
-            reach: 123456,
-            impressions: 234567,
-            spend: "$876.54",
-          },
-          {
-            name: "Retargeting",
-            reach: 98765,
-            impressions: 123456,
-            spend: "$765.43",
-          },
-          {
-            name: "Lookalike",
-            reach: 87654,
-            impressions: 98765,
-            spend: "$654.32",
-          },
-        ],
+    // Log the payload before making the request
+    console.log("MetaAds analyze payload from client:", {
+      adAccountId: formData.adAccountId,
+      accessToken: session?.facebook?.accessToken,
+      startDate: startDate.toISOString().split("T")[0],
+      endDate: endDate.toISOString().split("T")[0],
+    });
+    try {
+      const res = await fetch("/api/meta-ads/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          adAccountId: formData.adAccountId,
+          accessToken: session?.facebook?.accessToken,
+          startDate: startDate.toISOString().split("T")[0],
+          endDate: endDate.toISOString().split("T")[0],
+        }),
       });
+      if (!res.ok) {
+        const error = await res.json();
+        toast({
+          title: t("errorTitle"),
+          description: error.error || t("operationFailed"),
+          variant: "destructive",
+        });
+      } else {
+        const data = await res.json();
+        setResults(data);
+        toast({
+          title: t("analysisCompleteTitle"),
+          description: t("adsDataRetrieved"),
+        });
+      }
+    } catch (err) {
       toast({
-        title: "Analysis Complete",
-        description: "Meta Ads data has been retrieved.",
+        title: t("errorTitle"),
+        description: t("operationFailed"),
+        variant: "destructive",
       });
-    }, 2000);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   // Disconnect handler for Facebook (Meta)
@@ -269,24 +265,19 @@ export default function MetaAdsQueries() {
     <div className="grid gap-6 md:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle>Instructions</CardTitle>
+          <CardTitle>{t("instructionsTitle")}</CardTitle>
           {session?.facebook?.accessToken ? (
             <>
-              <CardDescription>
-                Enter your Ad Account ID, select your date range and create or
-                update your query.
-              </CardDescription>
+              <CardDescription>{t("instructionsDescription")}</CardDescription>
               <div className="flex gap-2 mt-4">
                 <Button variant="outline" onClick={handleDisconnectFacebook}>
-                  Disconnect Meta Account
+                  {t("disconnectButton")}
                 </Button>
               </div>
             </>
           ) : (
             <>
-              <CardDescription>
-                Connect your Meta account to begin.
-              </CardDescription>
+              <CardDescription>{t("connectDescription")}</CardDescription>
               <Button
                 variant="outline"
                 onClick={() =>
@@ -296,7 +287,7 @@ export default function MetaAdsQueries() {
                 }
                 className="mt-4"
               >
-                Connect Meta Account
+                {t("connectButton")}
               </Button>
             </>
           )}
@@ -305,20 +296,20 @@ export default function MetaAdsQueries() {
           {session?.facebook?.accessToken && (
             <>
               <Button variant="outline" className="gap-2">
-                <PlayCircle className="h-4 w-4" /> View Tutorial
+                <PlayCircle className="h-4 w-4" /> {t("viewTutorial")}
               </Button>
               <div className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <Label>Previous Queries</Label>
+                  <Label>{t("previousQueries")}</Label>
                   <Select
                     value={selectedQuery}
                     onValueChange={handleSelectChange}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a saved query or create new" />
+                      <SelectValue placeholder={t("selectPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="new">Create New Query</SelectItem>
+                      <SelectItem value="new">{t("createNewQuery")}</SelectItem>
                       {savedQueries.map((q) => (
                         <SelectItem key={q.id} value={q.id}>
                           {q.queryName}
@@ -328,12 +319,12 @@ export default function MetaAdsQueries() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="queryName">Query Name</Label>
+                  <Label htmlFor="queryName">{t("queryName")}</Label>
                   <div className="flex gap-2">
                     <Input
                       id="queryName"
                       name="queryName"
-                      placeholder="Enter query name"
+                      placeholder={t("queryNamePlaceholder")}
                       value={formData.queryName}
                       onChange={handleChange}
                     />
@@ -343,18 +334,18 @@ export default function MetaAdsQueries() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="adAccountId">Ad Account ID</Label>
+                  <Label htmlFor="adAccountId">{t("adAccountId")}</Label>
                   <Input
                     id="adAccountId"
                     name="adAccountId"
-                    placeholder="Enter Ad Account ID"
+                    placeholder={t("adAccountIdPlaceholder")}
                     value={formData.adAccountId}
                     onChange={handleChange}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Start Date</Label>
+                    <Label>{t("startDate")}</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
@@ -365,7 +356,7 @@ export default function MetaAdsQueries() {
                           )}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {startDate ? format(startDate, "PPP") : "Pick a date"}
+                          {startDate ? format(startDate, "PPP") : t("pickDate")}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
@@ -379,7 +370,7 @@ export default function MetaAdsQueries() {
                     </Popover>
                   </div>
                   <div className="space-y-2">
-                    <Label>End Date</Label>
+                    <Label>{t("endDate")}</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
@@ -390,7 +381,7 @@ export default function MetaAdsQueries() {
                           )}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {endDate ? format(endDate, "PPP") : "Pick a date"}
+                          {endDate ? format(endDate, "PPP") : t("pickDate")}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
@@ -407,9 +398,14 @@ export default function MetaAdsQueries() {
                 <Button
                   className="w-full"
                   onClick={handleAnalyze}
-                  disabled={isAnalyzing}
+                  disabled={
+                    isAnalyzing ||
+                    !formData.adAccountId ||
+                    !startDate ||
+                    !endDate
+                  }
                 >
-                  {isAnalyzing ? "Analyzing..." : "Analyze"}
+                  {isAnalyzing ? t("analyzing") : t("analyze")}
                 </Button>
               </div>
             </>
@@ -418,71 +414,38 @@ export default function MetaAdsQueries() {
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Results</CardTitle>
-          <CardDescription>
-            Meta Ads data for the selected period
-          </CardDescription>
+          <CardTitle>{t("resultsTitle")}</CardTitle>
+          <CardDescription>{t("resultsDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
           {!results && !isAnalyzing && (
             <div className="flex items-center justify-center h-[400px] bg-muted/20 rounded-md">
-              <p className="text-muted-foreground">
-                Enter your Ad Account ID and date range, then click Analyze to
-                see results
-              </p>
+              <p className="text-muted-foreground">{t("noResults")}</p>
             </div>
           )}
           {isAnalyzing && (
             <div className="flex flex-col items-center justify-center h-[400px] bg-muted/20 rounded-md">
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-              <p className="mt-4 text-muted-foreground">
-                Fetching Meta Ads data...
-              </p>
+              <p className="mt-4 text-muted-foreground">{t("analyzing")}</p>
             </div>
           )}
           {results && (
-            <div className="space-y-6">
-              {/* Render results as needed */}
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-muted/20 p-4 rounded-md">
-                  <p className="text-sm text-muted-foreground">Reach</p>
-                  <p className="text-2xl font-bold">
-                    {results.reach.toLocaleString()}
-                  </p>
-                </div>
-                <div className="bg-muted/20 p-4 rounded-md">
-                  <p className="text-sm text-muted-foreground">Impressions</p>
-                  <p className="text-2xl font-bold">
-                    {results.impressions.toLocaleString()}
-                  </p>
-                </div>
-                <div className="bg-muted/20 p-4 rounded-md">
-                  <p className="text-sm text-muted-foreground">Clicks</p>
-                  <p className="text-2xl font-bold">
-                    {results.clicks.toLocaleString()}
-                  </p>
-                </div>
-              </div>
-              <div>
-                <h3 className="font-medium mb-2">Top Campaigns</h3>
-                <div className="space-y-2">
-                  {results.campaigns.map((campaign: any, index: number) => (
-                    <div key={index} className="p-2 bg-muted/20 rounded-md">
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium">{campaign.name}</span>
-                        <span>{campaign.spend}</span>
-                      </div>
-                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                        <span>{campaign.reach.toLocaleString()} reach</span>
-                        <span>
-                          {campaign.impressions.toLocaleString()} impressions
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <MetaAdsResultsSection
+              results={results}
+              userInfo={{
+                name: session?.user?.name ?? "",
+                email: session?.user?.email ?? "",
+              }}
+              queryInfo={{
+                service: "Meta Ads",
+                queryName: formData.queryName,
+                queryData: {
+                  adAccountId: formData.adAccountId,
+                  startDate,
+                  endDate,
+                },
+              }}
+            />
           )}
         </CardContent>
       </Card>
