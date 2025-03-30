@@ -35,7 +35,6 @@ export default function MetaAdsQueries() {
   const [formData, setFormData] = useState({
     queryName: "",
     adAccountId: "",
-    accessToken: "",
   });
   const [selectedQuery, setSelectedQuery] = useState("new");
   const [savedQueries, setSavedQueries] = useState<
@@ -44,7 +43,6 @@ export default function MetaAdsQueries() {
       queryName: string;
       queryData: {
         adAccountId: number;
-        accessToken: string;
         startDate: string;
         endDate: string;
       };
@@ -79,7 +77,6 @@ export default function MetaAdsQueries() {
         setFormData({
           queryName: query.queryName,
           adAccountId: query.queryData.adAccountId.toString(),
-          accessToken: query.queryData.accessToken,
         });
         setStartDate(new Date(query.queryData.startDate));
         setEndDate(new Date(query.queryData.endDate));
@@ -100,13 +97,12 @@ export default function MetaAdsQueries() {
         setFormData({
           queryName: query.queryName,
           adAccountId: query.queryData.adAccountId.toString(),
-          accessToken: query.queryData.accessToken,
         });
         setStartDate(new Date(query.queryData.startDate));
         setEndDate(new Date(query.queryData.endDate));
       }
     } else {
-      setFormData({ queryName: "", adAccountId: "", accessToken: "" });
+      setFormData({ queryName: "", adAccountId: "" });
       setStartDate(undefined);
       setEndDate(undefined);
     }
@@ -124,7 +120,6 @@ export default function MetaAdsQueries() {
     if (
       !formData.queryName ||
       !formData.adAccountId ||
-      !formData.accessToken ||
       !startDate ||
       !endDate
     ) {
@@ -140,7 +135,6 @@ export default function MetaAdsQueries() {
       queryName: formData.queryName,
       queryData: {
         adAccountId: parseInt(formData.adAccountId),
-        accessToken: formData.accessToken,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
       },
@@ -184,12 +178,7 @@ export default function MetaAdsQueries() {
   };
 
   const handleAnalyze = () => {
-    if (
-      !formData.adAccountId ||
-      !formData.accessToken ||
-      !startDate ||
-      !endDate
-    ) {
+    if (!formData.adAccountId || !startDate || !endDate) {
       toast({
         title: "Error",
         description: "Fill in all required fields",
@@ -284,8 +273,8 @@ export default function MetaAdsQueries() {
           {session?.facebook?.accessToken ? (
             <>
               <CardDescription>
-                Enter your Ad Account ID, Access Token, select your date range
-                and create or update your query.
+                Enter your Ad Account ID, select your date range and create or
+                update your query.
               </CardDescription>
               <div className="flex gap-2 mt-4">
                 <Button variant="outline" onClick={handleDisconnectFacebook}>
@@ -360,17 +349,6 @@ export default function MetaAdsQueries() {
                     name="adAccountId"
                     placeholder="Enter Ad Account ID"
                     value={formData.adAccountId}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="accessToken">Access Token</Label>
-                  <Input
-                    id="accessToken"
-                    name="accessToken"
-                    placeholder="Enter Access Token"
-                    type="password"
-                    value={formData.accessToken}
                     onChange={handleChange}
                   />
                 </div>
@@ -449,8 +427,8 @@ export default function MetaAdsQueries() {
           {!results && !isAnalyzing && (
             <div className="flex items-center justify-center h-[400px] bg-muted/20 rounded-md">
               <p className="text-muted-foreground">
-                Enter your Ad Account ID, Access Token and date range, then
-                click Analyze to see results
+                Enter your Ad Account ID and date range, then click Analyze to
+                see results
               </p>
             </div>
           )}
