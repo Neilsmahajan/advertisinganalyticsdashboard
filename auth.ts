@@ -49,7 +49,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     Facebook({
       clientId: process.env.AUTH_FACEBOOK_ID!,
       clientSecret: process.env.AUTH_FACEBOOK_SECRET!,
-      authorization: { params: { scope: "email" } },
+      authorization: {
+        params: {
+          scope: "email,ads_management,ads_read",
+        },
+      },
     }),
   ],
   adapter: PrismaAdapter(prisma),
