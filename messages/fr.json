@@ -351,5 +351,11 @@
     "description": "Connect to your Microsoft Ads account to view your campaign performance."
   },
   "MicrosoftAdsQueries": {},
-  "MicrosoftAdsResultsSection": {}
+  "MicrosoftAdsResultsSection": {},
+  "MetaAdsPage": {
+    "title": "Annonces Meta",
+    "description": "Connectez-vous à votre compte Annonces Meta pour consulter les performances de vos campagnes."
+  },
+  "MetaAdsQueries": {},
+  "MetAdsResultsSection": {}
 }
