@@ -10,10 +10,12 @@ export default function UserDataDeletionPage() {
   const t = useTranslations("UserDataDeletion");
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
-  const handleDisconnectMeta = async () => {
+  const handleDisconnectFacebook = async () => {
     setIsDisconnecting(true);
     try {
-      const res = await fetch("/api/auth/disconnect/meta", { method: "POST" });
+      const res = await fetch("/api/auth/disconnect/facebook", {
+        method: "POST",
+      });
       if (res.ok) {
         toast({
           title: t("disconnectSuccessTitle"),
@@ -41,15 +43,13 @@ export default function UserDataDeletionPage() {
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-4">{t("pageTitle")}</h1>
       <p className="mb-6">{t("introText")}</p>
-      {/* {session?.meta?.accessToken ? (
-        <Button onClick={handleDisconnectMeta} disabled={isDisconnecting}>
+      {session?.facebook?.accessToken ? (
+        <Button onClick={handleDisconnectFacebook} disabled={isDisconnecting}>
           {isDisconnecting ? t("disconnecting") : t("disconnectButton")}
         </Button>
       ) : (
-        <Button onClick={() => signIn("meta")}>
-          {t("connectButton")}
-        </Button>
-      )} */}
+        <Button onClick={() => signIn("facebook")}>{t("connectButton")}</Button>
+      )}
     </div>
   );
 }
