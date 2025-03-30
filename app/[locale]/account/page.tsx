@@ -1,13 +1,13 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { getServerSession } from "next-auth";
+import { auth } from "@/auth";
 import SignOutButton from "./SignOutButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AccountQueries from "./AccountQueries"; // newly added
 import SignInButton from "@/components/SignInButton";
 
 export default async function AccountPage() {
-  const session = await getServerSession();
+  const session = await auth();
   if (!session) {
     return <SignInButton />;
   }

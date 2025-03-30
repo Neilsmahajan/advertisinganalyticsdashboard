@@ -61,7 +61,7 @@ export default function MicrosoftAdsQueries() {
   // Disconnect handler for Microsoft account
   const handleDisconnectMicrosoft = async () => {
     try {
-      const res = await fetch("/api/auth/disconnect/azure-ad", {
+      const res = await fetch("/api/auth/disconnect/microsoft-entra-id", {
         method: "POST",
       });
       if (res.ok) {
@@ -283,7 +283,7 @@ export default function MicrosoftAdsQueries() {
               <Button
                 variant="outline"
                 onClick={() =>
-                  signIn("azure-ad", {
+                  signIn("microsoft-entra-id", {
                     callbackUrl: `/${locale}/dashboard/microsoft-ads`,
                   })
                 }

@@ -14,13 +14,13 @@ import {
   TrendingUp,
   Clock,
 } from "lucide-react";
-import { getServerSession } from "next-auth";
-import { getTranslations, getLocale } from "next-intl/server";
+import { auth } from "@/auth";
+import { getTranslations } from "next-intl/server";
 import SignInButton from "@/components/SignInButton";
 
 export default async function DashboardPage() {
   const t = await getTranslations("Dashboard");
-  const session = await getServerSession();
+  const session = await auth();
   if (!session) {
     return <SignInButton />;
   }

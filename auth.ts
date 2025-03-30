@@ -1,8 +1,9 @@
-import type { DefaultSession, NextAuthOptions } from "next-auth";
+import NextAuth from "next-auth";
+import { DefaultSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import AzureADProvider from "next-auth/providers/azure-ad";
+import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id";
 import { prisma } from "@/lib/prisma";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 
 // Extend session type to include Microsoft tokens.
 declare module "next-auth" {
@@ -20,7 +21,7 @@ declare module "next-auth" {
   }
 }
 
-export const authOptions: NextAuthOptions = {
+export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -36,10 +37,10 @@ export const authOptions: NextAuthOptions = {
       },
     }),
     // Azure AD provider added for connecting Microsoft account.
-    AzureADProvider({
-      clientId: process.env.AZURE_AD_CLIENT_ID!,
-      clientSecret: process.env.AZURE_AD_CLIENT_SECRET!,
-      tenantId: process.env.AZURE_AD_TENANT_ID,
+    MicrosoftEntraID({
+      clientId: process.env.AUTH_MICROSOFT_ENTRA_ID_ID,
+      clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET,
+      issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
     }),
   ],
   adapter: PrismaAdapter(prisma),
@@ -53,7 +54,7 @@ export const authOptions: NextAuthOptions = {
         if (account.provider === "google") {
           token.accessToken = account.access_token;
           if (account.refresh_token) token.refreshToken = account.refresh_token;
-        } else if (account.provider === "azure-ad") {
+        } else if (account.provider === "microsoft-entra-id") {
           token.microsoftAccessToken = account.access_token;
           token.microsoftExpiresIn = account.expires_in;
           token.microsoftExtExpiresIn = account.ext_expires_in;
@@ -66,9 +67,9 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.sub as string;
         session.user.refreshToken = token.refreshToken as string;
-        // Check if an azure-ad account exists for this user
+        // Check if an microsoft-entra-id account exists for this user
         const azureAccount = await prisma.account.findFirst({
-          where: { userId: session.user.id, provider: "azure-ad" },
+          where: { userId: session.user.id, provider: "microsoft-entra-id" },
         });
         if (azureAccount) {
           session.microsoft = {
@@ -84,4 +85,4 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-};
+});

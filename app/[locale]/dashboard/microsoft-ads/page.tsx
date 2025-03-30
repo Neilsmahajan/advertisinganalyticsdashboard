@@ -1,11 +1,11 @@
-import { getServerSession } from "next-auth";
+import { auth } from "@/auth";
 import MicrosoftAdsQueries from "./MicrosoftAdsQueries";
 import { getTranslations } from "next-intl/server";
 import SignInButton from "@/components/SignInButton";
 
 export default async function MicrosoftAdsPage() {
   const t = await getTranslations("MicrosoftAdsPage");
-  const session = await getServerSession();
+  const session = await auth();
   if (!session) {
     return <SignInButton />;
   }
