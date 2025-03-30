@@ -156,6 +156,17 @@
     "contactDescription": "If you have any questions about these Terms of Service, please",
     "contactLinkText": "contact us"
   },
+  "UserDataDeletion": {
+    "pageTitle": "User Data & Account Deletion",
+    "introText": "Manage deletion of your data and disconnect your Meta account if you no longer wish to share your Facebook Ads information.",
+    "disconnectButton": "Disconnect Meta Account",
+    "disconnecting": "Disconnecting...",
+    "disconnectSuccessTitle": "Disconnected",
+    "disconnectSuccessDescription": "Your Meta account has been disconnected successfully.",
+    "disconnectErrorTitle": "Error",
+    "disconnectErrorDescription": "Failed to disconnect Meta account. Please try again.",
+    "connectButton": "Connect Meta Account"
+  },
   "Dashboard": {
     "pageTitle": "Dashboard",
     "welcomeText": "Welcome to your analytics dashboard",

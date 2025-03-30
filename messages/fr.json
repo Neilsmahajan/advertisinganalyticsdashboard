@@ -156,6 +156,17 @@
     "contactDescription": "Si vous avez des questions concernant ces conditions de service, veuillez",
     "contactLinkText": "nous contacter"
   },
+  "UserDataDeletion": {
+    "pageTitle": "Suppression des données utilisateur et du compte",
+    "introText": "Gérez la suppression de vos données et déconnectez votre compte Meta si vous ne souhaitez plus partager vos informations Facebook Ads.",
+    "disconnectButton": "Déconnecter le compte Meta",
+    "disconnecting": "Déconnexion en cours...",
+    "disconnectSuccessTitle": "Déconnecté",
+    "disconnectSuccessDescription": "Votre compte Meta a été déconnecté avec succès.",
+    "disconnectErrorTitle": "Erreur",
+    "disconnectErrorDescription": "Échec de la déconnexion du compte Meta. Veuillez réessayer.",
+    "connectButton": "Connecter le compte Meta"
+  },
   "Dashboard": {
     "pageTitle": "Tableau de bord",
     "welcomeText": "Bienvenue dans votre tableau de bord d'analyse",

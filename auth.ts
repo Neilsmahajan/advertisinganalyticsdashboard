@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import { DefaultSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id";
+import Facebook from "next-auth/providers/facebook";
 import { prisma } from "@/lib/prisma";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 
@@ -42,6 +43,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET,
       issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
     }),
+    Facebook,
   ],
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET!,
