@@ -4,18 +4,11 @@ import { auth } from "@/auth";
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
-    console.log("MetaAds analyze session:", session);
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const { adAccountId, accessToken, startDate, endDate } =
       await request.json();
-    console.log("MetaAds analyze payload:", {
-      adAccountId,
-      accessToken,
-      startDate,
-      endDate,
-    });
     if (!adAccountId || !accessToken || !startDate || !endDate) {
       return NextResponse.json(
         {
@@ -25,14 +18,10 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-
-    // Use the provided accessToken (from request body) instead of session.facebook
     const apiUrl = `https://graph.facebook.com/v21.0/act_${adAccountId}/insights?access_token=${accessToken}&fields=campaign_id,campaign_name,impressions,clicks,spend,reach&level=campaign&time_range={"since":"${startDate}","until":"${endDate}"}`;
-    console.log("MetaAds analyze API URL:", apiUrl);
     const metaResponse = await fetch(apiUrl);
     if (!metaResponse.ok) {
       const errorData = await metaResponse.json();
-      console.error("MetaAds analyze fetch error:", errorData);
       return NextResponse.json(
         { error: errorData.error || "Error fetching Meta Ads data" },
         { status: metaResponse.status },
@@ -64,7 +53,6 @@ export async function POST(request: NextRequest) {
         reach,
       });
     }
-
     const result = {
       impressions: totalImpressions,
       clicks: totalClicks,
@@ -72,8 +60,6 @@ export async function POST(request: NextRequest) {
       reach: totalReach,
       campaigns,
     };
-
-    console.log("MetaAds analyze result:", result);
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
     console.error("Error in Meta Ads analyze:", error);

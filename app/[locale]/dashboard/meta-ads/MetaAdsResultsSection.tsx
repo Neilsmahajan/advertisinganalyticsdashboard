@@ -1,6 +1,7 @@
 "use client";
-import { useTranslations } from "next-intl";
-import React, { useEffect } from "react";
+import { useTranslations, useLocale } from "next-intl";
+import { Button } from "@/components/ui/button";
+import React from "react";
 
 interface MetaAdsResultsSectionProps {
   results: {
@@ -30,13 +31,48 @@ export default function MetaAdsResultsSection({
   userInfo,
 }: MetaAdsResultsSectionProps) {
   const t = useTranslations("MetaAdsResultsSection");
+  const locale = useLocale();
 
-  useEffect(() => {
-    console.log("MetaAdsResultsSection received results:", results);
-  }, [results]);
+  const handleDownloadReport = async () => {
+    try {
+      const response = await fetch("/api/meta-ads/download-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userInfo,
+          queryInfo,
+          results,
+          service: "Meta Ads",
+          locale,
+        }),
+      });
+      if (!response.ok) {
+        console.error("Failed to generate Meta Ads report");
+        return;
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "meta-ads-report.pdf");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("Error generating Meta Ads report:", error);
+    }
+  };
 
   return (
     <div className="space-y-6">
+      <div className="flex gap-4">
+        <Button
+          className="bg-[#47adbf] hover:bg-[#47adbf]/90 text-white"
+          onClick={handleDownloadReport}
+        >
+          {t("downloadReport")}
+        </Button>
+      </div>
       <div>
         <h3 className="text-xl font-bold mb-4">{t("results")}</h3>
         <div className="overflow-x-auto">

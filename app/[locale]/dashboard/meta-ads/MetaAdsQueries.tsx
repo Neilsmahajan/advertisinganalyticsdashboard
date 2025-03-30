@@ -188,13 +188,6 @@ export default function MetaAdsQueries() {
       return;
     }
     setIsAnalyzing(true);
-    // Log the payload before making the request
-    console.log("MetaAds analyze payload from client:", {
-      adAccountId: formData.adAccountId,
-      accessToken: session?.facebook?.accessToken,
-      startDate: startDate.toISOString().split("T")[0],
-      endDate: endDate.toISOString().split("T")[0],
-    });
     try {
       const res = await fetch("/api/meta-ads/analyze", {
         method: "POST",
