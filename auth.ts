@@ -6,7 +6,7 @@ import Facebook from "next-auth/providers/facebook";
 import { prisma } from "@/lib/prisma";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 
-// Extend session type to include Microsoft tokens.
+// Extend session type to include Microsoft and Facebook tokens.
 declare module "next-auth" {
   interface Session {
     user: {
@@ -18,6 +18,10 @@ declare module "next-auth" {
       expiresIn?: number;
       extExpiresIn?: number;
       tokenType?: string;
+    };
+    facebook?: {
+      accessToken?: string;
+      // Facebook does not provide extended expiration values by default.
     };
   }
 }
@@ -37,18 +41,21 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         },
       },
     }),
-    // Azure AD provider added for connecting Microsoft account.
     MicrosoftEntraID({
       clientId: process.env.AUTH_MICROSOFT_ENTRA_ID_ID,
       clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET,
       issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
     }),
-    Facebook,
+    Facebook({
+      clientId: process.env.AUTH_FACEBOOK_ID!,
+      clientSecret: process.env.AUTH_FACEBOOK_SECRET!,
+      authorization: { params: { scope: "email" } },
+    }),
   ],
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET!,
   session: {
-    strategy: "jwt" as const,
+    strategy: "jwt",
   },
   callbacks: {
     jwt: async ({ token, account }: { token: any; account?: any }) => {
@@ -61,6 +68,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           token.microsoftExpiresIn = account.expires_in;
           token.microsoftExtExpiresIn = account.ext_expires_in;
           token.microsoftTokenType = account.token_type;
+        } else if (account.provider === "facebook") {
+          token.facebookAccessToken = account.access_token;
         }
       }
       return token;
@@ -69,7 +78,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       if (session.user) {
         session.user.id = token.sub as string;
         session.user.refreshToken = token.refreshToken as string;
-        // Check if an microsoft-entra-id account exists for this user
+        // Attach Microsoft tokens if an account exists.
         const azureAccount = await prisma.account.findFirst({
           where: { userId: session.user.id, provider: "microsoft-entra-id" },
         });
@@ -82,6 +91,17 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           };
         } else {
           session.microsoft = undefined;
+        }
+        // Attach Facebook tokens if an account exists.
+        const fbAccount = await prisma.account.findFirst({
+          where: { userId: session.user.id, provider: "facebook" },
+        });
+        if (fbAccount) {
+          session.facebook = {
+            accessToken: token.facebookAccessToken as string | undefined,
+          };
+        } else {
+          session.facebook = undefined;
         }
       }
       return session;

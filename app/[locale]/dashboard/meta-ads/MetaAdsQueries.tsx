@@ -28,6 +28,8 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import { useSearchParams } from "next/navigation";
+import { useSession, signIn } from "next-auth/react";
+import { useLocale } from "next-intl";
 
 export default function MetaAdsQueries() {
   const [formData, setFormData] = useState({
@@ -53,6 +55,8 @@ export default function MetaAdsQueries() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState<null | any>(null);
   const searchParams = useSearchParams();
+  const { data: session } = useSession();
+  const locale = useLocale();
 
   // Load saved Meta Ads queries on mount
   useEffect(() => {
@@ -243,133 +247,195 @@ export default function MetaAdsQueries() {
     }, 2000);
   };
 
+  // Disconnect handler for Facebook (Meta)
+  const handleDisconnectFacebook = async () => {
+    try {
+      const res = await fetch("/api/auth/disconnect/facebook", {
+        method: "POST",
+      });
+      if (res.ok) {
+        toast({
+          title: "Disconnected",
+          description: "Meta account disconnected successfully.",
+        });
+        location.reload();
+      } else {
+        toast({
+          title: "Error",
+          description: "Could not disconnect Meta account.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "An error occurred during disconnect.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <Card>
         <CardHeader>
           <CardTitle>Instructions</CardTitle>
-          <CardDescription>
-            Enter your Ad Account ID, Access Token, select your date range and
-            create or select an existing query.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Button variant="outline" className="gap-2">
-            <PlayCircle className="h-4 w-4" /> View Tutorial
-          </Button>
-          <div className="space-y-4 pt-4">
-            <div className="space-y-2">
-              <Label>Previous Queries</Label>
-              <Select value={selectedQuery} onValueChange={handleSelectChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a saved query or create new" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="new">Create New Query</SelectItem>
-                  {savedQueries.map((q) => (
-                    <SelectItem key={q.id} value={q.id}>
-                      {q.queryName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="queryName">Query Name</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="queryName"
-                  name="queryName"
-                  placeholder="Enter query name"
-                  value={formData.queryName}
-                  onChange={handleChange}
-                />
-                <Button variant="outline" onClick={handleSaveQuery}>
-                  <Save className="h-4 w-4" />
+          {session?.facebook?.accessToken ? (
+            <>
+              <CardDescription>
+                Enter your Ad Account ID, Access Token, select your date range
+                and create or update your query.
+              </CardDescription>
+              <div className="flex gap-2 mt-4">
+                <Button variant="outline" onClick={handleDisconnectFacebook}>
+                  Disconnect Meta Account
                 </Button>
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="adAccountId">Ad Account ID</Label>
-              <Input
-                id="adAccountId"
-                name="adAccountId"
-                placeholder="Enter Ad Account ID"
-                value={formData.adAccountId}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="accessToken">Access Token</Label>
-              <Input
-                id="accessToken"
-                name="accessToken"
-                placeholder="Enter Access Token"
-                type="password"
-                value={formData.accessToken}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Start Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !startDate && "text-muted-foreground",
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {startDate ? format(startDate, "PPP") : "Pick a date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={startDate}
-                      onSelect={setStartDate}
-                      initialFocus
+            </>
+          ) : (
+            <>
+              <CardDescription>
+                Connect your Meta account to begin.
+              </CardDescription>
+              <Button
+                variant="outline"
+                onClick={() =>
+                  signIn("facebook", {
+                    callbackUrl: `/${locale}/dashboard/meta-ads`,
+                  })
+                }
+                className="mt-4"
+              >
+                Connect Meta Account
+              </Button>
+            </>
+          )}
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {session?.facebook?.accessToken && (
+            <>
+              <Button variant="outline" className="gap-2">
+                <PlayCircle className="h-4 w-4" /> View Tutorial
+              </Button>
+              <div className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label>Previous Queries</Label>
+                  <Select
+                    value={selectedQuery}
+                    onValueChange={handleSelectChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a saved query or create new" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="new">Create New Query</SelectItem>
+                      {savedQueries.map((q) => (
+                        <SelectItem key={q.id} value={q.id}>
+                          {q.queryName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="queryName">Query Name</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="queryName"
+                      name="queryName"
+                      placeholder="Enter query name"
+                      value={formData.queryName}
+                      onChange={handleChange}
                     />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="space-y-2">
-                <Label>End Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !endDate && "text-muted-foreground",
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {endDate ? format(endDate, "PPP") : "Pick a date"}
+                    <Button variant="outline" onClick={handleSaveQuery}>
+                      <Save className="h-4 w-4" />
                     </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={setEndDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="adAccountId">Ad Account ID</Label>
+                  <Input
+                    id="adAccountId"
+                    name="adAccountId"
+                    placeholder="Enter Ad Account ID"
+                    value={formData.adAccountId}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="accessToken">Access Token</Label>
+                  <Input
+                    id="accessToken"
+                    name="accessToken"
+                    placeholder="Enter Access Token"
+                    type="password"
+                    value={formData.accessToken}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Start Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !startDate && "text-muted-foreground",
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {startDate ? format(startDate, "PPP") : "Pick a date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={startDate}
+                          onSelect={setStartDate}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>End Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !endDate && "text-muted-foreground",
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {endDate ? format(endDate, "PPP") : "Pick a date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={endDate}
+                          onSelect={setEndDate}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
+                <Button
+                  className="w-full"
+                  onClick={handleAnalyze}
+                  disabled={isAnalyzing}
+                >
+                  {isAnalyzing ? "Analyzing..." : "Analyze"}
+                </Button>
               </div>
-            </div>
-            <Button
-              className="w-full"
-              onClick={handleAnalyze}
-              disabled={isAnalyzing}
-            >
-              {isAnalyzing ? "Analyzing..." : "Analyze"}
-            </Button>
-          </div>
+            </>
+          )}
         </CardContent>
       </Card>
       <Card>
