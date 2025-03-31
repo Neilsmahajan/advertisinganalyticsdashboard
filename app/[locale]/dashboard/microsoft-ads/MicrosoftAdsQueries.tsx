@@ -469,34 +469,28 @@ export default function MicrosoftAdsQueries() {
                   <p className="text-sm text-muted-foreground">Spend</p>
                   <p className="text-2xl font-bold">{results.spend}</p>
                 </div>
-                <div className="bg-muted/20 p-4 rounded-md">
-                  <p className="text-sm text-muted-foreground">Conversions</p>
-                  <p className="text-2xl font-bold">{results.conversions}</p>
-                </div>
-                <div className="bg-muted/20 p-4 rounded-md">
-                  <p className="text-sm text-muted-foreground">Cost/Conv</p>
-                  <p className="text-2xl font-bold">
-                    {results.costPerConversion}
-                  </p>
-                </div>
               </div>
               <div>
                 <h3 className="font-medium mb-2">Top Campaigns</h3>
                 <div className="space-y-2">
-                  {results.campaigns.map((campaign: any, index: number) => (
-                    <div key={index} className="p-2 bg-muted/20 rounded-md">
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium">{campaign.name}</span>
-                        <span>{campaign.spend}</span>
+                  {results.campaigns && results.campaigns.length > 0 ? (
+                    results.campaigns.map((campaign: any, index: number) => (
+                      <div key={index} className="p-2 bg-muted/20 rounded-md">
+                        <div className="flex justify-between items-center">
+                          <span className="font-medium">{campaign.name}</span>
+                          <span>{campaign.spend}</span>
+                        </div>
+                        <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                          <span>
+                            {campaign.impressions.toLocaleString()} impressions
+                          </span>
+                          <span>{campaign.clicks.toLocaleString()} clicks</span>
+                        </div>
                       </div>
-                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                        <span>
-                          {campaign.impressions.toLocaleString()} impressions
-                        </span>
-                        <span>{campaign.clicks.toLocaleString()} clicks</span>
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-black/60">No campaign data available</p>
+                  )}
                 </div>
               </div>
               <div className="h-[150px] bg-muted/20 rounded-md flex items-center justify-center">

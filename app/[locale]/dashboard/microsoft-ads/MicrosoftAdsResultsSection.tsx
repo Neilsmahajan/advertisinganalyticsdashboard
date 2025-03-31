@@ -9,14 +9,14 @@ interface MicrosoftAdsResultsSectionProps {
     clicks: number;
     ctr: string;
     spend: string;
-    conversions: number;
-    costPerConversion: string;
-    campaigns: {
+    campaigns?: {
       name: string;
+      spend: string;
       impressions: number;
       clicks: number;
-      spend: string;
     }[];
+    // Removed conversions and costPerConversion temporarily
+    // ...other metrics may be added later...
   };
   queryInfo: {
     service: string;
@@ -93,16 +93,6 @@ export default function MicrosoftAdsResultsSection({
           <div className="bg-muted/20 p-4 rounded-md">
             <p className="text-sm text-muted-foreground">Spend</p>
             <p className="text-2xl font-bold">{results.spend}</p>
-          </div>
-          <div className="bg-muted/20 p-4 rounded-md">
-            <p className="text-sm text-muted-foreground">Conversions</p>
-            <p className="text-2xl font-bold">
-              {results.conversions.toLocaleString()}
-            </p>
-          </div>
-          <div className="bg-muted/20 p-4 rounded-md">
-            <p className="text-sm text-muted-foreground">Cost/Conv</p>
-            <p className="text-2xl font-bold">{results.costPerConversion}</p>
           </div>
         </div>
       </div>

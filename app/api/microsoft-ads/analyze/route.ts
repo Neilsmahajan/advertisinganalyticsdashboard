@@ -15,28 +15,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Simulate MS Ads analysis (dummy data)
+    // Simulate MS Ads analysis (dummy data) for basic metrics only
     const result = {
       impressions: 123456,
       clicks: 7890,
       ctr: "6.41%",
       spend: "$1,234.56",
-      conversions: 123,
-      costPerConversion: "$10.03",
-      campaigns: [
-        {
-          name: "Bing Campaign 1",
-          impressions: 40000,
-          clicks: 2500,
-          spend: "$400.00",
-        },
-        {
-          name: "Bing Campaign 2",
-          impressions: 83456,
-          clicks: 5390,
-          spend: "$834.56",
-        },
-      ],
     };
 
     return NextResponse.json(result, { status: 200 });
