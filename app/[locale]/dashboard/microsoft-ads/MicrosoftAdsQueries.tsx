@@ -210,7 +210,7 @@ export default function MicrosoftAdsQueries() {
     }
   };
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!formData.accountId || !formData.customerId || !startDate || !endDate) {
       toast({
         title: "Error",
@@ -220,54 +220,41 @@ export default function MicrosoftAdsQueries() {
       return;
     }
     setIsAnalyzing(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      setResults({
-        impressions: 345678,
-        clicks: 8765,
-        ctr: "2.53%",
-        spend: "$2,345.67",
-        conversions: 321,
-        costPerConversion: "$7.31",
-        campaigns: [
-          {
-            name: "Search Campaign",
-            impressions: 123456,
-            clicks: 3456,
-            spend: "$1,234.56",
-          },
-          {
-            name: "Display Campaign",
-            impressions: 87654,
-            clicks: 2345,
-            spend: "$876.54",
-          },
-          {
-            name: "Shopping Campaign",
-            impressions: 65432,
-            clicks: 1234,
-            spend: "$654.32",
-          },
-          {
-            name: "Audience Campaign",
-            impressions: 43210,
-            clicks: 987,
-            spend: "$432.10",
-          },
-          {
-            name: "Dynamic Search Ads",
-            impressions: 21098,
-            clicks: 765,
-            spend: "$210.98",
-          },
-        ],
+    try {
+      const res = await fetch("/api/microsoft-ads/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          accountId: formData.accountId,
+          customerId: formData.customerId,
+          startDate: startDate.toISOString().split("T")[0],
+          endDate: endDate.toISOString().split("T")[0],
+        }),
       });
+      if (!res.ok) {
+        const error = await res.json();
+        toast({
+          title: "Error",
+          description: error.error || "Operation failed",
+          variant: "destructive",
+        });
+      } else {
+        const data = await res.json();
+        setResults(data);
+        toast({
+          title: "Analysis Complete",
+          description: "Microsoft Ads data has been retrieved.",
+        });
+      }
+    } catch (err) {
       toast({
-        title: "Analysis Complete",
-        description: "Microsoft Ads data has been retrieved.",
+        title: "Error",
+        description: "Operation failed",
+        variant: "destructive",
       });
-    }, 2000);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   return (
