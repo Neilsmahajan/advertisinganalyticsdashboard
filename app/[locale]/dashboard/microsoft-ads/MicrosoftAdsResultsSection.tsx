@@ -5,18 +5,17 @@ import React from "react";
 
 interface MicrosoftAdsResultsSectionProps {
   results: {
-    impressions: number;
-    clicks: number;
-    ctr: string;
-    spend: string;
-    campaigns?: {
-      name: string;
-      spend: string;
-      impressions: number;
-      clicks: number;
+    total_impressions: number;
+    total_clicks: number;
+    total_spend: string;
+    campaigns: {
+      CampaignId: string;
+      CampaignName: string;
+      Impressions: number;
+      Clicks: number;
+      Spend: string;
+      Ctr: string;
     }[];
-    // Removed conversions and costPerConversion temporarily
-    // ...other metrics may be added later...
   };
   queryInfo: {
     service: string;
@@ -73,26 +72,22 @@ export default function MicrosoftAdsResultsSection({
       </div>
       <div>
         <h3 className="text-xl font-bold mb-4">{t("results") || "Results"}</h3>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div className="bg-muted/20 p-4 rounded-md">
-            <p className="text-sm text-muted-foreground">Impressions</p>
+            <p className="text-sm text-muted-foreground">Total Impressions</p>
             <p className="text-2xl font-bold">
-              {results.impressions.toLocaleString()}
+              {results.total_impressions.toLocaleString()}
             </p>
           </div>
           <div className="bg-muted/20 p-4 rounded-md">
-            <p className="text-sm text-muted-foreground">Clicks</p>
+            <p className="text-sm text-muted-foreground">Total Clicks</p>
             <p className="text-2xl font-bold">
-              {results.clicks.toLocaleString()}
+              {results.total_clicks.toLocaleString()}
             </p>
           </div>
-          <div className="bg-muted/20 p-4 rounded-md">
-            <p className="text-sm text-muted-foreground">CTR</p>
-            <p className="text-2xl font-bold">{results.ctr}</p>
-          </div>
-          <div className="bg-muted/20 p-4 rounded-md">
-            <p className="text-sm text-muted-foreground">Spend</p>
-            <p className="text-2xl font-bold">{results.spend}</p>
+          <div className="bg-muted/20 p-4 rounded-md col-span-2">
+            <p className="text-sm text-muted-foreground">Total Spend</p>
+            <p className="text-2xl font-bold">{results.total_spend}</p>
           </div>
         </div>
       </div>
@@ -102,22 +97,28 @@ export default function MicrosoftAdsResultsSection({
         </h3>
         <div className="space-y-2">
           {results.campaigns && results.campaigns.length > 0 ? (
-            results.campaigns.map((campaign, index) => (
-              <div key={index} className="p-2 bg-muted/20 rounded-md">
+            results.campaigns.map((campaign) => (
+              <div
+                key={campaign.CampaignId}
+                className="p-2 bg-muted/20 rounded-md"
+              >
                 <div className="flex justify-between items-center">
-                  <span className="font-medium">{campaign.name}</span>
-                  <span>{campaign.spend}</span>
+                  <span className="font-medium">{campaign.CampaignName}</span>
+                  <span>{campaign.Spend}</span>
                 </div>
                 <div className="flex justify-between text-xs text-muted-foreground mt-1">
                   <span>
-                    {campaign.impressions.toLocaleString()} impressions
+                    {campaign.Impressions.toLocaleString()} impressions
                   </span>
-                  <span>{campaign.clicks.toLocaleString()} clicks</span>
+                  <span>{campaign.Clicks.toLocaleString()} clicks</span>
+                  <span>{campaign.Ctr}</span>
                 </div>
               </div>
             ))
           ) : (
-            <p className="text-black/60">No campaign data available</p>
+            <p className="text-black/60">
+              {t("noCampaigns") || "No campaign data available"}
+            </p>
           )}
         </div>
       </div>
@@ -132,13 +133,14 @@ export default function MicrosoftAdsResultsSection({
         </h3>
         <div className="bg-white/10 rounded-lg p-6">
           <p>
-            <strong>Service:</strong> {queryInfo.service}
+            <strong>{t("service") || "Service"}:</strong> {queryInfo.service}
           </p>
           <p>
-            <strong>Query Name:</strong> {queryInfo.queryName}
+            <strong>{t("queryName") || "Query Name"}:</strong>{" "}
+            {queryInfo.queryName}
           </p>
           <p>
-            <strong>Query Data:</strong>
+            <strong>{t("queryData") || "Query Data"}</strong>
           </p>
           <pre className="text-black/60">
             {JSON.stringify(queryInfo.queryData, null, 2)}
