@@ -35,3 +35,4 @@ Thumbs.db
 
 # Visual Studio Code
 .vscode/*
+.env*.local
