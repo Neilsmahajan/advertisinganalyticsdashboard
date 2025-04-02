@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleAdsApi } from "google-ads-api";
 import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma"; // added import
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,6 +16,18 @@ export async function POST(request: NextRequest) {
         { error: "customerId, startDate, and endDate are required" },
         { status: 400 },
       );
+    }
+
+    // Ensure refresh token is available
+    let refreshToken = session?.user.refreshToken;
+    if (!refreshToken) {
+      const account = await prisma.account.findFirst({
+        where: { userId: session.user.id, provider: "google" },
+      });
+      if (!account || !account.refresh_token) {
+        throw new Error("Refresh token is not defined");
+      }
+      refreshToken = account.refresh_token;
     }
 
     const client = new GoogleAdsApi({
@@ -37,11 +50,7 @@ export async function POST(request: NextRequest) {
 
     const customer = client.Customer({
       customer_id: customerId,
-      refresh_token:
-        session?.user.refreshToken ||
-        (() => {
-          throw new Error("Refresh token is not defined");
-        })(),
+      refresh_token: refreshToken, // using the retrieved refresh token
     });
 
     // Build the query using the provided dates
