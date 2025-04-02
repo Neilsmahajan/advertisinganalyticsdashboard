@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
+import JSZip from "jszip"; // <-- added import for extracting the zip
 
 const SUBMIT_URL =
   "https://reporting.api.bingads.microsoft.com/Reporting/v13/GenerateReport/Submit";
@@ -10,11 +11,23 @@ function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// Updated parseCSV: This function skips metadata before the header.
 function parseCSV(csvText: string) {
   const lines = csvText.trim().split("\n");
-  const headers = lines[0].split(",").map((h) => h.trim());
-  const rows = lines.slice(1).map((line) => {
-    const values = line.split(",").map((v) => v.trim());
+  // find the header line (must contain CampaignName)
+  const start = lines.findIndex((line) => line.includes("CampaignName"));
+  if (start === -1) return [];
+  const headerLine = lines[start];
+  const headers = headerLine.split(",").map((h) => h.replace(/"/g, "").trim());
+  const dataLines = [];
+  for (let j = start + 1; j < lines.length; j++) {
+    const line = lines[j].trim();
+    // stop if the line is empty or if it starts with a copyright marker
+    if (!line || line.startsWith('"©')) break;
+    dataLines.push(line);
+  }
+  const rows = dataLines.map((line) => {
+    const values = line.split(",").map((v) => v.replace(/"/g, "").trim());
     const obj: Record<string, string> = {};
     headers.forEach((h, idx) => {
       obj[h] = values[idx];
@@ -53,12 +66,13 @@ export async function POST(request: NextRequest) {
       ExcludeReportFooter: false,
       ExcludeReportHeader: false,
       Format: "Csv",
+      FormatVersion: "2.0", // <-- added to match manual workflow
       ReportName: "Campaign Performance Report",
       ReturnOnlyCompleteData: false,
       Type: "CampaignPerformanceReportRequest",
-      Aggregation: "Daily",
+      Aggregation: "Summary", // <-- changed from "Daily" to "Summary"
       Columns: [
-        "TimePeriod",
+        // Removed "TimePeriod",
         "CampaignId",
         "CampaignName",
         "Impressions",
@@ -68,7 +82,7 @@ export async function POST(request: NextRequest) {
       ],
       Scope: {
         AccountIds: [accountId],
-        Campaigns: null,
+        // Campaigns not required if not filtering by campaigns.
       },
       Time: {
         CustomDateRangeStart: {
@@ -86,19 +100,23 @@ export async function POST(request: NextRequest) {
       },
     };
 
-    // Set required headers
-    const headers = {
-      "Content-Type": "application/json",
+    // Set required headers for submit and poll; note: for GET, remove Content-Type and add Accept.
+    const commonHeaders = {
       Authorization: `Bearer ${session.microsoft.accessToken}`,
       DeveloperToken: process.env.MICROSOFT_ADS_DEVELOPER_TOKEN || "",
       CustomerAccountId: accountId.toString(),
       CustomerId: customerId.toString(),
     };
+    // Submit request uses full headers including Content-Type.
+    const submitHeaders = {
+      ...commonHeaders,
+      "Content-Type": "application/json",
+    };
 
     // Submit report request
     const submitResp = await fetch(SUBMIT_URL, {
       method: "POST",
-      headers,
+      headers: submitHeaders,
       body: JSON.stringify({ ReportRequest: reportRequest }),
     });
     if (!submitResp.ok) {
@@ -117,37 +135,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Poll for report completion
-    let reportStatus = "";
+    // Poll for report completion using POST with JSON body (not GET with query params)
     let downloadUrl = "";
     const maxAttempts = 12;
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       await delay(5000);
-      const pollResp = await fetch(
-        `${POLL_URL}?ReportRequestId=${reportRequestId}`,
-        {
-          method: "GET",
-          headers,
-        },
-      );
+      const pollResp = await fetch(POLL_URL, {
+        method: "POST",
+        headers: { ...commonHeaders, "Content-Type": "application/json" }, // headers matching cURL command
+        body: JSON.stringify({ ReportRequestId: reportRequestId }),
+      });
       if (!pollResp.ok) {
-        console.warn(`[analyze] Poll attempt ${attempt + 1} non-ok response`);
+        const pollStatus = pollResp.status;
+        const pollBody = await pollResp.text();
+        console.warn(
+          `[analyze] Poll attempt ${
+            attempt + 1
+          } non-ok response. Status: ${pollStatus}; Body: ${pollBody}`,
+        );
         continue;
       }
       const pollJson = await pollResp.json();
       console.log(`[analyze] Poll attempt ${attempt + 1}:`, pollJson);
-      reportStatus = pollJson.ReportStatus;
-      if (reportStatus === "Success" && pollJson.ReportDownloadUrl) {
-        downloadUrl = pollJson.ReportDownloadUrl;
+      if (
+        pollJson.ReportRequestStatus &&
+        pollJson.ReportRequestStatus.Status === "Success" &&
+        pollJson.ReportRequestStatus.ReportDownloadUrl
+      ) {
+        downloadUrl = pollJson.ReportRequestStatus.ReportDownloadUrl;
         break;
       }
     }
-    if (reportStatus !== "Success" || !downloadUrl) {
+    if (!downloadUrl) {
       console.error("[analyze] Report not ready after polling");
       return NextResponse.json({ error: "Report not ready" }, { status: 500 });
     }
 
-    // Fetch the CSV report
+    // Fetch the zip file containing the CSV report
     const downloadResp = await fetch(downloadUrl);
     if (!downloadResp.ok) {
       const downloadErr = await downloadResp.text();
@@ -157,18 +181,28 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       );
     }
-    const csvText = await downloadResp.text();
-    console.log("[analyze] CSV downloaded, length:", csvText.length);
+    const downloadBuffer = await downloadResp.arrayBuffer();
+    const zip = await JSZip.loadAsync(downloadBuffer);
+    // Assume the zip contains one CSV file – find it by file name ending with .csv
+    const csvFileName = Object.keys(zip.files).find((name) =>
+      name.endsWith(".csv"),
+    );
+    if (!csvFileName) {
+      console.error("[analyze] CSV file not found in zip");
+      return NextResponse.json({ error: "CSV file missing" }, { status: 500 });
+    }
+    const csvFile = zip.files[csvFileName];
+    const csvText = await csvFile.async("string");
+    console.log("[analyze] CSV extracted, length:", csvText.length);
     const rows = parseCSV(csvText);
 
-    // Aggregate overall totals and compute CTR per campaign
+    // Aggregate overall totals while mapping per-campaign data
     let totalImpressions = 0;
     let totalClicks = 0;
     let totalSpend = 0;
     const campaigns = rows.map((row) => {
       const impressions = parseInt(row["Impressions"]) || 0;
       const clicks = parseInt(row["Clicks"]) || 0;
-      // Remove any non-numeric characters from Spend (e.g. $ and commas)
       const spend = parseFloat(row["Spend"].replace(/[^0-9.]/g, "")) || 0;
       totalImpressions += impressions;
       totalClicks += clicks;
@@ -186,6 +220,11 @@ export async function POST(request: NextRequest) {
         Ctr: ctr,
       };
     });
+    // Compute overall CTR from totals.
+    const overallCtr =
+      totalImpressions > 0
+        ? ((totalClicks / totalImpressions) * 100).toFixed(2) + "%"
+        : "0%";
 
     console.log("[analyze] Aggregated results:", {
       totalImpressions,
@@ -194,11 +233,13 @@ export async function POST(request: NextRequest) {
       campaignCount: campaigns.length,
     });
 
+    // Return results with overall totals renamed to match front-end expectation.
     return NextResponse.json(
       {
-        total_impressions: totalImpressions,
-        total_clicks: totalClicks,
-        total_spend: "$" + totalSpend.toFixed(2),
+        impressions: totalImpressions,
+        clicks: totalClicks,
+        spend: "$" + totalSpend.toFixed(2),
+        ctr: overallCtr,
         campaigns,
       },
       { status: 200 },

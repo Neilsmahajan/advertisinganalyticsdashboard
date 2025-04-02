@@ -477,14 +477,16 @@ export default function MicrosoftAdsQueries() {
                     results.campaigns.map((campaign: any, index: number) => (
                       <div key={index} className="p-2 bg-muted/20 rounded-md">
                         <div className="flex justify-between items-center">
-                          <span className="font-medium">{campaign.name}</span>
-                          <span>{campaign.spend}</span>
+                          <span className="font-medium">
+                            {campaign.CampaignName}
+                          </span>
+                          <span>{campaign.Spend}</span>
                         </div>
                         <div className="flex justify-between text-xs text-muted-foreground mt-1">
                           <span>
-                            {campaign.impressions.toLocaleString()} impressions
+                            {campaign.Impressions.toLocaleString()} impressions
                           </span>
-                          <span>{campaign.clicks.toLocaleString()} clicks</span>
+                          <span>{campaign.Clicks.toLocaleString()} clicks</span>
                         </div>
                       </div>
                     ))
