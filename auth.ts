@@ -47,10 +47,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
       authorization: {
         params: {
-          scope: "openid profile email offline_access",
-          // Line that throws OAuthCallbackError: `scope: "openid profile email offline_access https://ads.microsoft.com/msads.manage",`
-          prompt: "consent", // ensures user is prompted to consent and admin consent is triggered if needed
-          // removed resource parameter as it is not supported by Microsoft v2 endpoints
+          scope:
+            "openid profile email https://ads.microsoft.com/msads.manage offline_access",
+          prompt: "consent",
         },
       },
     }),
