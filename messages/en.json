@@ -259,7 +259,7 @@
   },
   "GoogleAnalyticsQueries": {
     "instructionsTitle": "Instructions",
-    "instructionsDescription": "Enter your Property ID, select your date range and create or select an existing query.",
+    "instructionsDescription": "Add google-analytics@advertisinganalytics-dashboard.iam.gserviceaccount.com as a Viewer in your Google Analytics dashboard (Admin > Account > Account access management). Then, get your Property ID from Admin > Property > Property details and enter it below with your desired date range.",
     "previousQueries": "Previous Queries",
     "selectPlaceholder": "Select a saved query or create new",
     "createNewQuery": "Create New Query",

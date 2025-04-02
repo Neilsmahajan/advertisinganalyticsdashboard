@@ -217,6 +217,7 @@ export default function GoogleAnalyticsQueries() {
       <Card>
         <CardHeader>
           <CardTitle>{t("instructionsTitle")}</CardTitle>
+          {/* The instructions now reference the updated text with the service account details */}
           <CardDescription>{t("instructionsDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
