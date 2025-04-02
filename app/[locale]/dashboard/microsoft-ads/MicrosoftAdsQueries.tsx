@@ -29,9 +29,11 @@ import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import { useSearchParams } from "next/navigation";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { useLocale } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import MicrosoftAdsResultsSection from "./MicrosoftAdsResultsSection";
 
 export default function MicrosoftAdsQueries() {
+  const t = useTranslations("MicrosoftAdsQueries");
   const { data: session } = useSession();
   const locale = useLocale();
   const [formData, setFormData] = useState({
@@ -66,22 +68,22 @@ export default function MicrosoftAdsQueries() {
       });
       if (res.ok) {
         toast({
-          title: "Disconnected",
-          description: "Microsoft account disconnected successfully.",
+          title: t("disconnectSuccessTitle"),
+          description: t("disconnectSuccessDescription"),
         });
         location.reload();
       } else {
         toast({
-          title: "Error",
-          description: "Could not disconnect Microsoft account.",
+          title: t("disconnectErrorTitle"),
+          description: t("disconnectErrorDescription"),
           variant: "destructive",
         });
       }
     } catch (error) {
       console.error(error);
       toast({
-        title: "Error",
-        description: "An error occurred during disconnect.",
+        title: t("disconnectErrorTitle"),
+        description: t("disconnectErrorDescription"),
         variant: "destructive",
       });
     }
@@ -157,8 +159,8 @@ export default function MicrosoftAdsQueries() {
       !endDate
     ) {
       toast({
-        title: "Error",
-        description: "Fill in all fields",
+        title: t("saveErrorTitle"),
+        description: t("saveErrorDescription"),
         variant: "destructive",
       });
       return;
@@ -193,18 +195,20 @@ export default function MicrosoftAdsQueries() {
       const result = await response.json();
       const savedQuery = result.query;
       toast({
-        title: "Success",
+        title: t("saveSuccessTitle"),
         description:
           selectedQuery === "new"
-            ? `New query "${formData.queryName}" saved.`
-            : `Query "${formData.queryName}" updated.`,
+            ? t("saveSuccessDescriptionNew", { queryName: formData.queryName })
+            : t("saveSuccessDescriptionUpdate", {
+                queryName: formData.queryName,
+              }),
       });
       refreshQueries();
       setSelectedQuery(savedQuery.id);
     } else {
       toast({
-        title: "Error",
-        description: "Operation failed",
+        title: t("saveErrorTitle"),
+        description: t("saveErrorDescription"),
         variant: "destructive",
       });
     }
@@ -213,8 +217,8 @@ export default function MicrosoftAdsQueries() {
   const handleAnalyze = async () => {
     if (!formData.accountId || !formData.customerId || !startDate || !endDate) {
       toast({
-        title: "Error",
-        description: "Please fill in all required fields",
+        title: t("analyzeErrorTitle"),
+        description: t("analyzeErrorDescription"),
         variant: "destructive",
       });
       return;
@@ -234,22 +238,22 @@ export default function MicrosoftAdsQueries() {
       if (!res.ok) {
         const error = await res.json();
         toast({
-          title: "Error",
-          description: error.error || "Operation failed",
+          title: t("analyzeErrorTitle"),
+          description: error.error || t("analyzeErrorDescription"),
           variant: "destructive",
         });
       } else {
         const data = await res.json();
         setResults(data);
         toast({
-          title: "Analysis Complete",
-          description: "Microsoft Ads data has been retrieved.",
+          title: t("analyzeSuccessTitle"),
+          description: t("analyzeSuccessDescription"),
         });
       }
     } catch (err) {
       toast({
-        title: "Error",
-        description: "Operation failed",
+        title: t("analyzeErrorTitle"),
+        description: t("analyzeErrorDescription"),
         variant: "destructive",
       });
     } finally {
@@ -261,12 +265,10 @@ export default function MicrosoftAdsQueries() {
     <div className="grid gap-6 md:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle>Instructions</CardTitle>
+          <CardTitle>{t("instructionsTitle")}</CardTitle>
           {!session?.microsoft?.accessToken ? (
             <>
-              <CardDescription>
-                Connect your Microsoft account to begin.
-              </CardDescription>
+              <CardDescription>{t("connectDescription")}</CardDescription>
               <Button
                 variant="outline"
                 onClick={() =>
@@ -276,18 +278,15 @@ export default function MicrosoftAdsQueries() {
                 }
                 className="mt-4"
               >
-                Connect Microsoft Account
+                {t("connectButton")}
               </Button>
             </>
           ) : (
             <>
-              <CardDescription>
-                Enter your Account ID, Customer ID and date range then create or
-                update your query.
-              </CardDescription>
+              <CardDescription>{t("queryDescription")}</CardDescription>
               <div className="flex gap-2 mt-4">
                 <Button variant="outline" onClick={handleDisconnectMicrosoft}>
-                  Disconnect Microsoft Account
+                  {t("disconnectButton")}
                 </Button>
               </div>
             </>
@@ -296,20 +295,20 @@ export default function MicrosoftAdsQueries() {
         {session?.microsoft?.accessToken && (
           <CardContent className="space-y-4">
             <Button variant="outline" className="gap-2">
-              <PlayCircle className="h-4 w-4" /> View Tutorial
+              <PlayCircle className="h-4 w-4" /> {t("tutorialButton")}
             </Button>
             <div className="space-y-4 pt-4">
               <div className="space-y-2">
-                <Label>Previous Queries</Label>
+                <Label>{t("previousQueriesLabel")}</Label>
                 <Select
                   value={selectedQuery}
                   onValueChange={handleSelectChange}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a saved query or create new" />
+                    <SelectValue placeholder={t("selectQueryPlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="new">Create New Query</SelectItem>
+                    <SelectItem value="new">{t("createNewQuery")}</SelectItem>
                     {savedQueries.map((q) => (
                       <SelectItem key={q.id} value={q.id}>
                         {q.queryName}
@@ -319,12 +318,12 @@ export default function MicrosoftAdsQueries() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="queryName">Query Name</Label>
+                <Label htmlFor="queryName">{t("queryNameLabel")}</Label>
                 <div className="flex gap-2">
                   <Input
                     id="queryName"
                     name="queryName"
-                    placeholder="Enter query name"
+                    placeholder={t("queryNamePlaceholder")}
                     value={formData.queryName}
                     onChange={handleChange}
                   />
@@ -334,28 +333,28 @@ export default function MicrosoftAdsQueries() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="accountId">Account ID</Label>
+                <Label htmlFor="accountId">{t("accountIdLabel")}</Label>
                 <Input
                   id="accountId"
                   name="accountId"
-                  placeholder="Enter Account ID"
+                  placeholder={t("accountIdPlaceholder")}
                   value={formData.accountId}
                   onChange={handleChange}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="customerId">Customer ID</Label>
+                <Label htmlFor="customerId">{t("customerIdLabel")}</Label>
                 <Input
                   id="customerId"
                   name="customerId"
-                  placeholder="Enter Customer ID"
+                  placeholder={t("customerIdPlaceholder")}
                   value={formData.customerId}
                   onChange={handleChange}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Start Date</Label>
+                  <Label>{t("startDateLabel")}</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -366,7 +365,7 @@ export default function MicrosoftAdsQueries() {
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {startDate ? format(startDate, "PPP") : "Pick a date"}
+                        {startDate ? format(startDate, "PPP") : t("pickDate")}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -380,7 +379,7 @@ export default function MicrosoftAdsQueries() {
                   </Popover>
                 </div>
                 <div className="space-y-2">
-                  <Label>End Date</Label>
+                  <Label>{t("endDateLabel")}</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -391,7 +390,7 @@ export default function MicrosoftAdsQueries() {
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {endDate ? format(endDate, "PPP") : "Pick a date"}
+                        {endDate ? format(endDate, "PPP") : t("pickDate")}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -416,7 +415,7 @@ export default function MicrosoftAdsQueries() {
                   !endDate
                 }
               >
-                {isAnalyzing ? "Analyzing..." : "Analyze"}
+                {isAnalyzing ? t("analyzingButton") : t("analyzeButton")}
               </Button>
             </div>
           </CardContent>
@@ -424,17 +423,14 @@ export default function MicrosoftAdsQueries() {
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Results</CardTitle>
-          <CardDescription>
-            Microsoft Ads data for the selected period
-          </CardDescription>
+          <CardTitle>{t("resultsTitle")}</CardTitle>
+          <CardDescription>{t("resultsDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
           {!results && !isAnalyzing && (
             <div className="flex items-center justify-center h-[400px] bg-muted/20 rounded-md">
               <p className="text-muted-foreground">
-                Enter your Account ID, Customer ID and date range, then click
-                Analyze to see results
+                {t("noResultsDescription")}
               </p>
             </div>
           )}
@@ -442,65 +438,24 @@ export default function MicrosoftAdsQueries() {
             <div className="flex flex-col items-center justify-center h-[400px] bg-muted/20 rounded-md">
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
               <p className="mt-4 text-muted-foreground">
-                Fetching Microsoft Ads data...
+                {t("fetchingDataDescription")}
               </p>
             </div>
           )}
           {results && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-muted/20 p-4 rounded-md">
-                  <p className="text-sm text-muted-foreground">Impressions</p>
-                  <p className="text-2xl font-bold">
-                    {results.impressions.toLocaleString()}
-                  </p>
-                </div>
-                <div className="bg-muted/20 p-4 rounded-md">
-                  <p className="text-sm text-muted-foreground">Clicks</p>
-                  <p className="text-2xl font-bold">
-                    {results.clicks.toLocaleString()}
-                  </p>
-                </div>
-                <div className="bg-muted/20 p-4 rounded-md">
-                  <p className="text-sm text-muted-foreground">CTR</p>
-                  <p className="text-2xl font-bold">{results.ctr}</p>
-                </div>
-                <div className="bg-muted/20 p-4 rounded-md">
-                  <p className="text-sm text-muted-foreground">Spend</p>
-                  <p className="text-2xl font-bold">{results.spend}</p>
-                </div>
-              </div>
-              <div>
-                <h3 className="font-medium mb-2">Top Campaigns</h3>
-                <div className="space-y-2">
-                  {results.campaigns && results.campaigns.length > 0 ? (
-                    results.campaigns.map((campaign: any, index: number) => (
-                      <div key={index} className="p-2 bg-muted/20 rounded-md">
-                        <div className="flex justify-between items-center">
-                          <span className="font-medium">
-                            {campaign.CampaignName}
-                          </span>
-                          <span>{campaign.Spend}</span>
-                        </div>
-                        <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                          <span>
-                            {campaign.Impressions.toLocaleString()} impressions
-                          </span>
-                          <span>{campaign.Clicks.toLocaleString()} clicks</span>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-black/60">No campaign data available</p>
-                  )}
-                </div>
-              </div>
-              <div className="h-[150px] bg-muted/20 rounded-md flex items-center justify-center">
-                <p className="text-muted-foreground">
-                  Campaign performance chart will appear here
-                </p>
-              </div>
-            </div>
+            <MicrosoftAdsResultsSection
+              results={results}
+              queryInfo={{
+                service: "Microsoft Ads",
+                queryName: formData.queryName,
+                queryData: {
+                  accountId: formData.accountId,
+                  customerId: formData.customerId,
+                  startDate,
+                  endDate,
+                },
+              }}
+            />
           )}
         </CardContent>
       </Card>

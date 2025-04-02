@@ -5,9 +5,9 @@ import React from "react";
 
 interface MicrosoftAdsResultsSectionProps {
   results: {
-    total_impressions: number;
-    total_clicks: number;
-    total_spend: string;
+    impressions: number;
+    clicks: number;
+    spend: string;
     campaigns: {
       CampaignId: string;
       CampaignName: string;
@@ -31,9 +31,10 @@ export default function MicrosoftAdsResultsSection({
   const t = useTranslations("MicrosoftAdsResultsSection");
   const locale = useLocale();
 
+  // New handler for downloading the report
   const handleDownloadReport = async () => {
     try {
-      const response = await fetch("/api/microsoft-ads/download_report", {
+      const response = await fetch("/api/microsoft-ads/download-report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -62,39 +63,38 @@ export default function MicrosoftAdsResultsSection({
 
   return (
     <div className="space-y-6">
+      {/* New Download Report Button in Results card */}
       <div className="flex gap-4">
         <Button
           className="bg-[#47adbf] hover:bg-[#47adbf]/90 text-white"
           onClick={handleDownloadReport}
         >
-          {t("downloadReport") || "Download Report"}
+          {t("downloadReport")}
         </Button>
       </div>
       <div>
-        <h3 className="text-xl font-bold mb-4">{t("results") || "Results"}</h3>
+        <h3 className="text-xl font-bold mb-4">{t("results")}</h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-muted/20 p-4 rounded-md">
             <p className="text-sm text-muted-foreground">Total Impressions</p>
             <p className="text-2xl font-bold">
-              {results.total_impressions.toLocaleString()}
+              {results.impressions.toLocaleString()}
             </p>
           </div>
           <div className="bg-muted/20 p-4 rounded-md">
             <p className="text-sm text-muted-foreground">Total Clicks</p>
             <p className="text-2xl font-bold">
-              {results.total_clicks.toLocaleString()}
+              {results.clicks.toLocaleString()}
             </p>
           </div>
           <div className="bg-muted/20 p-4 rounded-md col-span-2">
             <p className="text-sm text-muted-foreground">Total Spend</p>
-            <p className="text-2xl font-bold">{results.total_spend}</p>
+            <p className="text-2xl font-bold">{results.spend}</p>
           </div>
         </div>
       </div>
       <div>
-        <h3 className="text-xl font-bold mb-4">
-          {t("campaigns") || "Top Campaigns"}
-        </h3>
+        <h3 className="text-xl font-bold mb-4">{t("campaigns")}</h3>
         <div className="space-y-2">
           {results.campaigns && results.campaigns.length > 0 ? (
             results.campaigns.map((campaign) => (
@@ -116,9 +116,7 @@ export default function MicrosoftAdsResultsSection({
               </div>
             ))
           ) : (
-            <p className="text-black/60">
-              {t("noCampaigns") || "No campaign data available"}
-            </p>
+            <p className="text-black/60">{t("noCampaigns")}</p>
           )}
         </div>
       </div>
@@ -133,14 +131,13 @@ export default function MicrosoftAdsResultsSection({
         </h3>
         <div className="bg-white/10 rounded-lg p-6">
           <p>
-            <strong>{t("service") || "Service"}:</strong> {queryInfo.service}
+            <strong>{t("service")}:</strong> {queryInfo.service}
           </p>
           <p>
-            <strong>{t("queryName") || "Query Name"}:</strong>{" "}
-            {queryInfo.queryName}
+            <strong>{t("queryName")}:</strong> {queryInfo.queryName}
           </p>
           <p>
-            <strong>{t("queryData") || "Query Data"}</strong>
+            <strong>{t("queryData")}</strong>
           </p>
           <pre className="text-black/60">
             {JSON.stringify(queryInfo.queryData, null, 2)}
