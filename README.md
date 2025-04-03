@@ -10,7 +10,7 @@ The Advertising Analytics Dashboard is a comprehensive solution for tracking and
   - Google Ads
   - Meta Ads (Facebook/Instagram)
   - Microsoft Ads
-- **Authentication**: NextAuth.js for secure authentication and authorization.
+- **Authentication**: Auth.js for secure authentication and authorization.
 - **Backend**: Neon Database with Prisma ORM for data storage and management.
 - **Frontend**: React.js with Next.js for a fast and responsive user interface.
 - **Deployment**: Hosted on Vercel, accessible at [advertisinganalyticsdashboard.com](https://advertisinganalyticsdashboard.com).
