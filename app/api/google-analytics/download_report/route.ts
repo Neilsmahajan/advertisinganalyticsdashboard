@@ -216,6 +216,7 @@ export async function POST(request: NextRequest) {
           "--disable-setuid-sandbox",
         ],
         headless: chromium.default.headless,
+        env: { ...process.env, LD_LIBRARY_PATH: "/usr/lib:/usr/lib64" },
       });
     } else {
       browser = await puppeteerLib.launch({
