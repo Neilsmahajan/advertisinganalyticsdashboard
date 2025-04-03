@@ -20,6 +20,10 @@ const nextConfig: NextConfig = {
       test: /\.js\.map$/,
       use: "ignore-loader",
     });
+    if (options.isServer) {
+      config.externals = config.externals || [];
+      config.externals.push("chrome-aws-lambda");
+    }
     return config;
   },
 };

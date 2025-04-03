@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import puppeteer from "puppeteer";
 import chromium from "chrome-aws-lambda";
 
 export async function POST(request: NextRequest) {
   try {
+    // Dynamically load the correct puppeteer module
+    const puppeteer =
+      process.env.NODE_ENV === "production"
+        ? (await import("puppeteer-core")).default
+        : (await import("puppeteer")).default;
+
     const data = await request.json();
     const { userInfo, queryInfo, results, service, locale } = data;
     if (!userInfo || !queryInfo || !results || !service) {
@@ -102,7 +107,7 @@ export async function POST(request: NextRequest) {
       process.env.NODE_ENV === "production"
         ? {
             args: chromium.args,
-            executablePath: await chromium.executablePath,
+            executablePath: await chromium.executablePath, // <-- access as property
             headless: true,
           }
         : {
@@ -111,7 +116,7 @@ export async function POST(request: NextRequest) {
     );
     const page = await browser.newPage();
     await page.setContent(html_content, { waitUntil: "networkidle0" });
-    const pdfBuffer = await page.pdf({ format: "A4", landscape: true });
+    const pdfBuffer = await page.pdf({ format: "a4", landscape: true });
     await browser.close();
 
     return new NextResponse(pdfBuffer, {
