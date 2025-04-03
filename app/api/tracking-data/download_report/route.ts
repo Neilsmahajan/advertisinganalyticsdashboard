@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import puppeteer from "puppeteer";
+import chromium from "chrome-aws-lambda";
 
 export async function POST(request: NextRequest) {
   try {
@@ -97,9 +98,17 @@ export async function POST(request: NextRequest) {
       </html>
     `;
 
-    const browser = await puppeteer.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
+    const browser = await puppeteer.launch(
+      process.env.NODE_ENV === "production"
+        ? {
+            args: chromium.args,
+            executablePath: await chromium.executablePath,
+            headless: true,
+          }
+        : {
+            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+          },
+    );
     const page = await browser.newPage();
     await page.setContent(html_content, { waitUntil: "networkidle0" });
     const pdfBuffer = await page.pdf({ format: "A4", landscape: true });

@@ -15,6 +15,13 @@ const nextConfig: NextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
+  webpack: (config, options) => {
+    config.module.rules.push({
+      test: /\.js\.map$/,
+      use: "ignore-loader",
+    });
+    return config;
+  },
 };
 
 const withNextIntl = createNextIntlPlugin();
