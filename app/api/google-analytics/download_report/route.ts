@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import puppeteer from "puppeteer";
 
 export async function POST(request: NextRequest) {
   try {
@@ -192,23 +191,35 @@ export async function POST(request: NextRequest) {
 	    </html>
 	  `;
 
+    // Dynamically load puppeteer: use puppeteer-core in production, puppeteer locally.
+    let puppeteerLib:
+      | typeof import("puppeteer")
+      | typeof import("puppeteer-core");
+    if (process.env.NODE_ENV === "production") {
+      const { default: puppeteerCore } = await import("puppeteer-core");
+      puppeteerLib = puppeteerCore;
+    } else {
+      const { default: puppeteerRegular } = await import("puppeteer");
+      puppeteerLib = puppeteerRegular as unknown as typeof import("puppeteer");
+    }
+
     let browser;
     if (process.env.NODE_ENV === "production") {
       const chromium = await import("chrome-aws-lambda");
-      browser = await puppeteer.launch({
+      browser = await puppeteerLib.launch({
         executablePath: await chromium.default.executablePath,
-        args: chromium.default.args,
+        args: [...chromium.default.args, "--disable-dev-shm-usage"],
         headless: chromium.default.headless,
       });
     } else {
-      browser = await puppeteer.launch({
+      browser = await puppeteerLib.launch({
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
       });
     }
 
     const page = await browser.newPage();
     await page.setContent(html_content, { waitUntil: "networkidle0" });
-    const pdfBuffer = await page.pdf({ format: "A4", landscape: true });
+    const pdfBuffer = await page.pdf({ format: "a4", landscape: true });
     await browser.close();
 
     return new NextResponse(pdfBuffer, {
