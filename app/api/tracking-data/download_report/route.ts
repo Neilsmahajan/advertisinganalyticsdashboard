@@ -103,17 +103,24 @@ export async function POST(request: NextRequest) {
       </html>
     `;
 
-    const browser = await puppeteer.launch(
-      process.env.NODE_ENV === "production"
-        ? {
-            args: chromium.args,
-            executablePath: await chromium.executablePath, // <-- access as property
-            headless: true,
-          }
-        : {
-            args: ["--no-sandbox", "--disable-setuid-sandbox"],
-          },
-    );
+    // In production, obtain and verify executablePath
+    let launchOptions = {};
+    if (process.env.NODE_ENV === "production") {
+      const executable = await chromium.executablePath;
+      console.log("Chromium executable path:", executable);
+      if (!executable) {
+        throw new Error("Chromium executable path not found");
+      }
+      launchOptions = {
+        args: chromium.args,
+        executablePath: executable,
+        headless: true,
+      };
+    } else {
+      launchOptions = { args: ["--no-sandbox", "--disable-setuid-sandbox"] };
+    }
+
+    const browser = await puppeteer.launch(launchOptions);
     const page = await browser.newPage();
     await page.setContent(html_content, { waitUntil: "networkidle0" });
     const pdfBuffer = await page.pdf({ format: "a4", landscape: true });
