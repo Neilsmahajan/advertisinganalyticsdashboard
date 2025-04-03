@@ -12,12 +12,41 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Log environment variable status for debugging (do not log secrets in production)
+    console.log("GA env vars status:", {
+      GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PRIVATE_KEY_ID: Boolean(
+        process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PRIVATE_KEY_ID,
+      ),
+      GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PRIVATE_KEY: Boolean(
+        process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PRIVATE_KEY,
+      ),
+      GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_CLIENT_ID: Boolean(
+        process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_CLIENT_ID,
+      ),
+    });
+    if (
+      !process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PRIVATE_KEY_ID ||
+      !process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PRIVATE_KEY ||
+      !process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_CLIENT_ID
+    ) {
+      console.error("One or more GA env variables are missing");
+      return NextResponse.json(
+        { error: "Server configuration error: Missing GA credentials" },
+        { status: 500 },
+      );
+    }
+
     const credentials = {
       type: "service_account",
       project_id: "advertisinganalytics-dashboard",
       private_key_id:
         process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PRIVATE_KEY_ID,
-      private_key: process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PRIVATE_KEY,
+      // Replace escaped newlines with actual newline characters
+      private_key:
+        process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PRIVATE_KEY.replace(
+          /\\n/g,
+          "\n",
+        ),
       client_email:
         "google-analytics@advertisinganalytics-dashboard.iam.gserviceaccount.com",
       client_id: process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_CLIENT_ID,
@@ -29,7 +58,7 @@ export async function POST(request: NextRequest) {
       universe_domain: "googleapis.com",
     };
 
-    // Create the GA Data API client with proper credentials and scopes
+    // Create the GA Data API client with credentials
     const client = new BetaAnalyticsDataClient({ credentials });
 
     // Build the report request.
@@ -56,7 +85,7 @@ export async function POST(request: NextRequest) {
 
     const rows =
       response.rows?.map((row) => {
-        // Parse date returned as YYYYMMDD and format as "MMM dd, yyyy"
+        // Parse date (YYYYMMDD) and format as "MMM dd, yyyy"
         const dateFormatted =
           row.dimensionValues && row.dimensionValues[0]?.value
             ? format(
