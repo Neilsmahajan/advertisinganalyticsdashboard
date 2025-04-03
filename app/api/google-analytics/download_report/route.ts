@@ -208,7 +208,13 @@ export async function POST(request: NextRequest) {
       const chromium = await import("chrome-aws-lambda");
       browser = await puppeteerLib.launch({
         executablePath: await chromium.default.executablePath,
-        args: [...chromium.default.args, "--disable-dev-shm-usage"],
+        args: [
+          ...chromium.default.args,
+          "--disable-dev-shm-usage",
+          "--disable-gpu",
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+        ],
         headless: chromium.default.headless,
       });
     } else {
