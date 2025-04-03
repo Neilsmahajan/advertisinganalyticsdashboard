@@ -288,7 +288,16 @@ export default function MetaAdsQueries() {
         <CardContent className="space-y-4">
           {session?.facebook?.accessToken && (
             <>
-              <Button variant="outline" className="gap-2">
+              <Button
+                variant="outline"
+                className="gap-2"
+                onClick={() =>
+                  window.open(
+                    "https://www.youtube.com/watch?v=UxWZLysI4Qs",
+                    "_blank",
+                  )
+                }
+              >
                 <PlayCircle className="h-4 w-4" /> {t("viewTutorial")}
               </Button>
               <div className="space-y-4 pt-4">

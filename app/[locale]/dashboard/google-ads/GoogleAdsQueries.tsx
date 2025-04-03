@@ -218,7 +218,16 @@ export default function GoogleAdsQueries() {
           <CardDescription>{t("instructionsDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button variant="outline" className="gap-2">
+          <Button
+            variant="outline"
+            className="gap-2"
+            onClick={() =>
+              window.open(
+                "https://www.youtube.com/watch?v=KJ0mmCF742Y",
+                "_blank",
+              )
+            }
+          >
             <PlayCircle className="h-4 w-4" /> {t("viewTutorial")}
           </Button>
           <div className="space-y-4 pt-4">
