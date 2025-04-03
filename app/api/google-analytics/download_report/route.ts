@@ -192,9 +192,20 @@ export async function POST(request: NextRequest) {
 	    </html>
 	  `;
 
-    const browser = await puppeteer.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
+    let browser;
+    if (process.env.NODE_ENV === "production") {
+      const chromium = await import("chrome-aws-lambda");
+      browser = await puppeteer.launch({
+        executablePath: await chromium.default.executablePath,
+        args: chromium.default.args,
+        headless: chromium.default.headless,
+      });
+    } else {
+      browser = await puppeteer.launch({
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      });
+    }
+
     const page = await browser.newPage();
     await page.setContent(html_content, { waitUntil: "networkidle0" });
     const pdfBuffer = await page.pdf({ format: "A4", landscape: true });
