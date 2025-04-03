@@ -12,18 +12,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Log environment variable status for debugging (do not log secrets in production)
-    console.log("GA env vars status:", {
-      GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PRIVATE_KEY_ID: Boolean(
-        process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PRIVATE_KEY_ID,
-      ),
-      GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PRIVATE_KEY: Boolean(
-        process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PRIVATE_KEY,
-      ),
-      GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_CLIENT_ID: Boolean(
-        process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_CLIENT_ID,
-      ),
-    });
     if (
       !process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PRIVATE_KEY_ID ||
       !process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS_PRIVATE_KEY ||
