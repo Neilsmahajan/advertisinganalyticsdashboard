@@ -85,14 +85,14 @@ export default function TrackingDataResultsSection({
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-4">
+      {/* <div className="flex gap-4">
         <Button
           className="bg-[#47adbf] hover:bg-[#47adbf]/90 text-white"
           onClick={handleDownloadReport}
         >
           {t("downloadReport")}
         </Button>
-      </div>
+      </div> */}
       <div>
         <div className="bg-white/10 rounded-lg p-6">
           {results.analytics_tags ? (
