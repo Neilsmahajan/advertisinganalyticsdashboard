@@ -351,6 +351,7 @@
     "description": "Connectez-vous à votre compte Microsoft Ads pour consulter les performances de vos campagnes."
   },
   "MicrosoftAdsQueries": {
+    "viewTutorial": "Voir le tutoriel",
     "instructionsTitle": "Instructions",
     "instructionsDescription": "Entrez votre ID de compte, ID client et plage de dates pour créer ou sélectionner une requête Microsoft Ads.",
     "connectDescription": "Connectez votre compte Microsoft pour commencer à analyser les campagnes.",
