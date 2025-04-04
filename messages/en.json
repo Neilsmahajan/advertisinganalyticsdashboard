@@ -177,26 +177,18 @@
   "Dashboard": {
     "pageTitle": "Dashboard",
     "welcomeText": "Welcome to your analytics dashboard",
-    "filterLast7Days": "Last 7 days",
-    "viewReports": "View Reports",
-    "totalImpressions": "Total Impressions",
-    "impressionsChange": "+20.1% from last month",
-    "totalClicks": "Total Clicks",
-    "clicksChange": "+12.3% from last month",
-    "ctr": "CTR",
-    "ctrValue": "2.1%",
-    "ctrChange": "+1.2% from last month",
-    "conversions": "Conversions",
-    "conversionsValue": "1,203",
-    "conversionsChange": "+4.5% from last month",
-    "performanceOverview": "Performance Overview",
-    "performanceChartPlaceholder": "Performance chart will appear here",
-    "topCampaigns": "Top Campaigns",
-    "campaignsDescription": "Your best performing campaigns this month",
-    "campaignSummerSale": "Summer Sale",
-    "campaignNewProductLaunch": "New Product Launch",
-    "campaignHolidaySpecial": "Holiday Special",
-    "campaignRetargeting": "Retargeting"
+    "newQuery": "New Query",
+    "savedQueriesTitle": "Your Saved Queries"
+  },
+  "DashboardQueries": {
+    "deleteSuccessTitle": "Query deleted",
+    "deleteSuccessDescription": "The query has been successfully deleted",
+    "deleteErrorTitle": "Error",
+    "deleteErrorDescription": "Failed to delete the query. Please try again.",
+    "runButton": "Run",
+    "noSavedQueries": "No saved queries found for this service",
+    "createNewQuery": "Create New Query",
+    "loadingQueries": "Loading your saved queries..."
   },
   "DashboardSidebar": {
     "logoAlt": "Advertising Analytics Dashboard Logo",
