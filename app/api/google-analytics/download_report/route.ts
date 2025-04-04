@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import chromium from "chrome-aws-lambda";
 
 export async function POST(request: NextRequest) {
   try {
+    let browser;
     const data = await request.json();
     const { userInfo, queryInfo, results, service, locale, translatedHeaders } =
       data;
@@ -191,55 +193,53 @@ export async function POST(request: NextRequest) {
 	    </html>
 	  `;
 
-    // Dynamically load puppeteer: use puppeteer-core in production, puppeteer locally.
-    let puppeteerLib:
-      | typeof import("puppeteer")
-      | typeof import("puppeteer-core");
-    if (process.env.NODE_ENV === "production") {
-      const { default: puppeteerCore } = await import("puppeteer-core");
-      puppeteerLib = puppeteerCore;
-    } else {
-      const { default: puppeteerRegular } = await import("puppeteer");
-      puppeteerLib = puppeteerRegular as unknown as typeof import("puppeteer");
-    }
+    try {
+      if (process.env.NODE_ENV === "production") {
+        // In production (Vercel), use chrome-aws-lambda
+        const puppeteer = require("puppeteer-core");
+        browser = await puppeteer.launch({
+          args: [
+            ...chromium.args,
+            "--hide-scrollbars",
+            "--disable-web-security",
+          ],
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath,
+          headless: true,
+          ignoreHTTPSErrors: true,
+        });
+      } else {
+        // In development, use regular puppeteer
+        const puppeteer = require("puppeteer");
+        browser = await puppeteer.launch({
+          args: ["--no-sandbox", "--disable-setuid-sandbox"],
+          headless: true,
+        });
+      }
 
-    let browser;
-    if (process.env.NODE_ENV === "production") {
-      const chromium = await import("chrome-aws-lambda");
-      browser = await puppeteerLib.launch({
-        executablePath: await chromium.default.executablePath,
-        args: [
-          ...chromium.default.args,
-          "--disable-dev-shm-usage",
-          "--disable-gpu",
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-        ],
-        headless: chromium.default.headless,
-        env: { ...process.env, LD_LIBRARY_PATH: "/usr/lib:/usr/lib64" },
+      const page = await browser.newPage();
+      await page.setContent(html_content, { waitUntil: "networkidle0" });
+      const pdfBuffer = await page.pdf({ format: "a4", landscape: true });
+      await browser.close();
+
+      return new NextResponse(pdfBuffer, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": "attachment; filename=report.pdf",
+        },
       });
-    } else {
-      browser = await puppeteerLib.launch({
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      });
+    } catch (error) {
+      console.error("Browser launch error:", error);
+      throw error;
     }
-
-    const page = await browser.newPage();
-    await page.setContent(html_content, { waitUntil: "networkidle0" });
-    const pdfBuffer = await page.pdf({ format: "a4", landscape: true });
-    await browser.close();
-
-    return new NextResponse(pdfBuffer, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": "attachment; filename=report.pdf",
-      },
-    });
   } catch (error) {
     console.error("Error generating GA report:", error);
     return NextResponse.json(
-      { error: "An error occurred while generating report" },
+      {
+        error: "An error occurred while generating report",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 },
     );
   }

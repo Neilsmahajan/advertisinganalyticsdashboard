@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import puppeteer from "puppeteer";
+import chromium from "chrome-aws-lambda";
 
 export async function POST(request: NextRequest) {
   try {
+    let browser;
     const data = await request.json();
     // Removed userInfo from the check since it's optional for Google Ads report
     const { userInfo, queryInfo, results, service, locale, translatedHeaders } =
@@ -201,25 +202,53 @@ export async function POST(request: NextRequest) {
       </html>
     `;
 
-    const browser = await puppeteer.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
-    const page = await browser.newPage();
-    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-    const pdfBuffer = await page.pdf({ format: "A4", landscape: true });
-    await browser.close();
+    try {
+      if (process.env.NODE_ENV === "production") {
+        // In production (Vercel), use chrome-aws-lambda
+        const puppeteer = require("puppeteer-core");
+        browser = await puppeteer.launch({
+          args: [
+            ...chromium.args,
+            "--hide-scrollbars",
+            "--disable-web-security",
+          ],
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath,
+          headless: true,
+          ignoreHTTPSErrors: true,
+        });
+      } else {
+        // In development, use regular puppeteer
+        const puppeteer = require("puppeteer");
+        browser = await puppeteer.launch({
+          args: ["--no-sandbox", "--disable-setuid-sandbox"],
+          headless: true,
+        });
+      }
 
-    return new NextResponse(pdfBuffer, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": "attachment; filename=google-ads-report.pdf",
-      },
-    });
+      const page = await browser.newPage();
+      await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+      const pdfBuffer = await page.pdf({ format: "a4", landscape: true });
+      await browser.close();
+
+      return new NextResponse(pdfBuffer, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": "attachment; filename=google-ads-report.pdf",
+        },
+      });
+    } catch (error) {
+      console.error("Browser launch error:", error);
+      throw error;
+    }
   } catch (error) {
     console.error("Error generating Google Ads report:", error);
     return NextResponse.json(
-      { error: "An error occurred while generating report" },
+      {
+        error: "An error occurred while generating report",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 },
     );
   }

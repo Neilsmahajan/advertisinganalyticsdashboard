@@ -3,14 +3,10 @@ import chromium from "chrome-aws-lambda";
 
 export async function POST(request: NextRequest) {
   try {
-    // Dynamically load the correct puppeteer module
-    const puppeteer =
-      process.env.NODE_ENV === "production"
-        ? (await import("puppeteer-core")).default
-        : (await import("puppeteer")).default;
-
+    let browser;
     const data = await request.json();
     const { userInfo, queryInfo, results, service, locale } = data;
+
     if (!userInfo || !queryInfo || !results || !service) {
       return NextResponse.json(
         { error: "userInfo, queryInfo, results, and service are required" },
@@ -24,6 +20,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Extract locale and set translations
     const lowerLocale = (locale || "en").toLowerCase();
     const reportTitle = lowerLocale === "fr" ? "Rapport" : "Report";
     const userInfoLabel =
@@ -103,40 +100,53 @@ export async function POST(request: NextRequest) {
       </html>
     `;
 
-    // In production, obtain and verify executablePath
-    let launchOptions = {};
-    if (process.env.NODE_ENV === "production") {
-      const executable = await chromium.executablePath;
-      console.log("Chromium executable path:", executable);
-      if (!executable) {
-        throw new Error("Chromium executable path not found");
+    try {
+      if (process.env.NODE_ENV === "production") {
+        // In production (Vercel), use chrome-aws-lambda
+        const puppeteer = require("puppeteer-core");
+        browser = await puppeteer.launch({
+          args: [
+            ...chromium.args,
+            "--hide-scrollbars",
+            "--disable-web-security",
+          ],
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath,
+          headless: true,
+          ignoreHTTPSErrors: true,
+        });
+      } else {
+        // In development, use regular puppeteer
+        const puppeteer = require("puppeteer");
+        browser = await puppeteer.launch({
+          args: ["--no-sandbox", "--disable-setuid-sandbox"],
+          headless: true,
+        });
       }
-      launchOptions = {
-        args: chromium.args,
-        executablePath: executable,
-        headless: true,
-      };
-    } else {
-      launchOptions = { args: ["--no-sandbox", "--disable-setuid-sandbox"] };
+
+      const page = await browser.newPage();
+      await page.setContent(html_content, { waitUntil: "networkidle0" });
+      const pdfBuffer = await page.pdf({ format: "a4", landscape: true });
+      await browser.close();
+
+      return new NextResponse(pdfBuffer, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": "attachment; filename=report.pdf",
+        },
+      });
+    } catch (error) {
+      console.error("Browser launch error:", error);
+      throw error;
     }
-
-    const browser = await puppeteer.launch(launchOptions);
-    const page = await browser.newPage();
-    await page.setContent(html_content, { waitUntil: "networkidle0" });
-    const pdfBuffer = await page.pdf({ format: "a4", landscape: true });
-    await browser.close();
-
-    return new NextResponse(pdfBuffer, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": "attachment; filename=report.pdf",
-      },
-    });
   } catch (error) {
     console.error("Error generating report:", error);
     return NextResponse.json(
-      { error: "Error generating report" },
+      {
+        error: "Error generating report",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 },
     );
   }
