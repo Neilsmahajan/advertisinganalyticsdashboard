@@ -158,14 +158,21 @@
   },
   "UserDataDeletion": {
     "pageTitle": "User Data & Account Deletion",
-    "introText": "Manage deletion of your data and disconnect your Meta account if you no longer wish to share your Facebook Ads information.",
+    "introText": "Manage deletion of your data and disconnect your Meta or Microsoft account if you no longer wish to share your Facebook Ads or Microsoft information.",
     "disconnectButton": "Disconnect Meta Account",
     "disconnecting": "Disconnecting...",
     "disconnectSuccessTitle": "Disconnected",
     "disconnectSuccessDescription": "Your Meta account has been disconnected successfully.",
     "disconnectErrorTitle": "Error",
     "disconnectErrorDescription": "Failed to disconnect Meta account. Please try again.",
-    "connectButton": "Connect Meta Account"
+    "connectButton": "Connect Meta Account",
+    "disconnectMicrosoftButton": "Disconnect Microsoft Account",
+    "disconnectingMicrosoft": "Disconnecting...",
+    "disconnectSuccessTitleMicrosoft": "Disconnected",
+    "disconnectSuccessDescriptionMicrosoft": "Your Microsoft account has been disconnected successfully.",
+    "disconnectErrorTitleMicrosoft": "Error",
+    "disconnectErrorDescriptionMicrosoft": "Failed to disconnect Microsoft account. Please try again.",
+    "connectMicrosoftButton": "Connect Microsoft Account"
   },
   "Dashboard": {
     "pageTitle": "Dashboard",

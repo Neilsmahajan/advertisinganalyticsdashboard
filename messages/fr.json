@@ -158,14 +158,21 @@
   },
   "UserDataDeletion": {
     "pageTitle": "Suppression des données utilisateur et du compte",
-    "introText": "Gérez la suppression de vos données et déconnectez votre compte Meta si vous ne souhaitez plus partager vos informations Facebook Ads.",
+    "introText": "Gérez la suppression de vos données et déconnectez votre compte Meta ou Microsoft si vous ne souhaitez plus partager vos informations Facebook Ads ou Microsoft.",
     "disconnectButton": "Déconnecter le compte Meta",
     "disconnecting": "Déconnexion en cours...",
     "disconnectSuccessTitle": "Déconnecté",
     "disconnectSuccessDescription": "Votre compte Meta a été déconnecté avec succès.",
     "disconnectErrorTitle": "Erreur",
     "disconnectErrorDescription": "Échec de la déconnexion du compte Meta. Veuillez réessayer.",
-    "connectButton": "Connecter le compte Meta"
+    "connectButton": "Connecter le compte Meta",
+    "disconnectMicrosoftButton": "Déconnecter le compte Microsoft",
+    "disconnectingMicrosoft": "Déconnexion en cours...",
+    "disconnectSuccessTitleMicrosoft": "Déconnecté",
+    "disconnectSuccessDescriptionMicrosoft": "Votre compte Microsoft a été déconnecté avec succès.",
+    "disconnectErrorTitleMicrosoft": "Erreur",
+    "disconnectErrorDescriptionMicrosoft": "Échec de la déconnexion du compte Microsoft. Veuillez réessayer.",
+    "connectMicrosoftButton": "Connecter le compte Microsoft"
   },
   "Dashboard": {
     "pageTitle": "Tableau de bord",
