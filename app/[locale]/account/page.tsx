@@ -3,8 +3,9 @@ import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import SignOutButton from "./SignOutButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import AccountQueries from "./AccountQueries"; // newly added
+import AccountQueries from "./AccountQueries";
 import SignInButton from "@/components/SignInButton";
+import ConnectedAccounts from "./ConnectedAccounts";
 
 export default async function AccountPage() {
   const session = await auth();
@@ -58,6 +59,10 @@ export default async function AccountPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Connected Accounts Section */}
+        <ConnectedAccounts />
+
         <AccountQueries />
       </div>
     </div>
