@@ -1,7 +1,7 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { useTranslations, useLocale } from "next-intl";
-import React from "react";
+import React, { useState } from "react";
+import { DownloadButton } from "@/components/DownloadButton";
 
 interface MicrosoftAdsResultsSectionProps {
   results: {
@@ -30,9 +30,10 @@ export default function MicrosoftAdsResultsSection({
 }: MicrosoftAdsResultsSectionProps) {
   const t = useTranslations("MicrosoftAdsResultsSection");
   const locale = useLocale();
+  const [isDownloading, setIsDownloading] = useState(false);
 
-  // New handler for downloading the report
   const handleDownloadReport = async () => {
+    setIsDownloading(true);
     try {
       const response = await fetch("/api/microsoft-ads/download-report", {
         method: "POST",
@@ -58,18 +59,20 @@ export default function MicrosoftAdsResultsSection({
       link.remove();
     } catch (error) {
       console.error("Error generating report:", error);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex gap-4">
-        <Button
-          className="bg-[#47adbf] hover:bg-[#47adbf]/90 text-white"
+        <DownloadButton
+          isLoading={isDownloading}
           onClick={handleDownloadReport}
-        >
-          {t("downloadReport")}
-        </Button>
+          text={t("downloadReport")}
+          loadingText={t("generatingReport")}
+        />
       </div>
       <div>
         <h3 className="text-xl font-bold mb-4">{t("results")}</h3>

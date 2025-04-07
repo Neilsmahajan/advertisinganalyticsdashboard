@@ -248,6 +248,7 @@
   },
   "TrackingDataResultsSection": {
     "downloadReport": "Download Report",
+    "generatingReport": "Generating report...",
     "resultsWillAppear": "Results will appear here once analysis is complete.",
     "service": "Service",
     "queryName": "Query Name",
@@ -302,6 +303,7 @@
   },
   "GoogleAnalyticsResultsSection": {
     "downloadReport": "Download Report",
+    "generatingReport": "Generating report...",
     "results": "Results",
     "resultsWillAppear": "Results will appear here once analysis is complete.",
     "date": "Date",
@@ -352,6 +354,7 @@
   },
   "GoogleAdsResultsSection": {
     "downloadReport": "Download Report",
+    "generatingReport": "Generating report...",
     "results": "Results",
     "metric": "Metric",
     "value": "Value",
@@ -415,6 +418,7 @@
   },
   "MicrosoftAdsResultsSection": {
     "downloadReport": "Download Report",
+    "generatingReport": "Generating report...",
     "results": "Results",
     "metric": "Metric",
     "value": "Value",
@@ -463,6 +467,7 @@
   },
   "MetaAdsResultsSection": {
     "downloadReport": "Download Report",
+    "generatingReport": "Generating report...",
     "results": "Results",
     "resultsWillAppear": "Results will appear here once analysis is complete.",
     "metric": "Metric",

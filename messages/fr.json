@@ -87,12 +87,6 @@
     "metaNotConnected": "Non connecté",
     "connectMeta": "Connecter le compte Meta",
     "disconnectMeta": "Déconnecter le compte Meta",
-    "microsoftAccount": "Compte Microsoft",
-    "microsoftAccountDescription": "Connectez votre compte Microsoft pour accéder aux données de Microsoft Ads",
-    "microsoftConnected": "Connecté",
-    "microsoftNotConnected": "Non connecté",
-    "connectMicrosoft": "Connecter le compte Microsoft",
-    "disconnectMicrosoft": "Déconnecter le compte Microsoft",
     "disconnecting": "Déconnexion en cours...",
     "metaDisconnectSuccessTitle": "Déconnecté",
     "metaDisconnectSuccessDescription": "Votre compte Meta a été déconnecté avec succès.",
@@ -237,6 +231,7 @@
   },
   "TrackingDataResultsSection": {
     "downloadReport": "Télécharger le rapport",
+    "generatingReport": "Génération du rapport...",
     "resultsWillAppear": "Les résultats apparaîtront ici une fois l'analyse terminée.",
     "service": "Service",
     "queryName": "Nom de la requête",
@@ -291,6 +286,7 @@
   },
   "GoogleAnalyticsResultsSection": {
     "downloadReport": "Télécharger le rapport",
+    "generatingReport": "Génération du rapport...",
     "results": "Résultats",
     "resultsWillAppear": "Les résultats apparaîtront ici une fois l'analyse terminée.",
     "date": "Date",
@@ -341,6 +337,7 @@
   },
   "GoogleAdsResultsSection": {
     "downloadReport": "Télécharger le rapport",
+    "generatingReport": "Génération du rapport...",
     "results": "Résultats",
     "metric": "Métrique",
     "value": "Valeur",
@@ -404,6 +401,7 @@
   },
   "MicrosoftAdsResultsSection": {
     "downloadReport": "Télécharger le rapport",
+    "generatingReport": "Génération du rapport...",
     "results": "Résultats",
     "metric": "Métrique",
     "value": "Valeur",
@@ -452,6 +450,7 @@
   },
   "MetaAdsResultsSection": {
     "downloadReport": "Télécharger le rapport",
+    "generatingReport": "Génération du rapport...",
     "results": "Résultats",
     "resultsWillAppear": "Les résultats apparaîtront ici une fois l'analyse terminée.",
     "metric": "Métrique",

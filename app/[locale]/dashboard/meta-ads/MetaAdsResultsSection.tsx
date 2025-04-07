@@ -1,7 +1,7 @@
 "use client";
 import { useTranslations, useLocale } from "next-intl";
-import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useState } from "react";
+import { DownloadButton } from "@/components/DownloadButton";
 
 interface MetaAdsResultsSectionProps {
   results: {
@@ -32,8 +32,10 @@ export default function MetaAdsResultsSection({
 }: MetaAdsResultsSectionProps) {
   const t = useTranslations("MetaAdsResultsSection");
   const locale = useLocale();
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const handleDownloadReport = async () => {
+    setIsDownloading(true);
     try {
       const response = await fetch("/api/meta-ads/download-report", {
         method: "POST",
@@ -60,18 +62,20 @@ export default function MetaAdsResultsSection({
       link.remove();
     } catch (error) {
       console.error("Error generating Meta Ads report:", error);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex gap-4">
-        <Button
-          className="bg-[#47adbf] hover:bg-[#47adbf]/90 text-white"
+        <DownloadButton
+          isLoading={isDownloading}
           onClick={handleDownloadReport}
-        >
-          {t("downloadReport")}
-        </Button>
+          text={t("downloadReport")}
+          loadingText={t("generatingReport")}
+        />
       </div>
       <div>
         <h3 className="text-xl font-bold mb-4">{t("results")}</h3>

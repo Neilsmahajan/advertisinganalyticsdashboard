@@ -1,7 +1,7 @@
 "use client";
 import { useTranslations, useLocale } from "next-intl";
-import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useState } from "react";
+import { DownloadButton } from "@/components/DownloadButton";
 
 interface UserInfo {
   name: string;
@@ -28,24 +28,26 @@ interface GoogleAdsResultsSectionProps {
     queryName: string;
     queryData: Record<string, unknown>;
   };
-  userInfo: UserInfo; // Added userInfo prop
+  userInfo: UserInfo;
 }
 
 export default function GoogleAdsResultsSection({
   results,
   queryInfo,
-  userInfo, // Destructure userInfo
+  userInfo,
 }: GoogleAdsResultsSectionProps) {
   const t = useTranslations("GoogleAdsResultsSection");
   const locale = useLocale();
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const handleDownloadReport = async () => {
+    setIsDownloading(true);
     try {
       const response = await fetch("/api/google-ads/download-report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userInfo, // Passing userInfo in the request
+          userInfo,
           queryInfo,
           results,
           service: "Google Ads",
@@ -66,18 +68,20 @@ export default function GoogleAdsResultsSection({
       link.remove();
     } catch (error) {
       console.error("Error generating report:", error);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex gap-4">
-        <Button
-          className="bg-[#47adbf] hover:bg-[#47adbf]/90 text-white"
+        <DownloadButton
+          isLoading={isDownloading}
           onClick={handleDownloadReport}
-        >
-          {t("downloadReport")}
-        </Button>
+          text={t("downloadReport")}
+          loadingText={t("generatingReport")}
+        />
       </div>
       <div>
         <h3 className="text-xl font-bold mb-4">{t("results")}</h3>

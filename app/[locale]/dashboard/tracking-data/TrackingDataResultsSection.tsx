@@ -1,8 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { DownloadButton } from "@/components/DownloadButton";
 
 interface TrackingDataResultsSectionProps {
   results: {
@@ -48,12 +49,14 @@ export default function TrackingDataResultsSection({
 }: TrackingDataResultsSectionProps) {
   const t = useTranslations("TrackingDataResultsSection");
   const locale = useLocale();
+  const [isDownloading, setIsDownloading] = useState(false);
 
   // extract website domain from queryInfo
   const websiteUrlRaw = (queryInfo.queryData.websiteURL as string) || "";
   const websiteDomain = websiteUrlRaw.replace(/(^\w+:|^)\/\//, "");
 
   const handleDownloadReport = async () => {
+    setIsDownloading(true);
     try {
       const response = await fetch("/api/tracking-data/download-report", {
         method: "POST",
@@ -80,18 +83,20 @@ export default function TrackingDataResultsSection({
       link.remove();
     } catch (error) {
       console.error("Error generating report:", error);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex gap-4">
-        <Button
-          className="bg-[#47adbf] hover:bg-[#47adbf]/90 text-white"
+        <DownloadButton
+          isLoading={isDownloading}
           onClick={handleDownloadReport}
-        >
-          {t("downloadReport")}
-        </Button>
+          text={t("downloadReport")}
+          loadingText={t("generatingReport")}
+        />
       </div>
       <div>
         <div className="bg-white/10 rounded-lg p-6">
