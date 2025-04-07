@@ -322,7 +322,7 @@
   },
   "GoogleAdsQueries": {
     "instructionsTitle": "Instructions",
-    "instructionsDescription": "Enter your Customer ID, select your date range, and create or select an existing query.",
+    "instructionsDescription": "Ensure that your are logged in with the same Google Account as your Google Ads account. Enter your Customer ID, select your date range, and create or select an existing query.",
     "viewTutorial": "View Tutorial",
     "previousQueries": "Previous Queries",
     "selectPlaceholder": "Select a saved query or create new",

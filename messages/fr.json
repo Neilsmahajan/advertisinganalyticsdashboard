@@ -311,7 +311,7 @@
   },
   "GoogleAdsQueries": {
     "instructionsTitle": "Instructions",
-    "instructionsDescription": "Entrez votre ID client, sélectionnez votre plage de dates et créez ou sélectionnez une requête existante.",
+    "instructionsDescription": "Assurez-vous que vous êtes connecté avec le même compte Google que votre compte Google Ads. Entrez votre ID client, sélectionnez votre plage de dates et créez ou sélectionnez une requête existante.",
     "viewTutorial": "Voir le tutoriel",
     "previousQueries": "Requêtes précédentes",
     "selectPlaceholder": "Sélectionnez une requête sauvegardée ou créez-en une nouvelle",
