@@ -55,7 +55,7 @@ export default function TrackingDataResultsSection({
 
   const handleDownloadReport = async () => {
     try {
-      const response = await fetch("/api/tracking-data/download_report", {
+      const response = await fetch("/api/tracking-data/download-report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

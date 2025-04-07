@@ -36,7 +36,7 @@ export default function GoogleAnalyticsResultsSection({
 
   const handleDownloadReport = async () => {
     try {
-      const response = await fetch("/api/google-analytics/download_report", {
+      const response = await fetch("/api/google-analytics/download-report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
