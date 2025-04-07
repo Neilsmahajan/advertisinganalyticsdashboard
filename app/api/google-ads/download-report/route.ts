@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import chromium from "chrome-aws-lambda";
 
 export async function POST(request: NextRequest) {
   try {
     let browser;
     const data = await request.json();
-    // Removed userInfo from the check since it's optional for Google Ads report
     const { userInfo, queryInfo, results, service, locale, translatedHeaders } =
       data;
     if (!queryInfo || !results || !service) {
@@ -203,20 +201,53 @@ export async function POST(request: NextRequest) {
     `;
 
     try {
+      let pdfBuffer;
+
       if (process.env.NODE_ENV === "production") {
-        // In production (Vercel), use chrome-aws-lambda
-        const puppeteer = require("puppeteer-core");
-        browser = await puppeteer.launch({
-          args: [
-            ...chromium.args,
-            "--hide-scrollbars",
-            "--disable-web-security",
-          ],
-          defaultViewport: chromium.defaultViewport,
-          executablePath: await chromium.executablePath,
-          headless: true,
-          ignoreHTTPSErrors: true,
-        });
+        // In production (Vercel), use Browserless.io API for PDF generation
+        const browserlessAPIUrl =
+          process.env.BROWSERLESS_API_URL ||
+          "https://chrome.browserless.io/pdf";
+        const browserlessAPIKey = process.env.BROWSERLESS_API_KEY;
+
+        if (!browserlessAPIKey) {
+          throw new Error(
+            "BROWSERLESS_API_KEY environment variable is required in production",
+          );
+        }
+
+        const response = await fetch(
+          `${browserlessAPIUrl}?token=${browserlessAPIKey}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              html: htmlContent,
+              options: {
+                format: "A4",
+                landscape: true,
+                printBackground: true,
+                margin: {
+                  top: "10mm",
+                  right: "10mm",
+                  bottom: "10mm",
+                  left: "10mm",
+                },
+              },
+            }),
+          },
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(
+            `Browserless API error: ${response.status} ${errorText}`,
+          );
+        }
+
+        pdfBuffer = Buffer.from(await response.arrayBuffer());
       } else {
         // In development, use regular puppeteer
         const puppeteer = require("puppeteer");
@@ -224,12 +255,12 @@ export async function POST(request: NextRequest) {
           args: ["--no-sandbox", "--disable-setuid-sandbox"],
           headless: true,
         });
-      }
 
-      const page = await browser.newPage();
-      await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-      const pdfBuffer = await page.pdf({ format: "a4", landscape: true });
-      await browser.close();
+        const page = await browser.newPage();
+        await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+        pdfBuffer = await page.pdf({ format: "a4", landscape: true });
+        await browser.close();
+      }
 
       return new NextResponse(pdfBuffer, {
         status: 200,
@@ -239,7 +270,7 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (error) {
-      console.error("Browser launch error:", error);
+      console.error("Browser/PDF generation error:", error);
       throw error;
     }
   } catch (error) {

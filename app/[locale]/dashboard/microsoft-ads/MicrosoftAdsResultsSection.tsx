@@ -63,14 +63,14 @@ export default function MicrosoftAdsResultsSection({
 
   return (
     <div className="space-y-6">
-      {/* <div className="flex gap-4">
+      <div className="flex gap-4">
         <Button
           className="bg-[#47adbf] hover:bg-[#47adbf]/90 text-white"
           onClick={handleDownloadReport}
         >
           {t("downloadReport")}
         </Button>
-      </div> */}
+      </div>
       <div>
         <h3 className="text-xl font-bold mb-4">{t("results")}</h3>
         <div className="grid grid-cols-2 gap-4">

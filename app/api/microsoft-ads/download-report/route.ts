@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import puppeteer from "puppeteer";
 
 export async function POST(request: NextRequest) {
   try {
@@ -129,26 +128,88 @@ export async function POST(request: NextRequest) {
       </html>
     `;
 
-    // Launch Puppeteer to render PDF.
-    const browser = await puppeteer.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
-    const page = await browser.newPage();
-    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-    const pdfBuffer = await page.pdf({ format: "A4", landscape: true });
-    await browser.close();
+    try {
+      let pdfBuffer;
+      let browser;
 
-    return new NextResponse(pdfBuffer, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": "attachment; filename=microsoft-ads-report.pdf",
-      },
-    });
+      if (process.env.NODE_ENV === "production") {
+        // In production (Vercel), use Browserless.io API for PDF generation
+        const browserlessAPIUrl =
+          process.env.BROWSERLESS_API_URL ||
+          "https://chrome.browserless.io/pdf";
+        const browserlessAPIKey = process.env.BROWSERLESS_API_KEY;
+
+        if (!browserlessAPIKey) {
+          throw new Error(
+            "BROWSERLESS_API_KEY environment variable is required in production",
+          );
+        }
+
+        const response = await fetch(
+          `${browserlessAPIUrl}?token=${browserlessAPIKey}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              html: htmlContent,
+              options: {
+                format: "A4",
+                landscape: true,
+                printBackground: true,
+                margin: {
+                  top: "10mm",
+                  right: "10mm",
+                  bottom: "10mm",
+                  left: "10mm",
+                },
+              },
+            }),
+          },
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(
+            `Browserless API error: ${response.status} ${errorText}`,
+          );
+        }
+
+        pdfBuffer = Buffer.from(await response.arrayBuffer());
+      } else {
+        // In development, use regular puppeteer
+        const puppeteer = require("puppeteer");
+        browser = await puppeteer.launch({
+          args: ["--no-sandbox", "--disable-setuid-sandbox"],
+          headless: true,
+        });
+
+        const page = await browser.newPage();
+        await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+        pdfBuffer = await page.pdf({ format: "a4", landscape: true });
+        await browser.close();
+      }
+
+      return new NextResponse(pdfBuffer, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition":
+            "attachment; filename=microsoft-ads-report.pdf",
+        },
+      });
+    } catch (error) {
+      console.error("Browser/PDF generation error:", error);
+      throw error;
+    }
   } catch (error) {
     console.error("Error generating Microsoft Ads report:", error);
     return NextResponse.json(
-      { error: "An error occurred while generating report" },
+      {
+        error: "An error occurred while generating report",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 },
     );
   }
