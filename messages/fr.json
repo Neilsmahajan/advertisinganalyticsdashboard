@@ -102,8 +102,8 @@
     "microsoftDisconnectSuccessDescription": "Votre compte Microsoft a été déconnecté avec succès.",
     "microsoftDisconnectErrorTitle": "Erreur",
     "microsoftDisconnectErrorDescription": "Échec de la déconnexion du compte Microsoft. Veuillez réessayer."
-    },
-    "AccountQueries": {
+  },
+  "AccountQueries": {
     "loadingQueries": "Chargement des requêtes...",
     "noSavedQueries": "Aucune requête sauvegardée.",
     "deleteSuccessTitle": "Supprimé",

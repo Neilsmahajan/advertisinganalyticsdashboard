@@ -102,13 +102,16 @@ export async function POST(request: NextRequest) {
 
     try {
       if (process.env.NODE_ENV === "production") {
-        // In production (Vercel), use chrome-aws-lambda
+        // In production (Vercel), use chrome-aws-lambda with additional flags to avoid missing shared libraries
         const puppeteer = require("puppeteer-core");
         browser = await puppeteer.launch({
           args: [
             ...chromium.args,
             "--hide-scrollbars",
             "--disable-web-security",
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+            "--disable-dev-shm-usage",
           ],
           defaultViewport: chromium.defaultViewport,
           executablePath: await chromium.executablePath,
