@@ -62,7 +62,27 @@
   },
   "SignInButton": {
     "viewYourQueries": "View your Queries",
-    "signIn": "Sign In"
+    "signIn": "Sign In",
+    "loading": "Loading...",
+    "signingIn": "Signing in..."
+  },
+  "ConnectedAccounts": {
+    "title": "Connected Accounts",
+    "connecting": "Connecting...",
+    "disconnect": "Disconnect",
+    "disconnecting": "Disconnecting...",
+    "connect": "Connect",
+    "connectedSince": "Connected since {date}",
+    "fetchErrorTitle": "Error",
+    "fetchErrorDescription": "Could not load account connections",
+    "connectSuccessTitle": "Connected",
+    "connectSuccessDescription": "Your {service} account has been connected successfully",
+    "connectErrorTitle": "Connection Error",
+    "connectErrorDescription": "Failed to connect {service} account. Please try again.",
+    "disconnectSuccessTitle": "Disconnected",
+    "disconnectSuccessDescription": "Your {service} account has been disconnected successfully",
+    "disconnectErrorTitle": "Disconnection Error",
+    "disconnectErrorDescription": "Failed to disconnect {service} account. Please try again."
   },
   "Account": {
     "myAccount": "MY ACCOUNT",
@@ -87,12 +107,6 @@
     "metaNotConnected": "Not connected",
     "connectMeta": "Connect Meta Account",
     "disconnectMeta": "Disconnect Meta Account",
-    "microsoftAccount": "Microsoft Account",
-    "microsoftAccountDescription": "Connect your Microsoft account to access Microsoft Ads data",
-    "microsoftConnected": "Connected",
-    "microsoftNotConnected": "Not connected",
-    "connectMicrosoft": "Connect Microsoft Account",
-    "disconnectMicrosoft": "Disconnect Microsoft Account",
     "disconnecting": "Disconnecting...",
     "metaDisconnectSuccessTitle": "Disconnected",
     "metaDisconnectSuccessDescription": "Your Meta account has been disconnected successfully.",

@@ -1,24 +1,21 @@
-import type { ReactNode } from "react";
-import DashboardSidebar from "@/app/[locale]/dashboard/DashboardSidebar";
-import { redirect } from "next/navigation";
+import React, { Suspense } from "react";
+import DashboardSidebar from "./DashboardSidebar";
+import { DashboardSkeleton } from "@/components/ui/skeleton-loader";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
-// This is a mock authentication check
-// In a real application, you would check if the user is authenticated
-const isAuthenticated = () => {
-  // For demo purposes, we'll assume the user is authenticated
-  return true;
-};
-
-export default function DashboardLayout({ children }: { children: ReactNode }) {
-  // Check if user is authenticated
-  if (!isAuthenticated()) {
-    redirect("/login");
-  }
-
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
+    <div className="container grid flex-1 md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <DashboardSidebar />
-      <div className="flex-1 p-4 md:p-8">{children}</div>
+      <main className="px-4 py-6 md:px-8 md:py-8">
+        <ErrorBoundary>
+          <Suspense fallback={<DashboardSkeleton />}>{children}</Suspense>
+        </ErrorBoundary>
+      </main>
     </div>
   );
 }

@@ -1,4 +1,20 @@
 import { getTranslations } from "next-intl/server";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Service | Advertising Analytics Dashboard",
+  description:
+    "Read our terms of service agreement for using the Advertising Analytics Dashboard platform.",
+  openGraph: {
+    title: "Terms of Service | Advertising Analytics Dashboard",
+    description:
+      "Our terms of service agreement for using our advertising analytics platform",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
 
 export default async function TermsPage() {
   const t = await getTranslations("Terms");

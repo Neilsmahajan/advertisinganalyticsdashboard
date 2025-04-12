@@ -6,6 +6,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import DashboardQueries from "./DashboardQueries";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dashboard | Advertising Analytics Dashboard",
+  description:
+    "View and manage all your advertising campaign analytics and performance metrics in one place.",
+  openGraph: {
+    title: "Your Advertising Analytics Dashboard",
+    description:
+      "Track, analyze, and optimize your advertising campaigns across multiple platforms",
+    images: ["/cropped-advertising-analytics-dashboard-logo.png"],
+  },
+};
 
 export default async function DashboardPage() {
   const t = await getTranslations("Dashboard");

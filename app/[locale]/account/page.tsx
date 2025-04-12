@@ -5,7 +5,23 @@ import SignOutButton from "./SignOutButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AccountQueries from "./AccountQueries";
 import SignInButton from "@/components/SignInButton";
-import ConnectedAccounts from "./ConnectedAccounts";
+// import ConnectedAccounts from "./ConnectedAccounts";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Your Account | Advertising Analytics Dashboard",
+  description:
+    "Manage your account settings, preferences, and advertising platform integrations.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+  openGraph: {
+    title: "Account Management | Advertising Analytics Dashboard",
+    description:
+      "Securely manage your account settings and advertising platform connections",
+  },
+};
 
 export default async function AccountPage() {
   const session = await auth();
@@ -61,7 +77,7 @@ export default async function AccountPage() {
         </div>
 
         {/* Connected Accounts Section */}
-        <ConnectedAccounts />
+        {/* <ConnectedAccounts /> */}
 
         <AccountQueries />
       </div>

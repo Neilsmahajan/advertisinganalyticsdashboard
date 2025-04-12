@@ -1,0 +1,13 @@
+# Robots.txt file for Advertising Analytics Dashboard
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /privacy
+Allow: /terms
+Disallow: /dashboard/
+Disallow: /account/
+Disallow: /api/
+
+# Sitemaps
+Sitemap: https://advertisinganalytics.vercel.app/sitemap.xml

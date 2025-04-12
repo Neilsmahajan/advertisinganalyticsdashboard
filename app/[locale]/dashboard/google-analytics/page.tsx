@@ -1,8 +1,27 @@
 import { auth } from "@/auth";
-import { redirect } from "next/navigation";
-import GoogleAnalyticsQueries from "./GoogleAnalyticsQueries";
 import { getTranslations } from "next-intl/server";
 import SignInButton from "@/components/SignInButton";
+import GoogleAnalyticsQueries from "./GoogleAnalyticsQueries";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Google Analytics Dashboard | Advertising Analytics",
+  description:
+    "Visualize and analyze your website traffic data with comprehensive Google Analytics insights and reporting tools.",
+  keywords: [
+    "Google Analytics",
+    "website analytics",
+    "traffic analysis",
+    "user behavior",
+    "conversion tracking",
+  ],
+  openGraph: {
+    title: "Google Analytics Dashboard",
+    description:
+      "In-depth analytics and reporting for your website traffic and user behavior",
+    images: ["/google-analytics-logo.png"],
+  },
+};
 
 export default async function GoogleAnalyticsPage() {
   const t = await getTranslations("GoogleAnalyticsPage");

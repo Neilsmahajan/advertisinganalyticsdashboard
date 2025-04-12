@@ -1,4 +1,20 @@
 import { getTranslations } from "next-intl/server";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy | Advertising Analytics Dashboard",
+  description:
+    "Our privacy policy outlines how we collect, use, and protect your data when using the Advertising Analytics Dashboard.",
+  openGraph: {
+    title: "Privacy Policy | Advertising Analytics Dashboard",
+    description:
+      "Learn about our data privacy practices and how we protect your information",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
 
 export default async function PrivacyPage() {
   const t = await getTranslations("Privacy");

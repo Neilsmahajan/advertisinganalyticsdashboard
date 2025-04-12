@@ -2,6 +2,7 @@
 import { useTranslations, useLocale } from "next-intl";
 import React, { useState } from "react";
 import { DownloadButton } from "@/components/DownloadButton";
+import { toast } from "@/components/ui/use-toast";
 
 interface MicrosoftAdsResultsSectionProps {
   results: {
@@ -34,6 +35,14 @@ export default function MicrosoftAdsResultsSection({
 
   const handleDownloadReport = async () => {
     setIsDownloading(true);
+    toast({
+      title: t("preparingReport") || "Preparing report",
+      description:
+        t("reportPreparingDesc") ||
+        "Please wait while we generate your report...",
+      duration: 3000,
+    });
+
     try {
       const response = await fetch("/api/microsoft-ads/download-report", {
         method: "POST",
@@ -45,20 +54,40 @@ export default function MicrosoftAdsResultsSection({
           locale,
         }),
       });
+
       if (!response.ok) {
-        console.error("Failed to generate report");
-        return;
+        throw new Error("Failed to generate report");
       }
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", "microsoft-ads-report.pdf");
+      link.setAttribute(
+        "download",
+        `microsoft-ads-report-${new Date().toISOString().split("T")[0]}.pdf`,
+      );
       document.body.appendChild(link);
       link.click();
       link.remove();
+
+      toast({
+        title: t("reportReady") || "Report ready",
+        description:
+          t("reportReadyDesc") ||
+          "Your report has been downloaded successfully",
+        duration: 5000,
+      });
     } catch (error) {
       console.error("Error generating report:", error);
+      toast({
+        title: t("reportError") || "Error generating report",
+        description:
+          t("reportErrorDesc") ||
+          "There was a problem generating your report. Please try again.",
+        variant: "destructive",
+        duration: 5000,
+      });
     } finally {
       setIsDownloading(false);
     }
@@ -72,6 +101,7 @@ export default function MicrosoftAdsResultsSection({
           onClick={handleDownloadReport}
           text={t("downloadReport")}
           loadingText={t("generatingReport")}
+          className="relative"
         />
       </div>
       <div>

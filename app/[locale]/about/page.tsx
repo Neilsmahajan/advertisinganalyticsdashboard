@@ -1,6 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { BarChart3, Clock, Zap } from "lucide-react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About Us | Advertising Analytics Dashboard",
+  description:
+    "Learn about our mission to simplify advertising analytics across multiple platforms and provide powerful insights for marketers.",
+  keywords: [
+    "advertising analytics team",
+    "marketing dashboard company",
+    "analytics platform",
+    "data-driven advertising",
+  ],
+  openGraph: {
+    title: "About Advertising Analytics Dashboard",
+    description:
+      "Our story, mission, and dedication to providing powerful advertising analytics solutions",
+    type: "website",
+    images: ["/cropped-advertising-analytics-dashboard-logo.png"],
+  },
+};
 
 export default function AboutPage() {
   return (

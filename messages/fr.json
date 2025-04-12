@@ -62,7 +62,27 @@
   },
   "SignInButton": {
     "viewYourQueries": "Voir vos requêtes",
-    "signIn": "Se connecter"
+    "signIn": "Se connecter",
+    "loading": "Chargement...",
+    "signingIn": "Connexion en cours..."
+  },
+  "ConnectedAccounts": {
+    "title": "Comptes connectés",
+    "connecting": "Connexion en cours...",
+    "disconnect": "Déconnecter",
+    "disconnecting": "Déconnexion en cours...",
+    "connect": "Connecter",
+    "connectedSince": "Connecté depuis le {date}",
+    "fetchErrorTitle": "Erreur",
+    "fetchErrorDescription": "Impossible de charger les connexions de compte",
+    "connectSuccessTitle": "Connecté",
+    "connectSuccessDescription": "Votre compte {service} a été connecté avec succès",
+    "connectErrorTitle": "Erreur de connexion",
+    "connectErrorDescription": "Échec de la connexion du compte {service}. Veuillez réessayer.",
+    "disconnectSuccessTitle": "Déconnecté",
+    "disconnectSuccessDescription": "Votre compte {service} a été déconnecté avec succès",
+    "disconnectErrorTitle": "Erreur de déconnexion",
+    "disconnectErrorDescription": "Échec de la déconnexion du compte {service}. Veuillez réessayer."
   },
   "Account": {
     "myAccount": "MON COMPTE",

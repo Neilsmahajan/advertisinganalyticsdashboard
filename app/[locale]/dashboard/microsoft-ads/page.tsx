@@ -1,7 +1,26 @@
 import { auth } from "@/auth";
-import MicrosoftAdsQueries from "./MicrosoftAdsQueries";
 import { getTranslations } from "next-intl/server";
 import SignInButton from "@/components/SignInButton";
+import MicrosoftAdsQueries from "./MicrosoftAdsQueries";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Microsoft Ads Analytics | Advertising Dashboard",
+  description:
+    "Monitor and optimize your Microsoft Advertising campaigns with detailed performance metrics and insights.",
+  keywords: [
+    "Microsoft Ads analytics",
+    "Bing advertising",
+    "Microsoft PPC",
+    "Microsoft Advertising dashboard",
+  ],
+  openGraph: {
+    title: "Microsoft Ads Analytics Dashboard",
+    description:
+      "Comprehensive analytics for your Microsoft Advertising campaigns",
+    images: ["/microsoft-ads-logo.png"],
+  },
+};
 
 export default async function MicrosoftAdsPage() {
   const t = await getTranslations("MicrosoftAdsPage");
