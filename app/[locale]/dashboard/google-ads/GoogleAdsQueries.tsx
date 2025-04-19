@@ -80,7 +80,14 @@ export default function GoogleAdsQueries() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "customerId") {
+      // Remove all non-numeric characters
+      const numericValue = value.replace(/\D/g, "");
+      setFormData((prev) => ({ ...prev, [name]: numericValue }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSelectChange = (value: string) => {
@@ -173,6 +180,18 @@ export default function GoogleAdsQueries() {
       });
       return;
     }
+
+    // Validate that customerId has exactly 10 digits
+    if (formData.customerId.length !== 10) {
+      toast({
+        title: t("errorTitle"),
+        description:
+          t("customerIdInvalid") || "Customer ID must be exactly 10 digits",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsAnalyzing(true);
     try {
       const res = await fetch("/api/google-ads/analyze", {
@@ -271,6 +290,13 @@ export default function GoogleAdsQueries() {
                 value={formData.customerId}
                 onChange={handleChange}
               />
+              <p className="text-xs text-muted-foreground">
+                {formData.customerId && formData.customerId.length !== 10
+                  ? t("customerIdLengthNote") ||
+                    "Customer ID must be exactly 10 digits"
+                  : t("customerIdNote") ||
+                    "Dashes and other non-numeric characters will be automatically removed"}
+              </p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
