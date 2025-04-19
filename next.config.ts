@@ -9,11 +9,21 @@ const nextConfig: NextConfig = {
   },
   images: {
     unoptimized: true,
-    domains: ["lh3.googleusercontent.com"],
+    domains: [
+      "lh3.googleusercontent.com",
+      "lh4.googleusercontent.com",
+      "lh5.googleusercontent.com",
+      "lh6.googleusercontent.com",
+      "googleusercontent.com",
+    ],
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "*.googleusercontent.com",
+        hostname: "**.googleusercontent.com",
+      },
+      {
+        protocol: "http",
+        hostname: "**.googleusercontent.com",
       },
     ],
   },

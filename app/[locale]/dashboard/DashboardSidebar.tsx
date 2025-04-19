@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
+import { ProfileImage } from "@/components/ProfileImage";
 
 export default function DashboardSidebar() {
   const t = useTranslations("DashboardSidebar");
@@ -98,22 +99,12 @@ export default function DashboardSidebar() {
       <Link href="/account" onClick={() => setIsMobileOpen(false)}>
         <div className="mt-auto border-t p-4">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-              {session?.user.image ? (
-                <Image
-                  src={session.user.image}
-                  alt={session.user.name ?? "User"}
-                  width={32}
-                  height={32}
-                  className="rounded-full"
-                  unoptimized
-                />
-              ) : (
-                <span className="text-sm font-bold text-muted-foreground">
-                  {session?.user.name?.[0] ?? ""}
-                </span>
-              )}
-            </div>
+            <ProfileImage
+              src={session?.user.image}
+              alt={session?.user.name || "User"}
+              size={32}
+              fallbackText={session?.user.name?.[0]}
+            />
             <div>
               <p className="text-xs font-medium">{session?.user.name}</p>
               <p className="text-xs text-muted-foreground">
