@@ -5,6 +5,7 @@ import SignOutButton from "./SignOutButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AccountQueries from "./AccountQueries";
 import SignInButton from "@/components/SignInButton";
+import Image from "next/image"; // Add import for Image component
 // import ConnectedAccounts from "./ConnectedAccounts";
 import { Metadata } from "next";
 
@@ -51,12 +52,21 @@ export default async function AccountPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-4">
-                {session.user.image && (
-                  <img
+                {session.user.image ? (
+                  <Image
                     src={session.user.image}
                     alt="Profile"
+                    width={64}
+                    height={64}
                     className="w-16 h-16 rounded-full object-cover"
+                    unoptimized
                   />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+                    <span className="text-xl font-bold text-muted-foreground">
+                      {session.user.name?.[0] ?? "?"}
+                    </span>
+                  </div>
                 )}
                 <div className="grid grid-cols-1 gap-y-2">
                   <div>

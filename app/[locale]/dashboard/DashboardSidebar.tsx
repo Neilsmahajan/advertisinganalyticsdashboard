@@ -106,6 +106,7 @@ export default function DashboardSidebar() {
                   width={32}
                   height={32}
                   className="rounded-full"
+                  unoptimized
                 />
               ) : (
                 <span className="text-sm font-bold text-muted-foreground">
