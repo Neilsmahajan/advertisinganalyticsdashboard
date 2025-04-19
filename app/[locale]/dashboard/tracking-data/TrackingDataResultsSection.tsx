@@ -26,9 +26,16 @@ const tagImages: Record<string, string> = {
   "Google Site Tag": "google-tag-manager-logo.png",
   "Google Analytics": "google-analytics-logo.png",
   "Google Ads DoubleClick": "google-ads-logo.png",
+  "Google Ads": "google-ads-logo.png",
+  "Google Ads Conversion Tracking": "google-ads-logo.png",
+  "Google Conversion Linker": "google-ads-logo.png",
   "Facebook Pixel": "meta-ads-logo.png",
   "Facebook SDK": "meta-ads-logo.png",
+  "Facebook Conversion Tracking": "meta-ads-logo.png",
+  "Facebook Domain Verification": "meta-ads-logo.png",
   "Bing Universal Event Tracking": "bing-logo.png",
+  "Bing Ads": "bing-logo.png",
+  "Microsoft Clarity": "microsoft-logo.png",
   Hotjar: "hotjar-logo.png",
   Amplitude: "amplitude-logo.png",
   "Twitter Analytics": "x-ads-logo.png",
@@ -38,8 +45,35 @@ const tagImages: Record<string, string> = {
   Shopify: "shopify-logo.png",
   Mailchimp: "mailchimp-logo.png",
   "Bold Commerce": "bold-commerce-logo.png",
-  "Google Ads Conversion Tracking": "google-ads-logo.png",
   Automizely: "automizely-logo.png",
+  Pipedrive: "pipedrive-logo.png",
+  "Matomo Analytics": "matomo-logo.png",
+  "Plausible Analytics": "plausible-logo.png",
+  Segment: "segment-logo.png",
+  Mixpanel: "mixpanel-logo.png",
+  Intercom: "intercom-logo.png",
+  Kissmetrics: "kissmetrics-logo.png",
+  "Crazy Egg": "crazyegg-logo.png",
+  Optimizely: "optimizely-logo.png",
+  Woopra: "woopra-logo.png",
+  "Heap Analytics": "heap-logo.png",
+  FullStory: "fullstory-logo.png",
+  HubSpot: "hubspot-logo.png",
+  Pardot: "pardot-logo.png",
+  Drift: "drift-logo.png",
+  Zendesk: "zendesk-logo.png",
+  "Tawk.to": "tawkto-logo.png",
+  Crisp: "crisp-logo.png",
+  LiveChat: "livechat-logo.png",
+  Olark: "olark-logo.png",
+  Mouseflow: "mouseflow-logo.png",
+  ClickTale: "clicktale-logo.png",
+  Pingdom: "pingdom-logo.png",
+  "New Relic": "newrelic-logo.png",
+  Dynatrace: "dynatrace-logo.png",
+  Contentsquare: "contentsquare-logo.png",
+  "Adobe Analytics": "adobe-analytics-logo.png",
+  "Adobe Audience Manager": "adobe-audience-manager-logo.png",
 };
 
 export default function TrackingDataResultsSection({
@@ -53,7 +87,9 @@ export default function TrackingDataResultsSection({
 
   // extract website domain from queryInfo
   const websiteUrlRaw = (queryInfo.queryData.websiteURL as string) || "";
-  const websiteDomain = websiteUrlRaw.replace(/(^\w+:|^)\/\//, "").replace(/\/+$/, "");
+  const websiteDomain = websiteUrlRaw
+    .replace(/(^\w+:|^)\/\//, "")
+    .replace(/\/+$/, "");
 
   const handleDownloadReport = async () => {
     setIsDownloading(true);
@@ -116,9 +152,10 @@ export default function TrackingDataResultsSection({
                   <div>
                     <span>{tag}</span>
                     <p className="text-sm text-black/50">
-                      {t(`tagDescriptions.${tag}`)}
+                      {t(`tagDescriptions.${tag}`, { fallback: tag })}
                     </p>
                     {(tag === "Google Ads DoubleClick" ||
+                      tag === "Google Ads" ||
                       tag === "Google Ads Conversion Tracking") &&
                       websiteDomain && (
                         <a
@@ -130,7 +167,9 @@ export default function TrackingDataResultsSection({
                           {t("viewActiveGoogleAds")}
                         </a>
                       )}
-                    {(tag === "Facebook Pixel" || tag === "Facebook SDK") &&
+                    {(tag === "Facebook Pixel" ||
+                      tag === "Facebook SDK" ||
+                      tag === "Facebook Conversion Tracking") &&
                       websiteDomain && (
                         <a
                           href={`https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=ALL&is_targeted_country=false&media_type=all&q=${websiteDomain}&search_type=keyword_unordered`}
@@ -139,6 +178,18 @@ export default function TrackingDataResultsSection({
                           className="text-blue-400 underline"
                         >
                           {t("viewActiveMetaAds")}
+                        </a>
+                      )}
+                    {(tag === "Bing Universal Event Tracking" ||
+                      tag === "Bing Ads") &&
+                      websiteDomain && (
+                        <a
+                          href={`https://www.bing.com/search?q=site:${websiteDomain}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 underline"
+                        >
+                          {t("viewBingPage")}
                         </a>
                       )}
                   </div>
