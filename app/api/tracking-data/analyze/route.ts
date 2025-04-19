@@ -69,10 +69,24 @@ export async function POST(request: NextRequest) {
       "facebook-domain-verification": "Facebook Domain Verification",
       "pixel-id": "Facebook Pixel",
 
-      // Microsoft/Bing Services
+      // Microsoft/Bing Services - Enhanced
       "bat.bing.com": "Bing Universal Event Tracking",
       "uet.bing": "Bing Universal Event Tracking",
+      "bing_p.js": "Bing Universal Event Tracking",
+      mstag: "Bing Universal Event Tracking",
+      "window.uetq": "Bing Universal Event Tracking",
+      "uetq =": "Bing Universal Event Tracking",
+      "uet tag": "Bing Universal Event Tracking",
+      "o={ti:": "Bing Universal Event Tracking",
+      "microsoft.com/uet": "Bing Universal Event Tracking",
+      MicrosoftTag: "Bing Universal Event Tracking",
+      "Microsoft.UET": "Bing Universal Event Tracking",
+      "UET.js": "Bing Universal Event Tracking",
+      "UET:": "Bing Universal Event Tracking",
+      "UET/": "Bing Universal Event Tracking",
       msclkid: "Bing Ads",
+      "bing ads": "Bing Ads",
+      "microsoft advertising": "Bing Ads",
       "clarity.ms": "Microsoft Clarity",
       ms_clarity: "Microsoft Clarity",
 
@@ -151,6 +165,25 @@ export async function POST(request: NextRequest) {
     // Check inline script content more thoroughly
     $("script").each((i, el) => {
       const content = $(el).html() || "";
+
+      // Check for specific Bing UET tag patterns
+      if (
+        content.match(/window\.uetq\s*=\s*window\.uetq\s*\|\|\s*\[\]/) ||
+        content.match(/var\s+uetq\s*=\s*uetq\s*\|\|\s*\[\]/) ||
+        content.match(/var\s+o\s*=\s*{\s*ti:\s*["'][0-9]+["']/) ||
+        content.match(/o\s*=\s*{\s*ti:\s*["'][0-9]+["']/) ||
+        content.includes("UET.setup(") ||
+        content.includes(".UetData.")
+      ) {
+        analyticsTags.add("Bing Universal Event Tracking");
+      }
+
+      // Look for numeric UET IDs - typically 6-10 digits in length
+      const uetIdMatches = content.match(/ti:["'](\d{6,10})["']/g);
+      if (uetIdMatches) {
+        analyticsTags.add("Bing Universal Event Tracking");
+      }
+
       for (const [keyword, description] of Object.entries(trackingKeywords)) {
         if (content.toLowerCase().includes(keyword.toLowerCase())) {
           analyticsTags.add(description);
@@ -237,6 +270,33 @@ export async function POST(request: NextRequest) {
 
     // Check HTML text for common tracking strings that might be in comments or attributes
     const htmlText = html.toLowerCase();
+
+    // Enhanced Bing patterns
+    const bingPatterns = [
+      { pattern: 'ti:"', tag: "Bing Universal Event Tracking" },
+      { pattern: "q.push(['ueta',", tag: "Bing Universal Event Tracking" },
+      { pattern: "uet('send'", tag: "Bing Universal Event Tracking" },
+      { pattern: "bat.bing.com/bat.js", tag: "Bing Universal Event Tracking" },
+      { pattern: "bat.js", tag: "Bing Universal Event Tracking" },
+      { pattern: "uetq.push", tag: "Bing Universal Event Tracking" },
+    ];
+
+    for (const { pattern, tag } of bingPatterns) {
+      if (htmlText.includes(pattern)) {
+        analyticsTags.add(tag);
+      }
+    }
+
+    // Regex search for Bing UET IDs (commonly 6-10 digit numbers in specific contexts)
+    // This helps detect obfuscated or minified Bing tracking code
+    if (
+      html.match(/bat\.js#?(\d{6,10})/) ||
+      html.match(/uet#?(\d{6,10})/) ||
+      html.match(/ti[=:]["'](\d{6,10})["']/) ||
+      html.match(/microsoft\.com\/uet\/[^"']+(\d{6,10})/)
+    ) {
+      analyticsTags.add("Bing Universal Event Tracking");
+    }
 
     // Common patterns that might be anywhere in the HTML
     const commonPatterns = [
