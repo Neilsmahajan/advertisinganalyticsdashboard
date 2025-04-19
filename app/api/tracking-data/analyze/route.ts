@@ -28,8 +28,17 @@ export async function POST(request: NextRequest) {
         { status: res.status },
       );
     }
+
     const html = await res.text();
     const $ = load(html); // use load() from cheerio
+
+    const analyticsTags = new Set<string>();
+
+    // Check response headers for Microsoft/Bing related indicators
+    const headerStr = JSON.stringify(Object.fromEntries(res.headers));
+    if (/microsoft|bing|msclkid|uet/i.test(headerStr.toLowerCase())) {
+      analyticsTags.add("Bing Universal Event Tracking");
+    }
 
     // Enhanced tracking keywords with more comprehensive patterns
     const trackingKeywords: Record<string, string> = {
@@ -69,7 +78,7 @@ export async function POST(request: NextRequest) {
       "facebook-domain-verification": "Facebook Domain Verification",
       "pixel-id": "Facebook Pixel",
 
-      // Microsoft/Bing Services - Enhanced
+      // Microsoft/Bing Services - Further Enhanced
       "bat.bing.com": "Bing Universal Event Tracking",
       "uet.bing": "Bing Universal Event Tracking",
       "bing_p.js": "Bing Universal Event Tracking",
@@ -89,6 +98,10 @@ export async function POST(request: NextRequest) {
       "microsoft advertising": "Bing Ads",
       "clarity.ms": "Microsoft Clarity",
       ms_clarity: "Microsoft Clarity",
+      "sitestat.js": "Bing Universal Event Tracking", // Commonly used with UET
+      "ads.microsoft": "Bing Ads",
+      "msn.com": "Bing Universal Event Tracking",
+      bingapis: "Bing Universal Event Tracking",
 
       // Other Analytics Tools
       "static.hotjar.com": "Hotjar",
@@ -150,7 +163,20 @@ export async function POST(request: NextRequest) {
       demdex: "Adobe Audience Manager",
     };
 
-    const analyticsTags = new Set<string>();
+    // NEW: Collect all external script URLs for later analysis
+    const scriptUrls: string[] = [];
+    $("script[src]").each((i, el) => {
+      const src = $(el).attr("src") || "";
+      if (src) {
+        // Convert to absolute URL if needed
+        try {
+          const absoluteUrl = new URL(src, url).href;
+          scriptUrls.push(absoluteUrl);
+        } catch (e) {
+          scriptUrls.push(src);
+        }
+      }
+    });
 
     // Check external script sources for keywords
     $("script[src]").each((i, el) => {
@@ -166,20 +192,32 @@ export async function POST(request: NextRequest) {
     $("script").each((i, el) => {
       const content = $(el).html() || "";
 
-      // Check for specific Bing UET tag patterns
+      // Enhanced check for specific Bing UET tag patterns
       if (
         content.match(/window\.uetq\s*=\s*window\.uetq\s*\|\|\s*\[\]/) ||
         content.match(/var\s+uetq\s*=\s*uetq\s*\|\|\s*\[\]/) ||
         content.match(/var\s+o\s*=\s*{\s*ti:\s*["'][0-9]+["']/) ||
         content.match(/o\s*=\s*{\s*ti:\s*["'][0-9]+["']/) ||
         content.includes("UET.setup(") ||
-        content.includes(".UetData.")
+        content.includes(".UetData.") ||
+        // More flexible pattern matching for obfuscated code:
+        content.match(/u[\s_]*e[\s_]*t[\s_]*q?/i) ||
+        content.match(/\bt[\s_]*a[\s_]*g[\s_]*i[\s_]*d\b/i) ||
+        content.match(/microsoft[\s_]*ad/i) ||
+        content.match(/msn[\s_\.]*com/i) ||
+        content.match(/\bU[\s_]*E[\s_]*T\b/) ||
+        content.match(/bat[\s_\.]*bing/)
       ) {
         analyticsTags.add("Bing Universal Event Tracking");
       }
 
-      // Look for numeric UET IDs - typically 6-10 digits in length
-      const uetIdMatches = content.match(/ti:["'](\d{6,10})["']/g);
+      // More comprehensive check for UET IDs - any number that might be a UET tag ID in various contexts
+      const uetIdMatches =
+        content.match(/ti:["'](\d{6,10})["']/g) ||
+        content.match(/tag["'\s:=]+(\d{6,10})/g) ||
+        content.match(/microsoft[^"']+(\d{6,10})/gi) ||
+        content.match(/(\d{6,10})[^"']*(?:bing|microsoft|tag|uet)/gi);
+
       if (uetIdMatches) {
         analyticsTags.add("Bing Universal Event Tracking");
       }
@@ -271,14 +309,21 @@ export async function POST(request: NextRequest) {
     // Check HTML text for common tracking strings that might be in comments or attributes
     const htmlText = html.toLowerCase();
 
-    // Enhanced Bing patterns
+    // Enhanced Bing patterns - more comprehensive set
     const bingPatterns = [
       { pattern: 'ti:"', tag: "Bing Universal Event Tracking" },
       { pattern: "q.push(['ueta',", tag: "Bing Universal Event Tracking" },
       { pattern: "uet('send'", tag: "Bing Universal Event Tracking" },
-      { pattern: "bat.bing.com/bat.js", tag: "Bing Universal Event Tracking" },
-      { pattern: "bat.js", tag: "Bing Universal Event Tracking" },
+      { pattern: "bat.bing", tag: "Bing Universal Event Tracking" },
+      { pattern: "/bat.js", tag: "Bing Universal Event Tracking" },
       { pattern: "uetq.push", tag: "Bing Universal Event Tracking" },
+      { pattern: "window.uetq", tag: "Bing Universal Event Tracking" },
+      { pattern: "msclkid", tag: "Bing Universal Event Tracking" },
+      { pattern: "microsoft.co", tag: "Bing Universal Event Tracking" },
+      { pattern: "ms ads", tag: "Bing Universal Event Tracking" },
+      { pattern: "msads", tag: "Bing Universal Event Tracking" },
+      { pattern: "ms advertising", tag: "Bing Universal Event Tracking" },
+      { pattern: "ms_ad_", tag: "Bing Universal Event Tracking" },
     ];
 
     for (const { pattern, tag } of bingPatterns) {
@@ -287,34 +332,103 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // More aggressive regular expression patterns for highly obfuscated code
+    const obfuscatedBingPatterns = [
+      /\w+\.\w+\s*=\s*"[^"]*(?:bing|microsoft|ads)[^"]*"/i,
+      /\w+\(["'][^"']*(?:bing|microsoft|ads)[^"']*["']/i,
+      /\d{6,10}.*?(?:tag|track|conversion)/i,
+      /(?:tag|track|conversion).*?\d{6,10}/i,
+      /microsoft.*?tracking/i,
+      /tracking.*?microsoft/i,
+    ];
+
+    for (const pattern of obfuscatedBingPatterns) {
+      if (pattern.test(html)) {
+        analyticsTags.add("Bing Universal Event Tracking");
+        break;
+      }
+    }
+
+    // NEW: Check remote JS files that might contain tracking code
+    // This is a major enhancement that might find tracking in external files
+    const suspiciousScriptUrls = scriptUrls.filter((src) =>
+      /analytics|track|pixel|tag|bat|uet|conversion|mstag|ga|gtm|ads/i.test(
+        src,
+      ),
+    );
+
+    // Process up to 5 external scripts to avoid performance issues
+    const scriptPromises = suspiciousScriptUrls
+      .slice(0, 5)
+      .map(async (scriptUrl) => {
+        try {
+          const scriptController = new AbortController();
+          const scriptTimeoutId = setTimeout(
+            () => scriptController.abort(),
+            5000,
+          );
+
+          const scriptRes = await fetch(scriptUrl, {
+            headers,
+            signal: scriptController.signal,
+          });
+
+          clearTimeout(scriptTimeoutId);
+
+          if (scriptRes.ok) {
+            const scriptContent = await scriptRes.text();
+
+            // Check for Bing patterns in external scripts
+            if (
+              /bat\.js|uet|msclkid|microsoft\.com\/uet|bing|msn|{ti:/i.test(
+                scriptContent,
+              )
+            ) {
+              return "Bing Universal Event Tracking";
+            }
+
+            // Also check for other tracking codes while we're at it
+            if (
+              /google-analytics|gtag|fbq|facebook|twitter/i.test(scriptContent)
+            ) {
+              // We'll identify the specific tag in the main loop
+              return true;
+            }
+          }
+        } catch (e) {
+          // Silently fail for external script fetches
+          console.log(`Failed to fetch or analyze script: ${scriptUrl}`);
+        }
+        return false;
+      });
+
+    // Wait for all script analysis to complete
+    try {
+      const scriptResults = await Promise.all(scriptPromises);
+      scriptResults.forEach((result) => {
+        if (result === "Bing Universal Event Tracking") {
+          analyticsTags.add("Bing Universal Event Tracking");
+        }
+      });
+    } catch (e) {
+      console.log("Error analyzing external scripts:", e);
+    }
+
     // Regex search for Bing UET IDs (commonly 6-10 digit numbers in specific contexts)
     // This helps detect obfuscated or minified Bing tracking code
     if (
       html.match(/bat\.js#?(\d{6,10})/) ||
       html.match(/uet#?(\d{6,10})/) ||
       html.match(/ti[=:]["'](\d{6,10})["']/) ||
-      html.match(/microsoft\.com\/uet\/[^"']+(\d{6,10})/)
+      html.match(/microsoft\.com\/uet\/[^"']+(\d{6,10})/) ||
+      // Additional patterns
+      html.match(/"tag[\s]*":[\s]*"?(\d{6,10})/) ||
+      html.match(/\w+\.bing\.com/) ||
+      html.match(/microsoft\.com\/ads/) ||
+      html.match(/sitestat/) ||
+      html.match(/["']\d{6,10}["']/) // Look for any 6-10 digit numbers that could be UET IDs
     ) {
       analyticsTags.add("Bing Universal Event Tracking");
-    }
-
-    // Common patterns that might be anywhere in the HTML
-    const commonPatterns = [
-      { pattern: "bing ads", tag: "Bing Ads" },
-      { pattern: "facebook pixel", tag: "Facebook Pixel" },
-      { pattern: "fb pixel", tag: "Facebook Pixel" },
-      { pattern: "google analytics", tag: "Google Analytics" },
-      { pattern: "google tag manager", tag: "Google Site Tag" },
-      { pattern: "gtm-", tag: "Google Site Tag" },
-      { pattern: "ua-", tag: "Google Analytics" },
-      { pattern: "g-", tag: "Google Analytics" },
-      { pattern: "pixel-id", tag: "Facebook Pixel" },
-    ];
-
-    for (const { pattern, tag } of commonPatterns) {
-      if (htmlText.includes(pattern)) {
-        analyticsTags.add(tag);
-      }
     }
 
     const results = Array.from(analyticsTags);

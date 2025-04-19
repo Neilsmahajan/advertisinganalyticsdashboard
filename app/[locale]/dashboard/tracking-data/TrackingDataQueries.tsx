@@ -152,13 +152,52 @@ export default function TrackingDataQueries() {
     }
     setIsAnalyzing(true);
     try {
+      // Primary analysis
       const res = await fetch("/api/tracking-data/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: formData.websiteUrl }),
       });
+
       if (res.ok) {
         const data = await res.json();
+
+        // Extract domain for secondary analysis
+        const websiteUrlRaw = formData.websiteUrl;
+        const websiteDomain = websiteUrlRaw
+          .replace(/(^\w+:|^)\/\//, "")
+          .replace(/\/+$/, "");
+
+        // Secondary analysis - specific for hard-to-detect services like Bing Ads
+        try {
+          const domainRes = await fetch("/api/tracking-data/domain-analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ domain: websiteDomain }),
+          });
+
+          if (domainRes.ok) {
+            const domainData = await domainRes.json();
+
+            // If secondary analysis found Bing tracking, add it to our results
+            if (domainData.foundBingAds && domainData.analytics_tags) {
+              // Add any tags found in the secondary analysis
+              if (!data.analytics_tags) {
+                data.analytics_tags = [];
+              }
+
+              // Check if tag already exists before adding
+              domainData.analytics_tags.forEach((tag: string) => {
+                if (!data.analytics_tags.includes(tag)) {
+                  data.analytics_tags.push(tag);
+                }
+              });
+            }
+          }
+        } catch (domainErr) {
+          console.error("Error in secondary domain analysis:", domainErr);
+        }
+
         setResults(data);
         toast({
           title: "Analysis Complete",
