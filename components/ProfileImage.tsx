@@ -27,17 +27,16 @@ export function ProfileImage({
   // Generate classes for the container
   const containerClasses = cn(
     "rounded-full bg-muted flex items-center justify-center overflow-hidden",
-    className
+    className,
   );
 
   // If there's no source or an error loading it, show the fallback
   if (!src || error) {
     return (
-      <div
-        className={containerClasses}
-        style={{ width: size, height: size }}
-      >
-        <span className="text-muted-foreground font-bold" style={{ fontSize: size * 0.4 }}>
+      <div className={cn(containerClasses, `w-[${size}px] h-[${size}px]`)}>
+        <span
+          className={`text-muted-foreground font-bold text-[${size * 0.4}px]`}
+        >
           {letter.toUpperCase()}
         </span>
       </div>
@@ -45,10 +44,7 @@ export function ProfileImage({
   }
 
   return (
-    <div
-      className={containerClasses}
-      style={{ width: size, height: size }}
-    >
+    <div className={cn(containerClasses, `w-[${size}px] h-[${size}px]`)}>
       <Image
         src={src}
         alt={alt}
