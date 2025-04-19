@@ -53,7 +53,7 @@ export default function TrackingDataResultsSection({
 
   // extract website domain from queryInfo
   const websiteUrlRaw = (queryInfo.queryData.websiteURL as string) || "";
-  const websiteDomain = websiteUrlRaw.replace(/(^\w+:|^)\/\//, "");
+  const websiteDomain = websiteUrlRaw.replace(/(^\w+:|^)\/\//, "").replace(/\/+$/, "");
 
   const handleDownloadReport = async () => {
     setIsDownloading(true);
