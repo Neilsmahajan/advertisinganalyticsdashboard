@@ -36,8 +36,9 @@ import { toast } from "@/components/ui/use-toast";
 import { useSearchParams } from "next/navigation";
 import GoogleAdsResultsSection from "./GoogleAdsResultsSection";
 import { useTranslations } from "next-intl";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import Image from "next/image";
 
 export default function GoogleAdsQueries() {
   const t = useTranslations("GoogleAdsQueries");
@@ -274,6 +275,15 @@ export default function GoogleAdsQueries() {
     }
   };
 
+  // Handle sign out and reconnect
+  const handleSignOutAndReconnect = async () => {
+    await signOut({ redirect: false });
+    // Redirect to the sign-in page with a parameter indicating we need Google Ads permissions
+    window.location.href = `/api/auth/signin?callbackUrl=${encodeURIComponent(
+      window.location.href,
+    )}&prompt=consent`;
+  };
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <Card>
@@ -322,6 +332,49 @@ export default function GoogleAdsQueries() {
                 </div>
               )}
 
+              {/* Missing Google Ads permissions case */}
+              {accountStatus.hasRequiredScopes === false && (
+                <div className="mt-2 border-t border-yellow-200 pt-2">
+                  <p className="font-semibold text-sm">
+                    Missing Google Ads Permissions
+                  </p>
+                  <p className="text-xs mt-1">
+                    You need to grant Google Ads access permissions to use this
+                    feature:
+                  </p>
+                  <ol className="list-decimal list-inside text-xs mt-1">
+                    <li>Click the button below to sign out</li>
+                    <li>Sign in again with your Google account</li>
+                    <li>
+                      <span className="font-semibold">Important:</span> When
+                      prompted, make sure to check the box for "Google Ads"
+                      permissions
+                    </li>
+                  </ol>
+
+                  <div className="mt-2 mb-2">
+                    <Image
+                      src="/google-permissions-example.png"
+                      alt="Google permissions checkbox example"
+                      width={280}
+                      height={150}
+                      className="border border-yellow-300 rounded"
+                      unoptimized
+                    />
+                  </div>
+
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={handleSignOutAndReconnect}
+                    className="mt-2 w-full bg-yellow-700 hover:bg-yellow-800 text-white"
+                  >
+                    Sign out and reconnect with permissions
+                  </Button>
+                </div>
+              )}
+
+              {/* Existing Google Ads accounts check */}
               {accountStatus.status === "warning" &&
                 accountStatus.hasRequiredScopes &&
                 !accountStatus.hasAdsAccounts && (
