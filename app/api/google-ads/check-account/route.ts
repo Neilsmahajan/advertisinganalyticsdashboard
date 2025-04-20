@@ -2,6 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { GoogleAdsApi } from "google-ads-api";
+import { Redis } from "@upstash/redis";
+
+// Create Redis client if credentials are available
+let redis: Redis | null = null;
+if (
+  process.env.UPSTASH_REDIS_REST_URL &&
+  process.env.UPSTASH_REDIS_REST_TOKEN
+) {
+  redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  });
+}
 
 // Helper function to add timeout to a promise
 const withTimeout = (
@@ -27,6 +40,25 @@ export async function GET(request: NextRequest) {
     const session = await auth();
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Parse the query param to see if we should skip the slow API check
+    const skipSlowCheck =
+      request.nextUrl.searchParams.get("skipSlowCheck") === "true";
+    const userId = session.user.id;
+
+    // Check if we have a cached result
+    if (redis) {
+      try {
+        const cachedStatus = await redis.get(`google-ads-status:${userId}`);
+        if (cachedStatus) {
+          console.log("Returning cached Google Ads status");
+          return NextResponse.json(cachedStatus);
+        }
+      } catch (error) {
+        console.error("Redis error:", error);
+        // Continue without cache if Redis fails
+      }
     }
 
     // Check if user has a Google account
@@ -75,6 +107,19 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    // Basic checks passed! If we're skipping the slow API check, return early with what we know
+    if (skipSlowCheck) {
+      return NextResponse.json({
+        status: "pending", // Special status to indicate we haven't done the full check
+        connected: true,
+        hasRefreshToken: true,
+        hasRequiredScopes: true,
+        message:
+          "Basic permissions check passed. Checking API access in the background...",
+        scope: googleAccount.scope,
+      });
+    }
+
     // Try to verify actual Google Ads access by making a basic API call
     try {
       // Check for required environment variables
@@ -111,7 +156,7 @@ export async function GET(request: NextRequest) {
         !accessibleCustomers ||
         accessibleCustomers.resource_names.length === 0
       ) {
-        return NextResponse.json({
+        const result = {
           status: "warning",
           connected: true,
           hasRefreshToken: true,
@@ -120,11 +165,18 @@ export async function GET(request: NextRequest) {
           message:
             "Your Google account is not associated with any Google Ads accounts. You need to create a Google Ads account or be added to an existing one.",
           scope: googleAccount.scope,
-        });
+        };
+
+        // Cache the result
+        if (redis) {
+          await redis.set(`google-ads-status:${userId}`, result, { ex: 3600 }); // Cache for 1 hour
+        }
+
+        return NextResponse.json(result);
       }
 
       // Account has access to Google Ads accounts
-      return NextResponse.json({
+      const result = {
         status: "success",
         connected: true,
         hasRefreshToken: true,
@@ -133,7 +185,14 @@ export async function GET(request: NextRequest) {
         adsAccountsCount: accessibleCustomers.resource_names.length,
         message: `Google account properly connected with access to ${accessibleCustomers.resource_names.length} Google Ads account(s).`,
         scope: googleAccount.scope,
-      });
+      };
+
+      // Cache the successful result
+      if (redis) {
+        await redis.set(`google-ads-status:${userId}`, result, { ex: 3600 }); // Cache for 1 hour
+      }
+
+      return NextResponse.json(result);
     } catch (error: any) {
       console.error("Error verifying Google Ads access:", error);
 
@@ -141,7 +200,7 @@ export async function GET(request: NextRequest) {
       const isTimeout =
         error.message && error.message.includes("Timeout after");
 
-      return NextResponse.json({
+      const result = {
         status: "warning",
         connected: true,
         hasRefreshToken: true,
@@ -152,7 +211,14 @@ export async function GET(request: NextRequest) {
           : "Could not verify Google Ads access: " +
             (error.message || "Unknown error"),
         scope: googleAccount.scope,
-      });
+      };
+
+      // Even for errors, we can cache the result to avoid repeated timeout issues
+      if (redis && isTimeout) {
+        await redis.set(`google-ads-status:${userId}`, result, { ex: 600 }); // Cache for 10 minutes
+      }
+
+      return NextResponse.json(result);
     }
   } catch (error) {
     console.error("Error checking Google account status:", error);

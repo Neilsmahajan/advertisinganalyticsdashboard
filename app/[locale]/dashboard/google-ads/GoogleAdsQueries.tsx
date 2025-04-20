@@ -248,26 +248,63 @@ export default function GoogleAdsQueries() {
     setIsCheckingAccount(true);
     setAnalysisError(null);
 
-    // Set up a client-side timeout as a backup
-    const timeoutId = setTimeout(() => {
-      if (isCheckingAccount) {
-        setIsCheckingAccount(false);
-        toast({
-          title: "Operation Timed Out",
-          description:
-            "The account status check is taking too long. This may be due to Google Ads API delays. Please try again later.",
-          variant: "destructive",
-        });
-      }
-    }, 25000); // 25 second UI timeout
-
+    // First, do a fast check that skips the slow API call
     try {
-      const res = await fetch("/api/google-ads/check-account");
-      clearTimeout(timeoutId);
-
+      const res = await fetch(
+        "/api/google-ads/check-account?skipSlowCheck=true",
+      );
       const data = await res.json();
       setAccountStatus(data);
 
+      if (data.status === "pending") {
+        // We got back the basic permission check, now start a background check for full access
+        toast({
+          title: "Initial Check Complete",
+          description: "Checking Google Ads API access in the background...",
+        });
+
+        // Set up a longer timeout for the background check
+        const backgroundTimeoutId = setTimeout(() => {
+          toast({
+            title: "Background Check Timeout",
+            description:
+              "The Google Ads API is taking longer than expected. Results will update when available.",
+            variant: "default",
+          });
+        }, 15000);
+
+        // Start the background full check
+        fetch("/api/google-ads/check-account")
+          .then((res) => res.json())
+          .then((fullData) => {
+            clearTimeout(backgroundTimeoutId);
+            setAccountStatus(fullData);
+
+            toast({
+              title: "Account Status",
+              description: fullData.message,
+              variant: fullData.status === "error" ? "destructive" : "default",
+            });
+          })
+          .catch(() => {
+            clearTimeout(backgroundTimeoutId);
+            toast({
+              title: "Background Check Failed",
+              description:
+                "Could not complete the full account check. Please try again later.",
+              variant: "destructive",
+            });
+          })
+          .finally(() => {
+            // We don't set isCheckingAccount to false here because we already did after the initial check
+          });
+
+        // Don't wait for background check to finish - allow user to continue
+        setIsCheckingAccount(false);
+        return;
+      }
+
+      // For non-pending statuses, show the standard toast
       if (data.status !== "success") {
         toast({
           title: "Account Status",
@@ -281,7 +318,6 @@ export default function GoogleAdsQueries() {
         });
       }
     } catch (err) {
-      clearTimeout(timeoutId);
       toast({
         title: t("errorTitle"),
         description: t("operationFailed"),
