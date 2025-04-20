@@ -87,34 +87,21 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Check if the account has the required scopes
-    const requiredScopes = ["ads_read"];
-    const accountScopes = facebookAccount.scope?.split(",") || [];
-    const hasRequiredScopes = requiredScopes.every((scope) =>
-      accountScopes.includes(scope),
-    );
+    // Log the actual scope for debugging - this helps us understand what's stored
+    console.log(`Meta account scope: "${facebookAccount.scope}"`);
 
-    if (!hasRequiredScopes) {
-      return NextResponse.json({
-        status: "warning",
-        connected: true,
-        hasAccessToken: true,
-        hasRequiredScopes: false,
-        message:
-          "Meta account connected but missing required permissions. Please reconnect with the required permissions.",
-        scope: facebookAccount.scope,
-      });
-    }
+    // Instead of doing a strict scope check, we'll directly try to access the API
+    // The actual permissions might be sufficient but stored differently
+    // Skip straight to the API check which is more reliable
 
-    // Basic checks passed! If we're skipping the slow API check, return early with what we know
     if (skipSlowCheck) {
       return NextResponse.json({
         status: "pending", // Special status to indicate we haven't done the full check
         connected: true,
         hasAccessToken: true,
-        hasRequiredScopes: true,
+        hasRequiredScopes: true, // Assume true since we can't reliably check from the scope string
         message:
-          "Basic permissions check passed. Checking Meta Ads API access in the background...",
+          "Basic connectivity check passed. Checking Meta Ads API access in the background...",
         scope: facebookAccount.scope,
       });
     }
@@ -136,13 +123,22 @@ export async function GET(request: NextRequest) {
         const errorData = await response.json();
         const errorMessage = errorData.error?.message || "Unknown API error";
 
+        // If we get a specific permission error, then we know the scope is insufficient
+        const isPemissionError =
+          errorMessage.includes("permission") ||
+          errorMessage.includes("access") ||
+          errorMessage.includes("scope") ||
+          errorMessage.includes("authorize");
+
         const result = {
           status: "warning",
           connected: true,
           hasAccessToken: true,
-          hasRequiredScopes: true,
+          hasRequiredScopes: !isPemissionError, // Only false if API explicitly mentions permissions
           hasAdsAccounts: false,
-          message: `Error accessing Meta Ads: ${errorMessage}`,
+          message: isPemissionError
+            ? "Meta account connected but missing required permissions. Please reconnect with the required permissions."
+            : `Error accessing Meta Ads: ${errorMessage}`,
           scope: facebookAccount.scope,
         };
 
@@ -161,7 +157,7 @@ export async function GET(request: NextRequest) {
           status: "warning",
           connected: true,
           hasAccessToken: true,
-          hasRequiredScopes: true,
+          hasRequiredScopes: true, // If we got here, permissions are sufficient
           hasAdsAccounts: false,
           message:
             "Your Meta account is not associated with any Ad accounts. You need to create a Meta Ad account or be added to an existing one.",
@@ -181,7 +177,7 @@ export async function GET(request: NextRequest) {
         status: "success",
         connected: true,
         hasAccessToken: true,
-        hasRequiredScopes: true,
+        hasRequiredScopes: true, // If we got here, permissions are sufficient
         hasAdsAccounts: true,
         adsAccountsCount: data.data.length,
         message: `Meta account properly connected with access to ${data.data.length} Ad account(s).`,
@@ -205,7 +201,7 @@ export async function GET(request: NextRequest) {
         status: "warning",
         connected: true,
         hasAccessToken: true,
-        hasRequiredScopes: true,
+        hasRequiredScopes: true, // Assume permissions might be OK since we can't tell
         hasAdsAccounts: false,
         message: isTimeout
           ? "Meta Ads API is taking too long to respond. Please try again later."
