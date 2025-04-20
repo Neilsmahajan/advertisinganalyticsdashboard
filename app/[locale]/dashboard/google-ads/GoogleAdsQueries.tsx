@@ -29,6 +29,7 @@ import {
   Save,
   Eye,
   ExternalLink,
+  InfoIcon,
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -342,9 +343,20 @@ export default function GoogleAdsQueries() {
       <Card>
         <CardHeader>
           <CardTitle>{t("instructionsTitle")}</CardTitle>
-          <CardDescription>{t("instructionsDescription")}</CardDescription>
+          <CardDescription>{t("briefInstructions")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <Alert variant="default" className="bg-blue-50 border-blue-200">
+            <InfoIcon className="h-5 w-5 text-blue-600" />
+            <AlertTitle className="text-blue-800 font-medium">
+              {t("importantNote")}
+            </AlertTitle>
+            <AlertDescription className="text-blue-700">
+              <p className="mt-2">{t("instructionsDescription")}</p>
+              <p className="mt-2 font-medium">{t("findCustomerId")}</p>
+            </AlertDescription>
+          </Alert>
+
           <div className="flex flex-wrap gap-2">
             <Button
               variant="outline"

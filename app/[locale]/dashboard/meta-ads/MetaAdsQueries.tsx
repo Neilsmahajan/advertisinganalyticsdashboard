@@ -29,6 +29,7 @@ import {
   Save,
   Eye,
   ExternalLink,
+  InfoIcon,
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -365,7 +366,7 @@ export default function MetaAdsQueries() {
           <CardTitle>{t("instructionsTitle")}</CardTitle>
           {session?.facebook?.accessToken ? (
             <>
-              <CardDescription>{t("instructionsDescription")}</CardDescription>
+              <CardDescription>{t("briefInstructions")}</CardDescription>
               <div className="flex gap-2 mt-4">
                 <Button variant="outline" onClick={handleDisconnectFacebook}>
                   {t("disconnectButton")}
@@ -392,6 +393,30 @@ export default function MetaAdsQueries() {
         <CardContent className="space-y-4">
           {session?.facebook?.accessToken && (
             <>
+              <Alert variant="default" className="bg-blue-50 border-blue-200">
+                <InfoIcon className="h-5 w-5 text-blue-600" />
+                <AlertTitle className="text-blue-800 font-medium">
+                  {t("metaAdsRequirement")}
+                </AlertTitle>
+                <AlertDescription className="text-blue-700">
+                  <p>{t("instructionsDescription")}</p>
+                  <p className="mt-2 font-medium">{t("findAdAccountId")}</p>
+                  <Button
+                    variant="link"
+                    className="p-0 h-auto mt-1 text-blue-700"
+                    onClick={() =>
+                      window.open(
+                        "https://business.facebook.com/adsmanager/",
+                        "_blank",
+                      )
+                    }
+                  >
+                    {t("openMetaAdsManager")}{" "}
+                    <ExternalLink className="h-3 w-3 ml-1" />
+                  </Button>
+                </AlertDescription>
+              </Alert>
+
               <div className="flex flex-wrap gap-2">
                 <Button
                   variant="outline"

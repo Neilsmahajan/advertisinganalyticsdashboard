@@ -233,7 +233,10 @@
   },
   "TrackingDataQueries": {
     "instructionsTitle": "Instructions",
+    "briefInstructions": "Entrez l'URL de votre site Web pour identifier les balises de suivi.",
+    "howItWorks": "Comment ça fonctionne",
     "instructionsDescription": "Entrez l'URL de votre site web et sélectionnez parmi vos requêtes sauvegardées ou créez-en une nouvelle.",
+    "validUrlNote": "Assurez-vous d'entrer une URL valide incluant http:// ou https://",
     "previousQueries": "Requêtes précédentes",
     "selectPlaceholder": "Sélectionnez une requête sauvegardée ou créez-en une nouvelle",
     "createNewQuery": "Créer une nouvelle requête",
@@ -286,7 +289,16 @@
   },
   "GoogleAnalyticsQueries": {
     "instructionsTitle": "Instructions",
-    "instructionsDescription": "Entrez votre ID de propriété, sélectionnez votre plage de dates et créez ou sélectionnez une requête existante.",
+    "briefInstructions": "Accédez à vos données Google Analytics en suivant ces étapes.",
+    "importantRequirement": "Important: Compte de service requis",
+    "serviceAccountCopied": "Email du compte de service copié",
+    "serviceAccountCopiedDesc": "L'email du compte de service a été copié dans votre presse-papiers.",
+    "step1": "Étape 1:",
+    "step2": "Étape 2:",
+    "step3": "Étape 3:",
+    "addServiceAccount": "Ajoutez ce compte de service à votre Google Analytics avec un accès Lecteur:",
+    "navigateToAdmin": "Accédez à Admin > Gestion des accès au compte dans Google Analytics et ajoutez le compte de service en tant que Lecteur.",
+    "enterPropertyId": "Récupérez votre ID de propriété dans Admin > Paramètres de propriété et saisissez-le ci-dessous avec votre plage de dates.",
     "previousQueries": "Requêtes précédentes",
     "selectPlaceholder": "Sélectionnez une requête sauvegardée ou créez-en une nouvelle",
     "createNewQuery": "Créer une nouvelle requête",
@@ -328,7 +340,10 @@
   },
   "GoogleAdsQueries": {
     "instructionsTitle": "Instructions",
+    "briefInstructions": "Accédez aux données de vos campagnes Google Ads.",
+    "importantNote": "Exigences du compte Google Ads",
     "instructionsDescription": "Assurez-vous que vous êtes connecté avec le même compte Google que votre compte Google Ads. Entrez votre ID client, sélectionnez votre plage de dates et créez ou sélectionnez une requête existante.",
+    "findCustomerId": "Vous pouvez trouver votre ID client dans votre compte Google Ads sous Paramètres > Informations du compte.",
     "viewTutorial": "Voir le tutoriel",
     "previousQueries": "Requêtes précédentes",
     "selectPlaceholder": "Sélectionnez une requête sauvegardée ou créez-en une nouvelle",
@@ -357,7 +372,9 @@
     "analysisCompleteTitle": "Analyse terminée",
     "adsDataRetrieved": "Les données Google Ads ont été récupérées.",
     "results": "Résultats",
-    "resultsDescription": "Données Google Ads pour la période sélectionnée"
+    "resultsDescription": "Données Google Ads pour la période sélectionnée",
+    "checking": "Vérification en cours...",
+    "checkAccountStatus": "Vérifier le statut du compte"
   },
   "GoogleAdsResultsSection": {
     "downloadReport": "Télécharger le rapport",
@@ -385,7 +402,11 @@
   "MicrosoftAdsQueries": {
     "viewTutorial": "Voir le tutoriel",
     "instructionsTitle": "Instructions",
+    "briefInstructions": "Connectez-vous et analysez vos campagnes Microsoft Ads.",
+    "msAdsRequirement": "Exigences du compte Microsoft Ads",
     "instructionsDescription": "Entrez votre ID de compte, ID client et plage de dates pour créer ou sélectionner une requête Microsoft Ads.",
+    "findIDs": "Vous pouvez trouver votre ID de compte et ID client dans votre compte Microsoft Advertising.",
+    "openMicrosoftAds": "Ouvrir le portail Microsoft Ads",
     "connectDescription": "Connectez votre compte Microsoft pour commencer à analyser les campagnes.",
     "connectButton": "Connecter le compte Microsoft",
     "queryDescription": "Entrez votre ID de compte, ID client et plage de dates, puis créez ou mettez à jour votre requête.",
@@ -421,7 +442,10 @@
     "disconnectSuccessTitle": "Déconnecté",
     "disconnectSuccessDescription": "Votre compte Microsoft a été déconnecté avec succès.",
     "disconnectErrorTitle": "Erreur",
-    "disconnectErrorDescription": "Échec de la déconnexion du compte Microsoft. Veuillez réessayer."
+    "disconnectErrorDescription": "Échec de la déconnexion du compte Microsoft. Veuillez réessayer.",
+    "checking": "Vérification en cours...",
+    "checkAccountStatus": "Vérifier le statut du compte",
+    "refreshConnection": "Rafraîchir la connexion"
   },
   "MicrosoftAdsResultsSection": {
     "downloadReport": "Télécharger le rapport",
@@ -446,7 +470,11 @@
   },
   "MetaAdsQueries": {
     "instructionsTitle": "Instructions",
+    "briefInstructions": "Accédez aux données de vos campagnes Meta Ads.",
+    "metaAdsRequirement": "Exigences du compte Meta Ads",
     "instructionsDescription": "Entrez votre ID de compte publicitaire, sélectionnez votre plage de dates et créez ou sélectionnez une requête existante.",
+    "findAdAccountId": "Vous pouvez trouver votre ID de compte publicitaire dans Meta Ads Manager.",
+    "openMetaAdsManager": "Ouvrir Meta Ads Manager",
     "previousQueries": "Requêtes précédentes",
     "selectPlaceholder": "Sélectionnez une requête sauvegardée ou créez-en une nouvelle",
     "createNewQuery": "Créer une nouvelle requête",
@@ -470,7 +498,9 @@
     "connectButton": "Connecter le compte Meta",
     "disconnectButton": "Déconnecter le compte Meta",
     "viewTutorial": "Voir le tutoriel",
-    "noResults": "Entrez votre ID de compte publicitaire et votre plage de dates, puis cliquez sur Analyser pour voir les résultats"
+    "noResults": "Entrez votre ID de compte publicitaire et votre plage de dates, puis cliquez sur Analyser pour voir les résultats",
+    "checking": "Vérification en cours...",
+    "checkAccountStatus": "Vérifier le statut du compte"
   },
   "MetaAdsResultsSection": {
     "downloadReport": "Télécharger le rapport",

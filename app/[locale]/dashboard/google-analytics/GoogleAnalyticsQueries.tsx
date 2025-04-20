@@ -23,14 +23,22 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, PlayCircle, Save, Eye } from "lucide-react";
+import {
+  CalendarIcon,
+  PlayCircle,
+  Save,
+  Eye,
+  AlertCircle,
+  Copy,
+} from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
-import GoogleAnalyticsResultsSection from "./GoogleAnalyticsResultsSection"; // new import
+import GoogleAnalyticsResultsSection from "./GoogleAnalyticsResultsSection";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 export default function GoogleAnalyticsQueries() {
   const t = useTranslations("GoogleAnalyticsQueries");
@@ -49,6 +57,16 @@ export default function GoogleAnalyticsQueries() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState(null);
   const searchParams = useSearchParams();
+
+  const copyServiceAccount = () => {
+    navigator.clipboard.writeText(
+      "google-analytics@advertisinganalytics-dashboard.iam.gserviceaccount.com",
+    );
+    toast({
+      title: t("serviceAccountCopied"),
+      description: t("serviceAccountCopiedDesc"),
+    });
+  };
 
   // Load saved GA queries on mount
   useEffect(() => {
@@ -217,10 +235,45 @@ export default function GoogleAnalyticsQueries() {
       <Card>
         <CardHeader>
           <CardTitle>{t("instructionsTitle")}</CardTitle>
-          {/* The instructions now reference the updated text with the service account details */}
-          <CardDescription>{t("instructionsDescription")}</CardDescription>
+          <CardDescription>{t("briefInstructions")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <Alert className="bg-yellow-50 border-yellow-200">
+            <AlertCircle className="h-5 w-5 text-yellow-600" />
+            <AlertTitle className="text-yellow-800 font-medium text-base">
+              {t("importantRequirement")}
+            </AlertTitle>
+            <AlertDescription className="text-yellow-800">
+              <div className="mt-2 space-y-2">
+                <p>
+                  <span className="font-semibold">{t("step1")}</span>{" "}
+                  {t("addServiceAccount")}
+                </p>
+                <div className="flex items-center gap-2 p-2 bg-white border border-yellow-200 rounded-md">
+                  <code className="text-sm font-mono text-yellow-700">
+                    google-analytics@advertisinganalytics-dashboard.iam.gserviceaccount.com
+                  </code>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={copyServiceAccount}
+                    className="h-6 w-6 rounded-full"
+                  >
+                    <Copy className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+                <p>
+                  <span className="font-semibold">{t("step2")}</span>{" "}
+                  {t("navigateToAdmin")}
+                </p>
+                <p>
+                  <span className="font-semibold">{t("step3")}</span>{" "}
+                  {t("enterPropertyId")}
+                </p>
+              </div>
+            </AlertDescription>
+          </Alert>
+
           <Button
             variant="outline"
             className="gap-2"

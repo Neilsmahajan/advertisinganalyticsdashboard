@@ -244,7 +244,10 @@
   },
   "TrackingDataQueries": {
     "instructionsTitle": "Instructions",
+    "briefInstructions": "Enter your website URL to identify tracking tags.",
+    "howItWorks": "How It Works",
     "instructionsDescription": "Enter your website URL and select from your saved queries or create one.",
+    "validUrlNote": "Ensure you enter a valid URL including http:// or https://",
     "previousQueries": "Previous Queries",
     "selectPlaceholder": "Select a saved query or create new",
     "createNewQuery": "Create New Query",
@@ -297,7 +300,16 @@
   },
   "GoogleAnalyticsQueries": {
     "instructionsTitle": "Instructions",
-    "instructionsDescription": "Add google-analytics@advertisinganalytics-dashboard.iam.gserviceaccount.com as a Viewer in your Google Analytics dashboard (Admin > Account > Account access management). Then, get your Property ID from Admin > Property > Property details and enter it below with your desired date range.",
+    "briefInstructions": "Access your Google Analytics data by following these steps.",
+    "importantRequirement": "Important: Service Account Required",
+    "serviceAccountCopied": "Service Account Email Copied",
+    "serviceAccountCopiedDesc": "The service account email has been copied to your clipboard.",
+    "step1": "Step 1:",
+    "step2": "Step 2:",
+    "step3": "Step 3:",
+    "addServiceAccount": "Add this service account to your Google Analytics with Viewer access:",
+    "navigateToAdmin": "Navigate to Admin > Account Access Management in Google Analytics and add the service account as a Viewer.",
+    "enterPropertyId": "Get your Property ID from Admin > Property Settings and enter it below with your date range.",
     "previousQueries": "Previous Queries",
     "selectPlaceholder": "Select a saved query or create new",
     "createNewQuery": "Create New Query",
@@ -339,7 +351,10 @@
   },
   "GoogleAdsQueries": {
     "instructionsTitle": "Instructions",
+    "briefInstructions": "Access your Google Ads campaign data.",
+    "importantNote": "Google Ads Account Requirements",
     "instructionsDescription": "Ensure that your are logged in with the same Google Account as your Google Ads account. Enter your Customer ID, select your date range, and create or select an existing query.",
+    "findCustomerId": "You can find your Customer ID in your Google Ads account under Settings > Account information.",
     "viewTutorial": "View Tutorial",
     "previousQueries": "Previous Queries",
     "selectPlaceholder": "Select a saved query or create new",
@@ -368,7 +383,10 @@
     "analysisCompleteTitle": "Analysis Complete",
     "adsDataRetrieved": "Google Ads data has been retrieved.",
     "results": "Results",
-    "resultsDescription": "Google Ads data for the selected period"
+    "resultsDescription": "Google Ads data for the selected period",
+    "checking": "Checking...",
+    "checkAccountStatus": "Check Account Status",
+    "refreshConnection": "Refresh Connection"
   },
   "GoogleAdsResultsSection": {
     "downloadReport": "Download Report",
@@ -396,9 +414,12 @@
   "MicrosoftAdsQueries": {
     "viewTutorial": "View Tutorial",
     "instructionsTitle": "Instructions",
+    "briefInstructions": "Connect and analyze your Microsoft Ads campaigns.",
+    "msAdsRequirement": "Microsoft Ads Account Requirements",
     "instructionsDescription": "Enter your Account ID, Customer ID, and date range to create or select a Microsoft Ads query.",
+    "findIDs": "You can find your Account ID and Customer ID in your Microsoft Advertising account.",
+    "openMicrosoftAds": "Open Microsoft Ads Portal",
     "connectDescription": "Connect your Microsoft account to start analyzing campaigns.",
-    "connectButton": "Connect Microsoft Account",
     "queryDescription": "Enter your Account ID, Customer ID and date range, then create or update your query.",
     "previousQueriesLabel": "Previous Queries",
     "selectQueryPlaceholder": "Select a saved query or create new",
@@ -432,7 +453,10 @@
     "disconnectSuccessTitle": "Disconnected",
     "disconnectSuccessDescription": "Your Microsoft account has been disconnected successfully.",
     "disconnectErrorTitle": "Error",
-    "disconnectErrorDescription": "Failed to disconnect Microsoft account. Please try again."
+    "disconnectErrorDescription": "Failed to disconnect Microsoft account. Please try again.",
+    "checking": "Checking...",
+    "checkAccountStatus": "Check Account Status",
+    "refreshConnection": "Refresh Connection"
   },
   "MicrosoftAdsResultsSection": {
     "downloadReport": "Download Report",
@@ -457,7 +481,11 @@
   },
   "MetaAdsQueries": {
     "instructionsTitle": "Instructions",
+    "briefInstructions": "Access your Meta Ads campaign data.",
+    "metaAdsRequirement": "Meta Ads Account Requirements",
     "instructionsDescription": "Enter your Ad Account ID, select your date range and create or select an existing query.",
+    "findAdAccountId": "You can find your Ad Account ID in Meta Ads Manager.",
+    "openMetaAdsManager": "Open Meta Ads Manager",
     "previousQueries": "Previous Queries",
     "selectPlaceholder": "Select a saved query or create new",
     "createNewQuery": "Create New Query",
@@ -481,7 +509,9 @@
     "connectButton": "Connect Meta Account",
     "disconnectButton": "Disconnect Meta Account",
     "viewTutorial": "View Tutorial",
-    "noResults": "Enter your Ad Account ID and date range, then click Analyze to see results"
+    "noResults": "Enter your Ad Account ID and date range, then click Analyze to see results",
+    "checking": "Checking...",
+    "checkAccountStatus": "Check Account Status"
   },
   "MetaAdsResultsSection": {
     "downloadReport": "Download Report",

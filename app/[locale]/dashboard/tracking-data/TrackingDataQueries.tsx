@@ -17,12 +17,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlayCircle, Save } from "lucide-react";
+import { PlayCircle, Save, InfoIcon } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { useSearchParams } from "next/navigation";
 import TrackingDataResultsSection from "./TrackingDataResultsSection";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 export default function TrackingDataQueries() {
   const t = useTranslations("TrackingDataQueries");
@@ -227,9 +228,20 @@ export default function TrackingDataQueries() {
       <Card>
         <CardHeader>
           <CardTitle>{t("instructionsTitle")}</CardTitle>
-          <CardDescription>{t("instructionsDescription")}</CardDescription>
+          <CardDescription>{t("briefInstructions")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <Alert className="bg-blue-50 border-blue-200">
+            <InfoIcon className="h-5 w-5 text-blue-600" />
+            <AlertTitle className="text-blue-800 font-medium">
+              {t("howItWorks")}
+            </AlertTitle>
+            <AlertDescription className="text-blue-700">
+              <p>{t("instructionsDescription")}</p>
+              <p className="mt-2 font-medium">{t("validUrlNote")}</p>
+            </AlertDescription>
+          </Alert>
+
           <Button
             variant="outline"
             className="gap-2"

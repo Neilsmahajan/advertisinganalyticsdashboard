@@ -39,6 +39,7 @@ import {
   Eye,
   ExternalLink,
   RefreshCcw,
+  InfoIcon,
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -517,7 +518,7 @@ export default function MicrosoftAdsQueries() {
             </>
           ) : (
             <>
-              <CardDescription>{t("queryDescription")}</CardDescription>
+              <CardDescription>{t("briefInstructions")}</CardDescription>
               <div className="flex gap-2 mt-4">
                 <Button variant="outline" onClick={handleDisconnectMicrosoft}>
                   {t("disconnectButton")}
@@ -527,7 +528,7 @@ export default function MicrosoftAdsQueries() {
                   onClick={handleTokenRefresh}
                   className="gap-1"
                 >
-                  <RefreshCcw className="h-4 w-4" /> Refresh Connection
+                  <RefreshCcw className="h-4 w-4" /> {t("refreshConnection")}
                 </Button>
               </div>
             </>
@@ -535,6 +536,29 @@ export default function MicrosoftAdsQueries() {
         </CardHeader>
         {session?.microsoft?.accessToken && (
           <CardContent className="space-y-4">
+            <Alert variant="default" className="bg-blue-50 border-blue-200">
+              <InfoIcon className="h-5 w-5 text-blue-600" />
+              <AlertTitle className="text-blue-800 font-medium">
+                {t("msAdsRequirement")}
+              </AlertTitle>
+              <AlertDescription className="text-blue-700">
+                <p>{t("queryDescription")}</p>
+                <div className="mt-2">
+                  <p className="font-medium">{t("findIDs")}</p>
+                  <Button
+                    variant="link"
+                    className="p-0 h-auto mt-1 text-blue-700"
+                    onClick={() =>
+                      window.open("https://ads.microsoft.com/", "_blank")
+                    }
+                  >
+                    {t("openMicrosoftAds")}{" "}
+                    <ExternalLink className="h-3 w-3 ml-1" />
+                  </Button>
+                </div>
+              </AlertDescription>
+            </Alert>
+
             <div className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
@@ -555,7 +579,7 @@ export default function MicrosoftAdsQueries() {
                 disabled={isCheckingAccount}
               >
                 <Eye className="h-4 w-4" />{" "}
-                {isCheckingAccount ? "Checking..." : "Check Account Status"}
+                {isCheckingAccount ? t("checking") : t("checkAccountStatus")}
               </Button>
             </div>
 
