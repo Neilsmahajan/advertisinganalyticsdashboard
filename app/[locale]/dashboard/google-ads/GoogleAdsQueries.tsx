@@ -23,7 +23,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, PlayCircle, Save, Eye } from "lucide-react";
+import {
+  CalendarIcon,
+  PlayCircle,
+  Save,
+  Eye,
+  ExternalLink,
+} from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
@@ -31,6 +37,7 @@ import { useSearchParams } from "next/navigation";
 import GoogleAdsResultsSection from "./GoogleAdsResultsSection";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 export default function GoogleAdsQueries() {
   const t = useTranslations("GoogleAdsQueries");
@@ -50,6 +57,7 @@ export default function GoogleAdsQueries() {
   const [results, setResults] = useState<null | any>(null);
   const [accountStatus, setAccountStatus] = useState<any>(null);
   const [isCheckingAccount, setIsCheckingAccount] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
   const searchParams = useSearchParams();
 
   // Load saved queries via API on mount
@@ -195,6 +203,7 @@ export default function GoogleAdsQueries() {
     }
 
     setIsAnalyzing(true);
+    setAnalysisError(null);
     try {
       const res = await fetch("/api/google-ads/analyze", {
         method: "POST",
@@ -205,15 +214,17 @@ export default function GoogleAdsQueries() {
           endDate: endDate.toISOString().split("T")[0],
         }),
       });
+
+      const data = await res.json();
+
       if (!res.ok) {
-        const error = await res.json();
+        setAnalysisError(data.error || t("operationFailed"));
         toast({
           title: t("errorTitle"),
-          description: error.error || t("operationFailed"),
+          description: data.error || t("operationFailed"),
           variant: "destructive",
         });
       } else {
-        const data = await res.json();
         setResults(data);
         toast({
           title: t("analysisCompleteTitle"),
@@ -221,6 +232,7 @@ export default function GoogleAdsQueries() {
         });
       }
     } catch (err) {
+      setAnalysisError(t("operationFailed"));
       toast({
         title: t("errorTitle"),
         description: t("operationFailed"),
@@ -233,6 +245,7 @@ export default function GoogleAdsQueries() {
 
   const checkGoogleAccount = async () => {
     setIsCheckingAccount(true);
+    setAnalysisError(null);
     try {
       const res = await fetch("/api/google-ads/check-account");
       const data = await res.json();
@@ -308,6 +321,23 @@ export default function GoogleAdsQueries() {
                   Scopes: {accountStatus.scope}
                 </div>
               )}
+
+              {accountStatus.status === "warning" &&
+                accountStatus.hasRequiredScopes &&
+                !accountStatus.hasAdsAccounts && (
+                  <div className="mt-2 text-xs">
+                    <Button
+                      variant="link"
+                      className="h-auto p-0 text-yellow-800"
+                      onClick={() =>
+                        window.open("https://ads.google.com/home/", "_blank")
+                      }
+                    >
+                      Create a Google Ads account{" "}
+                      <ExternalLink className="ml-1 h-3 w-3" />
+                    </Button>
+                  </div>
+                )}
             </div>
           )}
 
@@ -430,7 +460,48 @@ export default function GoogleAdsQueries() {
           <CardDescription>{t("resultsDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
-          {!results && !isAnalyzing && (
+          {analysisError && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertTitle>Error analyzing Google Ads data</AlertTitle>
+              <AlertDescription>
+                {analysisError}
+                {analysisError.includes(
+                  "not associated with any Ads accounts",
+                ) && (
+                  <div className="mt-2">
+                    <p className="font-semibold">What to do:</p>
+                    <ul className="list-disc list-inside mt-1">
+                      <li>
+                        Create a Google Ads account or get access to an existing
+                        one
+                      </li>
+                      <li>
+                        Make sure your Google account email is associated with
+                        that Google Ads account
+                      </li>
+                      <li>
+                        <Button
+                          variant="link"
+                          className="h-auto p-0"
+                          onClick={() =>
+                            window.open(
+                              "https://ads.google.com/home/",
+                              "_blank",
+                            )
+                          }
+                        >
+                          Go to Google Ads{" "}
+                          <ExternalLink className="ml-1 h-3 w-3" />
+                        </Button>
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {!results && !isAnalyzing && !analysisError && (
             <div className="flex items-center justify-center h-[400px] bg-muted/20 rounded-md">
               <p className="text-muted-foreground">{t("noResults")}</p>
             </div>

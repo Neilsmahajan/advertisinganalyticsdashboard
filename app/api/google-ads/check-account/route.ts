@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { GoogleAdsApi } from "google-ads-api";
 
 export async function GET(request: NextRequest) {
   try {
@@ -55,15 +56,76 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({
-      status: "success",
-      connected: true,
-      hasRefreshToken: true,
-      hasRequiredScopes: true,
-      message:
-        "Google account properly connected with all required permissions.",
-      scope: googleAccount.scope,
-    });
+    // Try to verify actual Google Ads access by making a basic API call
+    try {
+      // Check for required environment variables
+      if (
+        !process.env.GOOGLE_CLIENT_ID ||
+        !process.env.GOOGLE_CLIENT_SECRET ||
+        !process.env.GOOGLE_ADS_DEVELOPER_TOKEN
+      ) {
+        return NextResponse.json(
+          {
+            status: "error",
+            message:
+              "Server configuration issue: Missing required environment variables.",
+          },
+          { status: 500 },
+        );
+      }
+
+      const client = new GoogleAdsApi({
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        developer_token: process.env.GOOGLE_ADS_DEVELOPER_TOKEN,
+      });
+
+      // Use the search accessible customers method to check if account has access to any Ads accounts
+      const accessibleCustomers = await client.listAccessibleCustomers(
+        googleAccount.refresh_token,
+      );
+
+      if (
+        !accessibleCustomers ||
+        accessibleCustomers.resource_names.length === 0
+      ) {
+        return NextResponse.json({
+          status: "warning",
+          connected: true,
+          hasRefreshToken: true,
+          hasRequiredScopes: true,
+          hasAdsAccounts: false,
+          message:
+            "Your Google account is not associated with any Google Ads accounts. You need to create a Google Ads account or be added to an existing one.",
+          scope: googleAccount.scope,
+        });
+      }
+
+      // Account has access to Google Ads accounts
+      return NextResponse.json({
+        status: "success",
+        connected: true,
+        hasRefreshToken: true,
+        hasRequiredScopes: true,
+        hasAdsAccounts: true,
+        adsAccountsCount: accessibleCustomers.resource_names.length,
+        message: `Google account properly connected with access to ${accessibleCustomers.resource_names.length} Google Ads account(s).`,
+        scope: googleAccount.scope,
+      });
+    } catch (error: any) {
+      console.error("Error verifying Google Ads access:", error);
+      return NextResponse.json({
+        status: "warning",
+        connected: true,
+        hasRefreshToken: true,
+        hasRequiredScopes: true,
+        hasAdsAccounts: false,
+        message:
+          "Could not verify Google Ads access: " +
+          (error.message || "Unknown error"),
+        scope: googleAccount.scope,
+      });
+    }
   } catch (error) {
     console.error("Error checking Google account status:", error);
     return NextResponse.json(

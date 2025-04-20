@@ -213,6 +213,13 @@ export async function POST(request: NextRequest) {
         statusCode = 404;
         errorMessage =
           "Customer ID not found or invalid. Please verify the customer ID.";
+      } else if (
+        errorMessages.includes("not associated with any Ads accounts")
+      ) {
+        // Specific message for accounts without Ads access
+        statusCode = 403;
+        errorMessage =
+          "The Google account that generated the OAuth access tokens is not associated with any Ads accounts. Create a new Ads account, or add your Google account to an existing Ads account.";
       }
 
       return NextResponse.json(
