@@ -122,6 +122,21 @@ export async function POST(request: NextRequest) {
     if (!submitResp.ok) {
       const errText = await submitResp.text();
       console.error("[analyze] Submit response error:", errText);
+
+      // Check specifically for token expiration errors
+      if (
+        errText.includes("AuthenticationTokenExpired") ||
+        errText.includes("Authentication token expired")
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "Authentication token expired. Please refresh your Microsoft connection.",
+          },
+          { status: 401 },
+        );
+      }
+
       return NextResponse.json({ error: errText }, { status: 500 });
     }
     const submitJson = await submitResp.json();
@@ -246,6 +261,23 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error("[analyze] Error in Microsoft Ads analyze:", error);
+
+    // Check if the error message might indicate token expiration
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (
+      errorMessage.includes("AuthenticationTokenExpired") ||
+      errorMessage.includes("Authentication token expired") ||
+      (errorMessage.includes("token") && errorMessage.includes("expire"))
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Authentication token expired. Please refresh your Microsoft connection.",
+        },
+        { status: 401 },
+      );
+    }
+
     return NextResponse.json(
       { error: "An error occurred while analyzing data" },
       { status: 500 },

@@ -17,17 +17,24 @@ interface MicrosoftAdsResultsSectionProps {
       Spend: string;
       Ctr: string;
     }[];
+    error?: string; // Added error property for error handling
   };
   queryInfo: {
     service: string;
     queryName: string;
     queryData: Record<string, unknown>;
   };
+  userInfo?: {
+    // Made optional since it wasn't passed in the existing code
+    name: string;
+    email: string;
+  };
 }
 
 export default function MicrosoftAdsResultsSection({
   results,
   queryInfo,
+  userInfo,
 }: MicrosoftAdsResultsSectionProps) {
   const t = useTranslations("MicrosoftAdsResultsSection");
   const locale = useLocale();
@@ -52,6 +59,7 @@ export default function MicrosoftAdsResultsSection({
           results,
           service: "Microsoft Ads",
           locale,
+          userInfo,
         }),
       });
 
@@ -92,6 +100,16 @@ export default function MicrosoftAdsResultsSection({
       setIsDownloading(false);
     }
   };
+
+  // If there's an error in the results, display it instead of the normal results
+  if (results.error) {
+    return (
+      <div className="p-4 rounded-md bg-red-50 border border-red-200">
+        <h3 className="text-lg font-medium text-red-800 mb-2">Error</h3>
+        <p className="text-red-700">{results.error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

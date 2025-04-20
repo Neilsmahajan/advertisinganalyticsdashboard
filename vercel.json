@@ -5,6 +5,9 @@
     },
     "app/api/meta-ads/check-account/route.ts": {
       "maxDuration": 30
+    },
+    "app/api/microsoft-ads/check-account/route.ts": {
+      "maxDuration": 30
     }
   }
 }
