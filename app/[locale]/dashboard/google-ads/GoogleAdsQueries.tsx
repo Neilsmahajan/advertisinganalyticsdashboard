@@ -48,6 +48,8 @@ export default function GoogleAdsQueries() {
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState<null | any>(null);
+  const [accountStatus, setAccountStatus] = useState<any>(null);
+  const [isCheckingAccount, setIsCheckingAccount] = useState(false);
   const searchParams = useSearchParams();
 
   // Load saved queries via API on mount
@@ -229,6 +231,36 @@ export default function GoogleAdsQueries() {
     }
   };
 
+  const checkGoogleAccount = async () => {
+    setIsCheckingAccount(true);
+    try {
+      const res = await fetch("/api/google-ads/check-account");
+      const data = await res.json();
+      setAccountStatus(data);
+
+      if (data.status !== "success") {
+        toast({
+          title: "Account Status",
+          description: data.message,
+          variant: data.status === "error" ? "destructive" : "default",
+        });
+      } else {
+        toast({
+          title: "Account Status",
+          description: data.message,
+        });
+      }
+    } catch (err) {
+      toast({
+        title: t("errorTitle"),
+        description: t("operationFailed"),
+        variant: "destructive",
+      });
+    } finally {
+      setIsCheckingAccount(false);
+    }
+  };
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <Card>
@@ -237,18 +269,48 @@ export default function GoogleAdsQueries() {
           <CardDescription>{t("instructionsDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button
-            variant="outline"
-            className="gap-2"
-            onClick={() =>
-              window.open(
-                "https://www.youtube.com/watch?v=KJ0mmCF742Y",
-                "_blank",
-              )
-            }
-          >
-            <PlayCircle className="h-4 w-4" /> {t("viewTutorial")}
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() =>
+                window.open(
+                  "https://www.youtube.com/watch?v=KJ0mmCF742Y",
+                  "_blank",
+                )
+              }
+            >
+              <PlayCircle className="h-4 w-4" /> {t("viewTutorial")}
+            </Button>
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={checkGoogleAccount}
+              disabled={isCheckingAccount}
+            >
+              <Eye className="h-4 w-4" />{" "}
+              {isCheckingAccount ? "Checking..." : "Check Account Status"}
+            </Button>
+          </div>
+          {accountStatus && (
+            <div
+              className={`text-sm p-2 rounded ${
+                accountStatus.status === "success"
+                  ? "bg-green-100 text-green-800"
+                  : accountStatus.status === "warning"
+                    ? "bg-yellow-100 text-yellow-800"
+                    : "bg-red-100 text-red-800"
+              }`}
+            >
+              {accountStatus.message}
+              {accountStatus.scope && (
+                <div className="mt-1 text-xs overflow-hidden text-ellipsis">
+                  Scopes: {accountStatus.scope}
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="space-y-4 pt-4">
             <div className="space-y-2">
               <Label>{t("previousQueries")}</Label>
