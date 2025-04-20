@@ -247,8 +247,24 @@ export default function GoogleAdsQueries() {
   const checkGoogleAccount = async () => {
     setIsCheckingAccount(true);
     setAnalysisError(null);
+
+    // Set up a client-side timeout as a backup
+    const timeoutId = setTimeout(() => {
+      if (isCheckingAccount) {
+        setIsCheckingAccount(false);
+        toast({
+          title: "Operation Timed Out",
+          description:
+            "The account status check is taking too long. This may be due to Google Ads API delays. Please try again later.",
+          variant: "destructive",
+        });
+      }
+    }, 25000); // 25 second UI timeout
+
     try {
       const res = await fetch("/api/google-ads/check-account");
+      clearTimeout(timeoutId);
+
       const data = await res.json();
       setAccountStatus(data);
 
@@ -265,6 +281,7 @@ export default function GoogleAdsQueries() {
         });
       }
     } catch (err) {
+      clearTimeout(timeoutId);
       toast({
         title: t("errorTitle"),
         description: t("operationFailed"),

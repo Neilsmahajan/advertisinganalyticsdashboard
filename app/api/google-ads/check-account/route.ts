@@ -3,6 +3,25 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { GoogleAdsApi } from "google-ads-api";
 
+// Helper function to add timeout to a promise
+const withTimeout = (
+  promise: Promise<any>,
+  ms: number,
+  errorMessage: string,
+) => {
+  const timeout = new Promise<never>((_, reject) => {
+    const id = setTimeout(() => {
+      clearTimeout(id);
+      reject(new Error(`Timeout after ${ms}ms: ${errorMessage}`));
+    }, ms);
+  });
+
+  return Promise.race([promise, timeout]);
+};
+
+export const runtime = "nodejs"; // Explicitly set Node.js runtime
+export const maxDuration = 30; // Set maximum duration to 30 seconds
+
 export async function GET(request: NextRequest) {
   try {
     const session = await auth();
@@ -80,9 +99,12 @@ export async function GET(request: NextRequest) {
         developer_token: process.env.GOOGLE_ADS_DEVELOPER_TOKEN,
       });
 
-      // Use the search accessible customers method to check if account has access to any Ads accounts
-      const accessibleCustomers = await client.listAccessibleCustomers(
-        googleAccount.refresh_token,
+      // Use the search accessible customers method with a timeout
+      // Give it 20 seconds max to complete, leaving some buffer for the function
+      const accessibleCustomers = await withTimeout(
+        client.listAccessibleCustomers(googleAccount.refresh_token),
+        20000, // 20 second timeout for this specific operation
+        "Google Ads API call took too long",
       );
 
       if (
@@ -114,15 +136,21 @@ export async function GET(request: NextRequest) {
       });
     } catch (error: any) {
       console.error("Error verifying Google Ads access:", error);
+
+      // Check if it's a timeout error
+      const isTimeout =
+        error.message && error.message.includes("Timeout after");
+
       return NextResponse.json({
         status: "warning",
         connected: true,
         hasRefreshToken: true,
         hasRequiredScopes: true,
         hasAdsAccounts: false,
-        message:
-          "Could not verify Google Ads access: " +
-          (error.message || "Unknown error"),
+        message: isTimeout
+          ? "Google Ads API is taking too long to respond. Please try again later."
+          : "Could not verify Google Ads access: " +
+            (error.message || "Unknown error"),
         scope: googleAccount.scope,
       });
     }
