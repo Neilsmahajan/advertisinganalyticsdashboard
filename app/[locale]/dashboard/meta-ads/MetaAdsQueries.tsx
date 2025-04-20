@@ -23,7 +23,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, PlayCircle, Save } from "lucide-react";
+import {
+  CalendarIcon,
+  PlayCircle,
+  Save,
+  Eye,
+  ExternalLink,
+} from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
@@ -31,6 +37,8 @@ import { useSearchParams } from "next/navigation";
 import { useSession, signIn } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
 import MetaAdsResultsSection from "./MetaAdsResultsSection";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import Image from "next/image";
 
 export default function MetaAdsQueries() {
   const [formData, setFormData] = useState({
@@ -53,6 +61,9 @@ export default function MetaAdsQueries() {
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState<null | any>(null);
+  const [accountStatus, setAccountStatus] = useState<any>(null);
+  const [isCheckingAccount, setIsCheckingAccount] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const { data: session } = useSession();
   const t = useTranslations("MetaAdsQueries");
@@ -188,6 +199,7 @@ export default function MetaAdsQueries() {
       return;
     }
     setIsAnalyzing(true);
+    setAnalysisError(null);
     try {
       const res = await fetch("/api/meta-ads/analyze", {
         method: "POST",
@@ -199,15 +211,17 @@ export default function MetaAdsQueries() {
           endDate: endDate.toISOString().split("T")[0],
         }),
       });
+
+      const data = await res.json();
+
       if (!res.ok) {
-        const error = await res.json();
+        setAnalysisError(data.error || t("operationFailed"));
         toast({
           title: t("errorTitle"),
-          description: error.error || t("operationFailed"),
+          description: data.error || t("operationFailed"),
           variant: "destructive",
         });
       } else {
-        const data = await res.json();
         setResults(data);
         toast({
           title: t("analysisCompleteTitle"),
@@ -215,6 +229,7 @@ export default function MetaAdsQueries() {
         });
       }
     } catch (err) {
+      setAnalysisError(t("operationFailed"));
       toast({
         title: t("errorTitle"),
         description: t("operationFailed"),
@@ -254,6 +269,95 @@ export default function MetaAdsQueries() {
     }
   };
 
+  // Handle sign in to reconnect with permissions
+  const handleSignInWithPermissions = () => {
+    signIn("facebook", {
+      callbackUrl: `/${locale}/dashboard/meta-ads`,
+    });
+  };
+
+  const checkMetaAccount = async () => {
+    setIsCheckingAccount(true);
+    setAnalysisError(null);
+
+    // First, do a fast check that skips the slow API call
+    try {
+      const res = await fetch("/api/meta-ads/check-account?skipSlowCheck=true");
+      const data = await res.json();
+      setAccountStatus(data);
+
+      if (data.status === "pending") {
+        // We got back the basic permission check, now start a background check for full access
+        toast({
+          title: "Initial Check Complete",
+          description: "Checking Meta Ads API access in the background...",
+        });
+
+        // Set up a longer timeout for the background check
+        const backgroundTimeoutId = setTimeout(() => {
+          toast({
+            title: "Background Check Timeout",
+            description:
+              "The Meta Ads API is taking longer than expected. Results will update when available.",
+            variant: "default",
+          });
+        }, 15000);
+
+        // Start the background full check
+        fetch("/api/meta-ads/check-account")
+          .then((res) => res.json())
+          .then((fullData) => {
+            clearTimeout(backgroundTimeoutId);
+            setAccountStatus(fullData);
+
+            toast({
+              title: "Account Status",
+              description: fullData.message,
+              variant: fullData.status === "error" ? "destructive" : "default",
+            });
+          })
+          .catch(() => {
+            clearTimeout(backgroundTimeoutId);
+            toast({
+              title: "Background Check Failed",
+              description:
+                "Could not complete the full account check. Please try again later.",
+              variant: "destructive",
+            });
+          })
+          .finally(() => {
+            // We don't set isCheckingAccount to false here because we already did after the initial check
+          });
+
+        // Don't wait for background check to finish - allow user to continue
+        setIsCheckingAccount(false);
+        return;
+      }
+
+      // For non-pending statuses, show the standard toast
+      if (data.status !== "success") {
+        toast({
+          title: "Account Status",
+          description: data.message,
+          variant: data.status === "error" ? "destructive" : "default",
+        });
+      } else {
+        toast({
+          title: "Account Status",
+          description: data.message,
+        });
+      }
+    } catch (err) {
+      toast({
+        title: t("errorTitle"),
+        description: t("operationFailed"),
+        variant: "destructive",
+      });
+    } finally {
+      setIsCheckingAccount(false);
+    }
+  };
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <Card>
@@ -288,18 +392,101 @@ export default function MetaAdsQueries() {
         <CardContent className="space-y-4">
           {session?.facebook?.accessToken && (
             <>
-              <Button
-                variant="outline"
-                className="gap-2"
-                onClick={() =>
-                  window.open(
-                    "https://www.youtube.com/watch?v=UxWZLysI4Qs",
-                    "_blank",
-                  )
-                }
-              >
-                <PlayCircle className="h-4 w-4" /> {t("viewTutorial")}
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() =>
+                    window.open(
+                      "https://www.youtube.com/watch?v=UxWZLysI4Qs",
+                      "_blank",
+                    )
+                  }
+                >
+                  <PlayCircle className="h-4 w-4" /> {t("viewTutorial")}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={checkMetaAccount}
+                  disabled={isCheckingAccount}
+                >
+                  <Eye className="h-4 w-4" />{" "}
+                  {isCheckingAccount ? "Checking..." : "Check Account Status"}
+                </Button>
+              </div>
+
+              {accountStatus && (
+                <div
+                  className={`text-sm p-2 rounded ${
+                    accountStatus.status === "success"
+                      ? "bg-green-100 text-green-800"
+                      : accountStatus.status === "warning"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {accountStatus.message}
+                  {accountStatus.scope && (
+                    <div className="mt-1 text-xs overflow-hidden text-ellipsis">
+                      Scopes: {accountStatus.scope}
+                    </div>
+                  )}
+
+                  {/* Missing Meta Ads permissions case */}
+                  {accountStatus.hasRequiredScopes === false && (
+                    <div className="mt-2 border-t border-yellow-200 pt-2">
+                      <p className="font-semibold text-sm">
+                        Missing Meta Ads Permissions
+                      </p>
+                      <p className="text-xs mt-1">
+                        You need to grant Meta Ads access permissions to use
+                        this feature:
+                      </p>
+                      <ol className="list-decimal list-inside text-xs mt-1">
+                        <li>Click the button below to reconnect</li>
+                        <li>Sign in with your Facebook/Meta account</li>
+                        <li>
+                          <span className="font-semibold">Important:</span> When
+                          prompted, make sure to accept the permissions for Meta
+                          Ads
+                        </li>
+                      </ol>
+
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={handleSignInWithPermissions}
+                        className="mt-2 w-full bg-blue-700 hover:bg-blue-800 text-white"
+                      >
+                        Reconnect with permissions
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* No Meta Ads accounts case */}
+                  {accountStatus.status === "warning" &&
+                    accountStatus.hasRequiredScopes &&
+                    !accountStatus.hasAdsAccounts && (
+                      <div className="mt-2 text-xs">
+                        <Button
+                          variant="link"
+                          className="h-auto p-0 text-yellow-800"
+                          onClick={() =>
+                            window.open(
+                              "https://business.facebook.com/adsmanager/",
+                              "_blank",
+                            )
+                          }
+                        >
+                          Create a Meta Ads account{" "}
+                          <ExternalLink className="ml-1 h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
+                </div>
+              )}
+
               <div className="space-y-4 pt-4">
                 <div className="space-y-2">
                   <Label>{t("previousQueries")}</Label>
@@ -420,7 +607,43 @@ export default function MetaAdsQueries() {
           <CardDescription>{t("resultsDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
-          {!results && !isAnalyzing && (
+          {analysisError && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertTitle>Error analyzing Meta Ads data</AlertTitle>
+              <AlertDescription>
+                {analysisError}
+                {analysisError.includes("Error fetching Meta Ads data") && (
+                  <div className="mt-2">
+                    <p className="font-semibold">What to do:</p>
+                    <ul className="list-disc list-inside mt-1">
+                      <li>Verify that your Ad Account ID is correct</li>
+                      <li>
+                        Make sure your Facebook/Meta account has access to this
+                        Ad account
+                      </li>
+                      <li>
+                        <Button
+                          variant="link"
+                          className="h-auto p-0"
+                          onClick={() =>
+                            window.open(
+                              "https://business.facebook.com/adsmanager/",
+                              "_blank",
+                            )
+                          }
+                        >
+                          Go to Meta Ads Manager{" "}
+                          <ExternalLink className="ml-1 h-3 w-3" />
+                        </Button>
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {!results && !isAnalyzing && !analysisError && (
             <div className="flex items-center justify-center h-[400px] bg-muted/20 rounded-md">
               <p className="text-muted-foreground">{t("noResults")}</p>
             </div>
