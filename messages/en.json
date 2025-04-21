@@ -420,6 +420,7 @@
     "findIDs": "You can find your Account ID and Customer ID in your Microsoft Advertising account.",
     "openMicrosoftAds": "Open Microsoft Ads Portal",
     "connectDescription": "Connect your Microsoft account to start analyzing campaigns.",
+    "connectButton": "Connect Microsoft Account",
     "queryDescription": "Enter your Account ID, Customer ID and date range, then create or update your query.",
     "previousQueriesLabel": "Previous Queries",
     "selectQueryPlaceholder": "Select a saved query or create new",
