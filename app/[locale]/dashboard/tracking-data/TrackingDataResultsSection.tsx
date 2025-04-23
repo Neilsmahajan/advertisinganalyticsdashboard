@@ -62,7 +62,7 @@ const tagImages: Record<string, string> = {
   Pardot: "pardot-logo.png",
   Drift: "drift-logo.png",
   Zendesk: "zendesk-logo.png",
-  "Tawk.to": "tawkto-logo.png",
+  Tawk_to: "tawkto-logo.png",
   Crisp: "crisp-logo.png",
   LiveChat: "livechat-logo.png",
   Olark: "olark-logo.png",
@@ -90,6 +90,27 @@ export default function TrackingDataResultsSection({
   const websiteDomain = websiteUrlRaw
     .replace(/(^\w+:|^)\/\//, "")
     .replace(/\/+$/, "");
+
+  // Helper functions to check if specific tags exist
+  const hasGoogleAdsTags = () => {
+    if (!results.analytics_tags) return false;
+    return results.analytics_tags.some(
+      (tag) =>
+        tag === "Google Ads DoubleClick" ||
+        tag === "Google Ads" ||
+        tag === "Google Ads Conversion Tracking",
+    );
+  };
+
+  const hasMetaAdsTags = () => {
+    if (!results.analytics_tags) return false;
+    return results.analytics_tags.some(
+      (tag) =>
+        tag === "Facebook Pixel" ||
+        tag === "Facebook SDK" ||
+        tag === "Facebook Conversion Tracking",
+    );
+  };
 
   const handleDownloadReport = async () => {
     setIsDownloading(true);
@@ -198,6 +219,46 @@ export default function TrackingDataResultsSection({
             </ul>
           ) : (
             <p className="text-black/60">{t("resultsWillAppear")}</p>
+          )}
+
+          {/* New section for transparency tools when tags aren't found */}
+          {results.analytics_tags && results.analytics_tags.length > 0 && (
+            <div className="mt-6 border-t pt-4 border-gray-200">
+              <h4 className="font-medium mb-2">{t("transparencyTools")}</h4>
+              <div className="space-y-2">
+                {!hasGoogleAdsTags() && websiteDomain && (
+                  <div className="ml-2">
+                    <p className="text-sm text-black/70 mb-1">
+                      {t("noGoogleAdsTagsFound")}
+                    </p>
+                    <a
+                      href={`https://adstransparency.google.com/?region=anywhere&domain=${websiteDomain}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 underline text-sm"
+                    >
+                      {t("checkGoogleAdsTransparency")}
+                    </a>
+                  </div>
+                )}
+
+                {!hasMetaAdsTags() && websiteDomain && (
+                  <div className="ml-2">
+                    <p className="text-sm text-black/70 mb-1">
+                      {t("noMetaAdsTagsFound")}
+                    </p>
+                    <a
+                      href={`https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=ALL&is_targeted_country=false&media_type=all&q=${websiteDomain}&search_type=keyword_unordered`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 underline text-sm"
+                    >
+                      {t("checkMetaAdsLibrary")}
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
           )}
         </div>
       </div>
