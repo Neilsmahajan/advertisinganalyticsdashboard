@@ -143,10 +143,10 @@ export default function TrackingDataQueries() {
   };
 
   const handleAnalyze = async () => {
-    if (!formData.queryName || !formData.websiteUrl) {
+    if (!formData.websiteUrl) {
       toast({
         title: "Error",
-        description: "Fill in all required fields",
+        description: "Please enter a website URL",
         variant: "destructive",
       });
       return;
@@ -299,9 +299,7 @@ export default function TrackingDataQueries() {
             <Button
               className="w-full"
               onClick={handleAnalyze}
-              disabled={
-                isAnalyzing || !formData.queryName || !formData.websiteUrl
-              }
+              disabled={isAnalyzing || !formData.websiteUrl}
             >
               {isAnalyzing ? t("analyzing") : t("analyze")}
             </Button>
