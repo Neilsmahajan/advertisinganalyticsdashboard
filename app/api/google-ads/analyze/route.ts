@@ -3,6 +3,34 @@ import { GoogleAdsApi } from "google-ads-api";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma"; // added import
 
+// Helper function to discover manager account IDs for a refresh token
+async function discoverManagerAccounts(client: any, refreshToken: string) {
+  try {
+    console.log("[google-ads/analyze] Attempting to discover manager accounts");
+    const accessibleCustomers =
+      await client.listAccessibleCustomers(refreshToken);
+
+    // Filter for likely manager accounts (typically have larger IDs and manage other accounts)
+    // This is a heuristic - in a real implementation you might want a more sophisticated approach
+    const managerIds = accessibleCustomers.resource_names
+      .map((name: string) => name.split("/")[1])
+      .filter((id: string) => id); // Remove any undefined/empty values
+
+    console.log(
+      `[google-ads/analyze] Found potential manager accounts: ${managerIds.join(
+        ", ",
+      )}`,
+    );
+    return managerIds;
+  } catch (error) {
+    console.error(
+      "[google-ads/analyze] Error discovering manager accounts:",
+      error,
+    );
+    return [];
+  }
+}
+
 export async function POST(request: NextRequest) {
   console.log("[google-ads/analyze] Starting analysis request");
   try {
@@ -105,12 +133,8 @@ export async function POST(request: NextRequest) {
     console.log(
       `[google-ads/analyze] Setting up customer with ID: ${customerId}`,
     );
-    const customer = client.Customer({
-      customer_id: customerId,
-      refresh_token: refreshToken,
-    });
 
-    // Build the query using the provided dates
+    // Initial query attempt with direct customer setup
     const query = `
       SELECT
         campaign.id,
@@ -124,10 +148,83 @@ export async function POST(request: NextRequest) {
         AND segments.date <= '${endDate}'
       ORDER BY campaign.id
     `;
-    console.log(`[google-ads/analyze] Executing query: ${query}`);
 
     try {
+      // First attempt: direct access to customer
+      console.log("[google-ads/analyze] Attempting direct customer access");
+      const customer = client.Customer({
+        customer_id: customerId,
+        refresh_token: refreshToken,
+      });
+
+      console.log(`[google-ads/analyze] Executing query: ${query}`);
       const queryResponse = await customer.query(query);
+
+      // If we get here, direct access worked - process results normally
+      return processResults(queryResponse);
+    } catch (directAccessError: any) {
+      console.error(
+        "[google-ads/analyze] Direct access failed:",
+        directAccessError,
+      );
+
+      // If this looks like a permission issue or account not found, try using manager accounts
+      if (
+        directAccessError.message?.includes("permission") ||
+        directAccessError.message?.includes("access") ||
+        directAccessError.message?.includes("not found")
+      ) {
+        // Discover potential manager accounts
+        const managerAccountIds = await discoverManagerAccounts(
+          client,
+          refreshToken,
+        );
+
+        if (managerAccountIds.length > 0) {
+          console.log(
+            `[google-ads/analyze] Attempting access through ${managerAccountIds.length} manager accounts`,
+          );
+
+          // Try each manager account
+          for (const managerId of managerAccountIds) {
+            try {
+              console.log(
+                `[google-ads/analyze] Trying with login_customer_id: ${managerId}`,
+              );
+              const customer = client.Customer({
+                customer_id: customerId,
+                login_customer_id: managerId,
+                refresh_token: refreshToken,
+              });
+
+              const queryResponse = await customer.query(query);
+              console.log(
+                "[google-ads/analyze] Query successful using manager account",
+              );
+
+              // If successful, process results
+              return processResults(queryResponse);
+            } catch (managerError) {
+              console.error(
+                `[google-ads/analyze] Manager access failed for ${managerId}:`,
+                managerError,
+              );
+              // Continue to next manager account
+            }
+          }
+        }
+
+        // If we get here, we've tried direct access and all manager accounts without success
+        console.error("[google-ads/analyze] All access attempts failed");
+        return handleApiError(directAccessError);
+      } else {
+        // For other errors, just forward to error handler
+        return handleApiError(directAccessError);
+      }
+    }
+
+    // Helper function to process successful query results
+    function processResults(queryResponse: any[]) {
       console.log(
         `[google-ads/analyze] Query successful, received ${queryResponse.length} campaigns`,
       );
@@ -182,7 +279,10 @@ export async function POST(request: NextRequest) {
         `[google-ads/analyze] Analysis complete: ${totalImpressions} impressions, ${totalClicks} clicks, ${campaigns.length} campaigns`,
       );
       return NextResponse.json(result, { status: 200 });
-    } catch (apiError: any) {
+    }
+
+    // Helper function to handle API errors
+    function handleApiError(apiError: any) {
       // Handle specific Google Ads API errors
       console.error("[google-ads/analyze] Google Ads API error:", apiError);
 
@@ -205,14 +305,14 @@ export async function POST(request: NextRequest) {
       ) {
         statusCode = 403;
         errorMessage =
-          "Permission denied. Your account may not have access to this customer ID.";
+          "Permission denied. Your account may not have access to this customer ID. If this is an account under a Google Ads Manager, ensure your Google account has proper access rights.";
       } else if (
         apiError.message?.includes("not found") ||
         apiError.message?.includes("invalid customer")
       ) {
         statusCode = 404;
         errorMessage =
-          "Customer ID not found or invalid. Please verify the customer ID.";
+          "Customer ID not found or invalid. Please verify the customer ID. If this is an account under a Google Ads Manager, ensure your Google account has proper access permissions.";
       } else if (
         errorMessages.includes("not associated with any Ads accounts")
       ) {
