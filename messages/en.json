@@ -60,6 +60,26 @@
     "linkedin": "LinkedIn",
     "rightsReserved": "© {year} Advertising Analytics Dashboard. All rights reserved."
   },
+  "About": {
+    "pageTitle": "ABOUT ADVERTISING ANALYTICS DASHBOARD",
+    "introText": "At Advertising Analytics Dashboard, our mission is to simplify the way businesses manage and optimize their advertising campaigns. Whether you're a small business owner or part of a large enterprise, we provide the tools you need to track performance, gain insights, and maximize the impact of your marketing strategies.",
+    "whatWeDoTitle": "What We Do:",
+    "unifiedAnalyticsTitle": "Unified Analytics",
+    "unifiedAnalyticsText": "Consolidate data from multiple ad platforms in one place.",
+    "realTimeInsightsTitle": "Real-Time Insights",
+    "realTimeInsightsText": "Access up-to-date metrics to make informed decisions.",
+    "scalableSolutionsTitle": "Scalable Solutions",
+    "scalableSolutionsText": "Designed to grow with your business and adapt to your needs.",
+    "whyChooseUsTitle": "Why Choose Us?",
+    "whyChooseUsText": "With Advertising Analytics Dashboard, you can:",
+    "chooseUsPoint1": "Save time by managing all your campaigns from a single interface.",
+    "chooseUsPoint2": "Gain a competitive edge with actionable insights.",
+    "chooseUsPoint3": "Focus on growth while we handle the data.",
+    "ourVisionTitle": "Our Vision",
+    "ourVisionText": "We aim to empower businesses with advanced analytics and intuitive tools that unlock the full potential of their advertising efforts. By bridging technology and marketing, we help you reach new heights.",
+    "contactUs": "Contact Us",
+    "exploreServices": "Explore Services"
+  },
   "SignInButton": {
     "viewYourQueries": "View your Queries",
     "signIn": "Sign In",

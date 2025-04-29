@@ -60,6 +60,26 @@
     "linkedin": "LinkedIn",
     "rightsReserved": "© {year} Tableau de bord d'analyse publicitaire. Tous droits réservés."
   },
+  "About": {
+    "pageTitle": "À PROPOS DU TABLEAU DE BORD D'ANALYSE PUBLICITAIRE",
+    "introText": "Au Tableau de Bord d'Analyse Publicitaire, notre mission est de simplifier la façon dont les entreprises gèrent et optimisent leurs campagnes publicitaires. Que vous soyez propriétaire d'une petite entreprise ou membre d'une grande organisation, nous fournissons les outils nécessaires pour suivre les performances, obtenir des informations et maximiser l'impact de vos stratégies marketing.",
+    "whatWeDoTitle": "Ce Que Nous Faisons :",
+    "unifiedAnalyticsTitle": "Analyses Unifiées",
+    "unifiedAnalyticsText": "Consolidez les données de plusieurs plateformes publicitaires en un seul endroit.",
+    "realTimeInsightsTitle": "Informations en Temps Réel",
+    "realTimeInsightsText": "Accédez à des métriques actualisées pour prendre des décisions éclairées.",
+    "scalableSolutionsTitle": "Solutions Évolutives",
+    "scalableSolutionsText": "Conçues pour évoluer avec votre entreprise et s'adapter à vos besoins.",
+    "whyChooseUsTitle": "Pourquoi Nous Choisir ?",
+    "whyChooseUsText": "Avec le Tableau de Bord d'Analyse Publicitaire, vous pouvez :",
+    "chooseUsPoint1": "Gagner du temps en gérant toutes vos campagnes depuis une seule interface.",
+    "chooseUsPoint2": "Obtenir un avantage concurrentiel grâce à des informations exploitables.",
+    "chooseUsPoint3": "Vous concentrer sur la croissance pendant que nous gérons les données.",
+    "ourVisionTitle": "Notre Vision",
+    "ourVisionText": "Nous visons à donner aux entreprises les moyens d'utiliser des analyses avancées et des outils intuitifs qui libèrent tout le potentiel de leurs efforts publicitaires. En reliant la technologie et le marketing, nous vous aidons à atteindre de nouveaux sommets.",
+    "contactUs": "Contactez-Nous",
+    "exploreServices": "Explorer les Services"
+  },
   "SignInButton": {
     "viewYourQueries": "Voir vos requêtes",
     "signIn": "Se connecter",
