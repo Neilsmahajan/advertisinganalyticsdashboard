@@ -247,6 +247,17 @@
     "createNewQuery": "Créer une nouvelle requête",
     "loadingQueries": "Chargement de vos requêtes sauvegardées..."
   },
+  "DashboardSidebar": {
+    "logoAlt": "Logo du tableau de bord d'analyse publicitaire",
+    "logoText": "Tableau de bord d'analyse publicitaire",
+    "routeDashboard": "Tableau de bord",
+    "routeTrackingData": "Données de suivi",
+    "routeGoogleAnalytics": "Google Analytics",
+    "routeGoogleAds": "Google Ads",
+    "routeMetaAds": "Meta Ads",
+    "routeMicrosoftAds": "Microsoft Ads",
+    "toggleSidebar": "Basculer la barre latérale"
+  },
   "TrackingDataPage": {
     "title": "Données de suivi",
     "description": "Entrez l'URL de votre site web pour identifier toutes les balises de suivi et les services d'analyse sur votre site."
