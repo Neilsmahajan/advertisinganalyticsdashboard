@@ -66,7 +66,7 @@ async function isManagerAccount(
       return isManager;
     }
     return false;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(
       `[google-ads/analyze] Error checking manager status: ${JSON.stringify(
         error,
@@ -74,9 +74,10 @@ async function isManagerAccount(
     );
     // If we get "not found" error, it might be a client account needing a manager login
     if (
-      error.message?.includes("not found") ||
-      error.message?.includes("permission") ||
-      error.message?.includes("access")
+      error instanceof Error &&
+      (error.message?.includes("not found") ||
+        error.message?.includes("permission") ||
+        error.message?.includes("access"))
     ) {
       console.log(
         "[google-ads/analyze] This appears to be a client account that needs manager credentials",
