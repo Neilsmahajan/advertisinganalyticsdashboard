@@ -583,6 +583,48 @@ export default function GoogleAdsQueries() {
               <AlertTitle>Error analyzing Google Ads data</AlertTitle>
               <AlertDescription>
                 {analysisError}
+
+                {/* Special handling for Manager Account error */}
+                {analysisError.includes("Manager Account Detected") && (
+                  <div className="mt-2 p-3 bg-rose-100 border border-rose-300 rounded-md">
+                    <p className="font-semibold">What happened:</p>
+                    <p className="mt-1">
+                      The Customer ID you entered is for a Google Ads Manager
+                      Account. Manager accounts are used to oversee multiple
+                      client accounts but don't contain campaign metrics
+                      directly.
+                    </p>
+
+                    <p className="font-semibold mt-3">What to do instead:</p>
+                    <ol className="list-decimal list-inside mt-1">
+                      <li>Log in to your Google Ads Manager Account</li>
+                      <li>From the top right, click your account menu</li>
+                      <li>
+                        Select "Switch accounts" to see your list of client
+                        accounts
+                      </li>
+                      <li>
+                        Use one of those client account Customer IDs instead
+                      </li>
+                    </ol>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-3 bg-white"
+                      onClick={() =>
+                        window.open(
+                          "https://ads.google.com/aw/overview",
+                          "_blank",
+                        )
+                      }
+                    >
+                      Open Google Ads Manager{" "}
+                      <ExternalLink className="ml-1 h-3 w-3" />
+                    </Button>
+                  </div>
+                )}
+
                 {analysisError.includes(
                   "not associated with any Ads accounts",
                 ) && (
