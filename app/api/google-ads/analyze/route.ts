@@ -31,6 +31,49 @@ async function discoverManagerAccounts(client: any, refreshToken: string) {
   }
 }
 
+// New helper function to check if an account is a manager account
+async function isManagerAccount(
+  client: any,
+  refreshToken: string,
+  customerId: string,
+) {
+  try {
+    console.log(
+      `[google-ads/analyze] Checking if ${customerId} is a manager account`,
+    );
+
+    // Use a safe query that works on manager accounts - just getting the name
+    const customer = client.Customer({
+      customer_id: customerId,
+      refresh_token: refreshToken,
+    });
+
+    const query = `
+      SELECT customer.id, customer.manager, customer.descriptive_name
+      FROM customer
+      WHERE customer.id = ${customerId}
+    `;
+
+    const response = await customer.query(query);
+    if (response && response.length > 0) {
+      // Check if the account is a manager account
+      const isManager = response[0].customer?.manager === true;
+      console.log(
+        `[google-ads/analyze] Account ${customerId} is ${
+          isManager ? "a manager account" : "a client account"
+        }`,
+      );
+      return isManager;
+    }
+    return false;
+  } catch (error) {
+    console.error(
+      `[google-ads/analyze] Error checking manager status: ${error}`,
+    );
+    return false; // Assume not a manager account if we can't determine
+  }
+}
+
 export async function POST(request: NextRequest) {
   console.log("[google-ads/analyze] Starting analysis request");
   try {
@@ -134,7 +177,23 @@ export async function POST(request: NextRequest) {
       `[google-ads/analyze] Setting up customer with ID: ${customerId}`,
     );
 
-    // Initial query attempt with direct customer setup
+    // Check if the account is a manager account before attempting queries
+    const isManager = await isManagerAccount(client, refreshToken, customerId);
+    if (isManager) {
+      console.error(
+        `[google-ads/analyze] ${customerId} is a manager account - cannot query metrics directly`,
+      );
+      return NextResponse.json(
+        {
+          error: "Manager Account Detected",
+          details:
+            "You've entered a Google Ads Manager Account ID. Manager accounts don't contain campaign metrics directly. Please use one of the client account IDs managed by this account instead.",
+        },
+        { status: 400 },
+      );
+    }
+
+    // Initial query to get campaign metrics
     const query = `
       SELECT
         campaign.id,
@@ -150,7 +209,7 @@ export async function POST(request: NextRequest) {
     `;
 
     try {
-      // First attempt: direct access to customer
+      // First attempt: direct customer access
       console.log("[google-ads/analyze] Attempting direct customer access");
       const customer = client.Customer({
         customer_id: customerId,
@@ -193,7 +252,7 @@ export async function POST(request: NextRequest) {
               );
               const customer = client.Customer({
                 customer_id: customerId,
-                login_customer_id: managerId,
+                login_customer_id: managerId, // Use the manager account ID as the login ID
                 refresh_token: refreshToken,
               });
 
@@ -212,6 +271,29 @@ export async function POST(request: NextRequest) {
               // Continue to next manager account
             }
           }
+
+          // If we've tried all manager accounts and still failed
+          console.error(
+            "[google-ads/analyze] All manager access attempts failed",
+          );
+          return NextResponse.json(
+            {
+              error: "Access Denied",
+              details:
+                "You don't have permission to access this client account. If this is a client account under a manager, make sure your Google account has the proper access permissions.",
+            },
+            { status: 403 },
+          );
+        } else {
+          console.error("[google-ads/analyze] No manager accounts found");
+          return NextResponse.json(
+            {
+              error: "No Manager Accounts Found",
+              details:
+                "Your Google account doesn't have access to any manager accounts that could provide access to this client account.",
+            },
+            { status: 403 },
+          );
         }
 
         // If we get here, we've tried direct access and all manager accounts without success
@@ -320,6 +402,14 @@ export async function POST(request: NextRequest) {
         statusCode = 403;
         errorMessage =
           "The Google account that generated the OAuth access tokens is not associated with any Ads accounts. Create a new Ads account, or add your Google account to an existing Ads account.";
+      } else if (
+        apiError.message?.includes(
+          "Metrics cannot be requested for a manager account",
+        )
+      ) {
+        statusCode = 400;
+        errorMessage =
+          "You've entered a Google Ads Manager Account ID. Manager accounts don't contain campaign metrics directly. Please use one of the client account IDs managed by this account instead.";
       }
 
       return NextResponse.json(
