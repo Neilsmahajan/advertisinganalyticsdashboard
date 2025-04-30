@@ -31,7 +31,7 @@ async function discoverManagerAccounts(client: any, refreshToken: string) {
   }
 }
 
-// New helper function to check if an account is a manager account
+// Modified helper function to check if an account is a manager account with better error handling
 async function isManagerAccount(
   client: any,
   refreshToken: string,
@@ -68,82 +68,137 @@ async function isManagerAccount(
     return false;
   } catch (error) {
     console.error(
-      `[google-ads/analyze] Error checking manager status: ${error}`,
+      `[google-ads/analyze] Error checking manager status: ${JSON.stringify(
+        error,
+      )}`,
     );
+    // If we get "not found" error, it might be a client account needing a manager login
+    if (
+      error.message?.includes("not found") ||
+      error.message?.includes("permission") ||
+      error.message?.includes("access")
+    ) {
+      console.log(
+        "[google-ads/analyze] This appears to be a client account that needs manager credentials",
+      );
+      return false; // Not a manager, but a client account
+    }
     return false; // Assume not a manager account if we can't determine
   }
 }
 
-// New function to find relationships between managers and clients
-async function findManagerClientRelationships(
+// Known client-manager relationships to avoid expensive lookups
+// This could also be stored in a database for dynamically growing relationships
+const KNOWN_CLIENT_MANAGERS: Record<string, string> = {
+  // Format: "clientId": "managerId"
+  "9252611272": "9288644403", // Evos Boutiques is under Vloe Manager
+};
+
+// Direct access function to fetch client data using appropriate credentials
+async function executeQueryWithBestCredentials(
   client: any,
   refreshToken: string,
+  customerId: string,
+  query: string,
 ) {
+  console.log(
+    `[google-ads/analyze] Trying to execute query for customer: ${customerId}`,
+  );
+
+  // Check if this is a known client with a known manager
+  const knownManagerId = KNOWN_CLIENT_MANAGERS[customerId];
+
+  if (knownManagerId) {
+    try {
+      console.log(
+        `[google-ads/analyze] Using known manager relationship: client ${customerId} under manager ${knownManagerId}`,
+      );
+      const customer = client.Customer({
+        customer_id: customerId,
+        login_customer_id: knownManagerId,
+        refresh_token: refreshToken,
+      });
+
+      console.log(
+        `[google-ads/analyze] Executing query with known manager login_customer_id: ${knownManagerId}`,
+      );
+      const response = await customer.query(query);
+      console.log(
+        `[google-ads/analyze] Query successful using known manager relationship`,
+      );
+      return response;
+    } catch (error) {
+      console.error(
+        `[google-ads/analyze] Failed with known manager relationship:`,
+        error,
+      );
+      // Fall through to other methods if this fails
+    }
+  }
+
+  // Try direct access
   try {
-    console.log("[google-ads/analyze] Finding manager-client relationships");
-    // Get all accessible accounts first
-    const accessibleCustomers =
-      await client.listAccessibleCustomers(refreshToken);
-    const customerIds = accessibleCustomers.resource_names
-      .map((name: string) => name.split("/")[1])
-      .filter((id: string) => id);
+    console.log(
+      `[google-ads/analyze] Trying direct access for customer ${customerId}`,
+    );
+    const customer = client.Customer({
+      customer_id: customerId,
+      refresh_token: refreshToken,
+    });
 
-    // Find which ones are managers
-    const managerIds: string[] = [];
-    const relationships: Record<string, string[]> = {};
+    const response = await customer.query(query);
+    console.log(
+      `[google-ads/analyze] Direct access successful for customer ${customerId}`,
+    );
+    return response;
+  } catch (directError) {
+    console.error(`[google-ads/analyze] Direct access failed:`, directError);
 
-    for (const id of customerIds) {
-      try {
-        const customer = client.Customer({
-          customer_id: id,
-          refresh_token: refreshToken,
-        });
+    // If direct access fails, try to discover manager accounts and use them
+    try {
+      console.log(`[google-ads/analyze] Attempting to find a manager account`);
+      const managerIds = await discoverManagerAccounts(client, refreshToken);
 
-        // Try to query customer client links to see if this is a manager
-        const query = `
-          SELECT
-            customer_client_link.client_customer,
-            customer_client_link.manager_link_id
-          FROM
-            customer_client_link
-        `;
+      if (managerIds.length > 0) {
+        // Try each manager account until one works
+        for (const managerId of managerIds) {
+          try {
+            console.log(
+              `[google-ads/analyze] Trying with login_customer_id: ${managerId}`,
+            );
+            const customer = client.Customer({
+              customer_id: customerId,
+              login_customer_id: managerId,
+              refresh_token: refreshToken,
+            });
 
-        const response = await customer.query(query);
+            const response = await customer.query(query);
 
-        if (response && response.length > 0) {
-          managerIds.push(id);
+            // If successful, store this relationship for future use (could save to database)
+            console.log(
+              `[google-ads/analyze] Found working manager ${managerId} for client ${customerId}`,
+            );
+            KNOWN_CLIENT_MANAGERS[customerId] = managerId;
 
-          // Map the manager to its clients
-          interface CustomerClientLink {
-            client_customer: string;
-            manager_link_id: string;
+            return response;
+          } catch (managerError) {
+            console.error(
+              `[google-ads/analyze] Manager ${managerId} access failed:`,
+              managerError,
+            );
+            // Continue to next manager
           }
-
-          interface CustomerClientLinkResponse {
-            customer_client_link?: CustomerClientLink;
-          }
-
-          relationships[id] = response.map((link: CustomerClientLinkResponse) =>
-            link.customer_client_link?.client_customer.split("/").pop(),
-          );
-
-          console.log(
-            `[google-ads/analyze] Found manager ${id} with ${response.length} clients`,
-          );
         }
-      } catch (error) {
-        // Skip errors - this account might not be a manager
-        continue;
       }
+    } catch (discoveryError) {
+      console.error(
+        `[google-ads/analyze] Manager discovery failed:`,
+        discoveryError,
+      );
     }
 
-    return { managerIds, relationships };
-  } catch (error) {
-    console.error(
-      "[google-ads/analyze] Error finding manager-client relationships:",
-      error,
-    );
-    return { managerIds: [], relationships: {} };
+    // If all attempts fail, throw the original error
+    throw directError;
   }
 }
 
@@ -250,44 +305,31 @@ export async function POST(request: NextRequest) {
       `[google-ads/analyze] Setting up customer with ID: ${customerId}`,
     );
 
-    // Check if the account is a manager account before attempting queries
-    const isManager = await isManagerAccount(client, refreshToken, customerId);
-    if (isManager) {
-      console.error(
-        `[google-ads/analyze] ${customerId} is a manager account - cannot query metrics directly`,
+    // First, check if this is a manager account - this is fast and should complete
+    try {
+      const isManager = await isManagerAccount(
+        client,
+        refreshToken,
+        customerId,
       );
-      return NextResponse.json(
-        {
-          error: "Manager Account Detected",
-          details:
-            "You've entered a Google Ads Manager Account ID. Manager accounts don't contain campaign metrics directly. Please use one of the client account IDs managed by this account instead.",
-        },
-        { status: 400 },
-      );
-    }
-
-    // Find manager accounts and their relationships with clients
-    const { managerIds, relationships } = await findManagerClientRelationships(
-      client,
-      refreshToken,
-    );
-    console.log(
-      `[google-ads/analyze] Found ${managerIds.length} manager accounts`,
-    );
-
-    // Determine which manager account manages this client (if any)
-    let managerIdForClient = null;
-    for (const managerId of managerIds) {
-      if (
-        relationships[managerId] &&
-        relationships[managerId].includes(customerId)
-      ) {
-        managerIdForClient = managerId;
-        console.log(
-          `[google-ads/analyze] Found manager ${managerId} for client ${customerId}`,
+      if (isManager) {
+        console.error(
+          `[google-ads/analyze] ${customerId} is a manager account - cannot query metrics directly`,
         );
-        break;
+        return NextResponse.json(
+          {
+            error: "Manager Account Detected",
+            details:
+              "You've entered a Google Ads Manager Account ID. Manager accounts don't contain campaign metrics directly. Please use one of the client account IDs managed by this account instead.",
+          },
+          { status: 400 },
+        );
       }
+    } catch (error) {
+      // If checking manager status fails, continue as we'll try all access methods
+      console.log(
+        "[google-ads/analyze] Error checking manager status, continuing with query process",
+      );
     }
 
     // Initial query to get campaign metrics
@@ -306,130 +348,18 @@ export async function POST(request: NextRequest) {
     `;
 
     try {
-      // If we found a specific manager for this client, try that first
-      if (managerIdForClient) {
-        console.log(
-          `[google-ads/analyze] Attempting access via known manager account: ${managerIdForClient}`,
-        );
-        try {
-          const customer = client.Customer({
-            customer_id: customerId,
-            login_customer_id: managerIdForClient,
-            refresh_token: refreshToken,
-          });
-
-          console.log(
-            `[google-ads/analyze] Executing query with login_customer_id: ${query}`,
-          );
-          const queryResponse = await customer.query(query);
-          console.log(
-            "[google-ads/analyze] Query successful using specific manager account",
-          );
-
-          return processResults(queryResponse);
-        } catch (error) {
-          console.error(
-            `[google-ads/analyze] Access via known manager failed:`,
-            error,
-          );
-          // Continue to try direct access
-        }
-      }
-
-      // Try direct access next
-      console.log("[google-ads/analyze] Attempting direct customer access");
-      const customer = client.Customer({
-        customer_id: customerId,
-        refresh_token: refreshToken,
-      });
-
-      console.log(`[google-ads/analyze] Executing query: ${query}`);
-      const queryResponse = await customer.query(query);
-
-      // If we get here, direct access worked - process results normally
-      return processResults(queryResponse);
-    } catch (directAccessError: any) {
-      console.error(
-        "[google-ads/analyze] Direct access failed:",
-        directAccessError,
+      // Our new optimized function to try all access methods efficiently
+      const queryResponse = await executeQueryWithBestCredentials(
+        client,
+        refreshToken,
+        customerId,
+        query,
       );
 
-      // If this looks like a permission issue or account not found, try using manager accounts
-      if (
-        directAccessError.message?.includes("permission") ||
-        directAccessError.message?.includes("access") ||
-        directAccessError.message?.includes("not found")
-      ) {
-        // Discover potential manager accounts if we didn't already
-        const allManagerIds =
-          managerIds.length > 0
-            ? managerIds
-            : await discoverManagerAccounts(client, refreshToken);
-
-        if (allManagerIds.length > 0) {
-          console.log(
-            `[google-ads/analyze] Attempting access through ${allManagerIds.length} manager accounts`,
-          );
-
-          // Try each manager account
-          for (const managerId of allManagerIds) {
-            try {
-              console.log(
-                `[google-ads/analyze] Trying with login_customer_id: ${managerId}`,
-              );
-              const customer = client.Customer({
-                customer_id: customerId,
-                login_customer_id: managerId, // Use the manager account ID as the login ID
-                refresh_token: refreshToken,
-              });
-
-              const queryResponse = await customer.query(query);
-              console.log(
-                "[google-ads/analyze] Query successful using manager account",
-              );
-
-              // If successful, process results
-              return processResults(queryResponse);
-            } catch (managerError) {
-              console.error(
-                `[google-ads/analyze] Manager access failed for ${managerId}:`,
-                managerError,
-              );
-              // Continue to next manager account
-            }
-          }
-
-          // If we've tried all manager accounts and still failed
-          console.error(
-            "[google-ads/analyze] All manager access attempts failed",
-          );
-          return NextResponse.json(
-            {
-              error: "Access Denied",
-              details:
-                "You don't have permission to access this client account. If this is a client account under a manager, make sure your Google account has the proper access permissions.",
-            },
-            { status: 403 },
-          );
-        } else {
-          console.error("[google-ads/analyze] No manager accounts found");
-          return NextResponse.json(
-            {
-              error: "No Manager Accounts Found",
-              details:
-                "Your Google account doesn't have access to any manager accounts that could provide access to this client account.",
-            },
-            { status: 403 },
-          );
-        }
-
-        // If we get here, we've tried direct access and all manager accounts without success
-        console.error("[google-ads/analyze] All access attempts failed");
-        return handleApiError(directAccessError);
-      } else {
-        // For other errors, just forward to error handler
-        return handleApiError(directAccessError);
-      }
+      return processResults(queryResponse);
+    } catch (error) {
+      console.error("[google-ads/analyze] All access attempts failed:", error);
+      return handleApiError(error);
     }
 
     // Helper function to process successful query results
