@@ -2,13 +2,65 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoogleAdsApi } from "google-ads-api";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { Redis } from "@upstash/redis";
+
+// Create Redis client if credentials are available
+let redis: Redis | null = null;
+if (
+  process.env.UPSTASH_REDIS_REST_URL &&
+  process.env.UPSTASH_REDIS_REST_TOKEN
+) {
+  redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  });
+}
+
+// Helper function to add timeout to a promise
+const withTimeout = (
+  promise: Promise<any>,
+  ms: number,
+  errorMessage: string,
+) => {
+  const timeout = new Promise<never>((_, reject) => {
+    const id = setTimeout(() => {
+      clearTimeout(id);
+      reject(new Error(`Timeout after ${ms}ms: ${errorMessage}`));
+    }, ms);
+  });
+
+  return Promise.race([promise, timeout]);
+};
 
 // Helper function to discover manager account IDs for a refresh token
 async function discoverManagerAccounts(client: any, refreshToken: string) {
   try {
     console.log("[google-ads/analyze] Attempting to discover manager accounts");
-    const accessibleCustomers =
-      await client.listAccessibleCustomers(refreshToken);
+
+    // Check redis cache for known manager accounts
+    if (redis) {
+      try {
+        const cachedManagers = await redis.get(
+          "google-ads:manager-accounts:" + refreshToken.slice(-8),
+        );
+        if (cachedManagers && Array.isArray(cachedManagers)) {
+          console.log(
+            `[google-ads/analyze] Using ${cachedManagers.length} cached manager accounts`,
+          );
+          return cachedManagers;
+        }
+      } catch (e) {
+        console.error("[google-ads/analyze] Redis error:", e);
+        // Continue without cache if Redis fails
+      }
+    }
+
+    // Set a timeout for the API call to prevent hanging
+    const accessibleCustomers = await withTimeout(
+      client.listAccessibleCustomers(refreshToken),
+      8000, // 8 second timeout for this specific operation
+      "Manager account discovery took too long",
+    );
 
     // Filter for likely manager accounts (typically have larger IDs and manage other accounts)
     // This is a heuristic - in a real implementation you might want a more sophisticated approach
@@ -21,6 +73,20 @@ async function discoverManagerAccounts(client: any, refreshToken: string) {
         managerIds.length
       } potential manager accounts: ${managerIds.join(", ")}`,
     );
+
+    // Cache the result for future use
+    if (redis) {
+      try {
+        await redis.set(
+          "google-ads:manager-accounts:" + refreshToken.slice(-8),
+          managerIds,
+          { ex: 86400 }, // Cache for 24 hours
+        );
+      } catch (e) {
+        console.error("[google-ads/analyze] Redis cache error:", e);
+      }
+    }
+
     return managerIds;
   } catch (error) {
     console.error(
@@ -54,7 +120,12 @@ async function isManagerAccount(
       WHERE customer.id = ${customerId}
     `;
 
-    const response = await customer.query(query);
+    const response = await withTimeout(
+      customer.query(query),
+      5000, // 5 second timeout
+      `Manager status check for ${customerId} took too long`,
+    );
+
     if (response && response.length > 0) {
       // Check if the account is a manager account
       const isManager = response[0].customer?.manager === true;
@@ -93,6 +164,7 @@ async function isManagerAccount(
 const KNOWN_CLIENT_MANAGERS: Record<string, string> = {
   // Format: "clientId": "managerId"
   "9252611272": "9288644403", // Evos Boutiques is under Vloe Manager
+  "2915525598": "9288644403", // Adding the new client account under the same manager
 };
 
 // Direct access function to fetch client data using appropriate credentials
@@ -105,6 +177,44 @@ async function executeQueryWithBestCredentials(
   console.log(
     `[google-ads/analyze] Trying to execute query for customer: ${customerId}`,
   );
+
+  // First, check Redis cache for any previously discovered manager for this client
+  if (redis) {
+    try {
+      const cachedManagerId = await redis.get(
+        `google-ads:client-manager:${customerId}`,
+      );
+      if (cachedManagerId && typeof cachedManagerId === "string") {
+        console.log(
+          `[google-ads/analyze] Using cached manager ${cachedManagerId} for client ${customerId}`,
+        );
+        try {
+          const customer = client.Customer({
+            customer_id: customerId,
+            login_customer_id: cachedManagerId,
+            refresh_token: refreshToken,
+          });
+
+          const response = await customer.query(query);
+          console.log(
+            `[google-ads/analyze] Query successful using cached manager relationship`,
+          );
+          return response;
+        } catch (error) {
+          console.error(
+            `[google-ads/analyze] Cached manager relationship failed:`,
+            error,
+          );
+          // Remove the failed cached relationship
+          await redis.del(`google-ads:client-manager:${customerId}`);
+          // Continue to other methods
+        }
+      }
+    } catch (e) {
+      console.error("[google-ads/analyze] Redis error:", e);
+      // Continue without cache if Redis fails
+    }
+  }
 
   // Check if this is a known client with a known manager
   const knownManagerId = KNOWN_CLIENT_MANAGERS[customerId];
@@ -127,6 +237,20 @@ async function executeQueryWithBestCredentials(
       console.log(
         `[google-ads/analyze] Query successful using known manager relationship`,
       );
+
+      // Cache this manager relationship for future use
+      if (redis) {
+        try {
+          await redis.set(
+            `google-ads:client-manager:${customerId}`,
+            knownManagerId,
+            { ex: 2592000 },
+          ); // Cache for 30 days
+        } catch (e) {
+          console.error("[google-ads/analyze] Redis cache error:", e);
+        }
+      }
+
       return response;
     } catch (error) {
       console.error(
@@ -156,12 +280,22 @@ async function executeQueryWithBestCredentials(
     console.error(`[google-ads/analyze] Direct access failed:`, directError);
 
     // If direct access fails, try to discover manager accounts and use them
+    // First check if we have cached manager accounts
+    let managerIds: string[] = [];
+
+    // Try to find appropriate manager account with a timeout
     try {
       console.log(`[google-ads/analyze] Attempting to find a manager account`);
-      const managerIds = await discoverManagerAccounts(client, refreshToken);
+
+      // Get list of manager accounts with timeout protection
+      managerIds = await withTimeout(
+        discoverManagerAccounts(client, refreshToken),
+        10000, // 10 second timeout
+        "Manager account discovery took too long",
+      );
 
       if (managerIds.length > 0) {
-        // Try each manager account until one works
+        // Try each manager account until one works (with a faster timeout per attempt)
         for (const managerId of managerIds) {
           try {
             console.log(
@@ -173,13 +307,33 @@ async function executeQueryWithBestCredentials(
               refresh_token: refreshToken,
             });
 
-            const response = await customer.query(query);
+            // Set a timeout for the query attempt
+            const response = await withTimeout(
+              customer.query(query),
+              5000, // 5 second timeout per manager attempt
+              `Query with manager ${managerId} took too long`,
+            );
 
-            // If successful, store this relationship for future use (could save to database)
+            // If successful, store this relationship for future use
             console.log(
               `[google-ads/analyze] Found working manager ${managerId} for client ${customerId}`,
             );
+
+            // Update in-memory mapping
             KNOWN_CLIENT_MANAGERS[customerId] = managerId;
+
+            // Cache this manager relationship
+            if (redis) {
+              try {
+                await redis.set(
+                  `google-ads:client-manager:${customerId}`,
+                  managerId,
+                  { ex: 2592000 },
+                ); // Cache for 30 days
+              } catch (e) {
+                console.error("[google-ads/analyze] Redis cache error:", e);
+              }
+            }
 
             return response;
           } catch (managerError) {
@@ -202,6 +356,10 @@ async function executeQueryWithBestCredentials(
     throw directError;
   }
 }
+
+// Set Node.js runtime and max duration
+export const runtime = "nodejs";
+export const maxDuration = 30;
 
 export async function POST(request: NextRequest) {
   console.log("[google-ads/analyze] Starting analysis request");
