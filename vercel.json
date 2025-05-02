@@ -10,7 +10,7 @@
       "maxDuration": 30
     },
     "app/api/google-ads/analyze/route.ts": {
-      "maxDuration": 50
+      "maxDuration": 60
     }
   }
 }

@@ -97,6 +97,88 @@ async function discoverManagerAccounts(client: any, refreshToken: string) {
   }
 }
 
+// New function to get client accounts under a specific manager
+async function getClientAccountsForManager(
+  client: any,
+  refreshToken: string,
+  managerId: string,
+) {
+  try {
+    console.log(
+      `[google-ads/analyze] Getting client accounts for manager ${managerId}`,
+    );
+
+    // Check cache first
+    if (redis) {
+      try {
+        const cacheKey = `google-ads:manager-clients:${managerId}`;
+        const cachedClients = await redis.get(cacheKey);
+        if (cachedClients && Array.isArray(cachedClients)) {
+          console.log(
+            `[google-ads/analyze] Using ${cachedClients.length} cached client accounts for manager ${managerId}`,
+          );
+          return cachedClients;
+        }
+      } catch (e) {
+        console.error("[google-ads/analyze] Redis error:", e);
+      }
+    }
+
+    // Use GAQL query to get customer client information
+    const customer = client.Customer({
+      customer_id: managerId,
+      refresh_token: refreshToken,
+    });
+
+    // This query gets all direct child accounts (level = 1)
+    const query = `
+      SELECT
+        customer_client.client_customer,
+        customer_client.level,
+        customer_client.manager,
+        customer_client.descriptive_name,
+        customer_client.id
+      FROM customer_client
+      WHERE customer_client.level = 1
+    `;
+
+    // Set a timeout for this operation
+    const response = await withTimeout(
+      customer.query(query),
+      10000, // 10 second timeout
+      `Getting clients for manager ${managerId} took too long`,
+    );
+
+    // Extract client IDs from the response
+    const clientIds = response
+      .filter((row: any) => row.customer_client?.id)
+      .map((row: any) => row.customer_client.id.toString());
+
+    console.log(
+      `[google-ads/analyze] Found ${clientIds.length} client accounts under manager ${managerId}`,
+    );
+
+    // Cache the client list
+    if (redis && clientIds.length > 0) {
+      try {
+        await redis.set(`google-ads:manager-clients:${managerId}`, clientIds, {
+          ex: 86400, // Cache for 24 hours
+        });
+      } catch (e) {
+        console.error("[google-ads/analyze] Redis cache error:", e);
+      }
+    }
+
+    return clientIds;
+  } catch (error) {
+    console.error(
+      `[google-ads/analyze] Error getting clients for manager ${managerId}:`,
+      error,
+    );
+    return [];
+  }
+}
+
 // Modified helper function to check if an account is a manager account with better error handling
 async function isManagerAccount(
   client: any,
@@ -163,9 +245,16 @@ async function isManagerAccount(
 // This could also be stored in a database for dynamically growing relationships
 const KNOWN_CLIENT_MANAGERS: Record<string, string> = {
   // Format: "clientId": "managerId"
+  // Vloe Manager clients
   "9252611272": "9288644403", // Evos Boutiques is under Vloe Manager
-  "2915525598": "9288644403", // Adding the new client account under the same manager
+  "2915525598": "9288644403", // Another client under Vloe Manager
+  "6062950441": "9288644403", // Adding your new client account under the same manager
+  // You can add more known relationships here as they're discovered
 };
+
+// Vloe Manager special optimization - all Vloe Manager's clients
+// If we see a permission error for an unknown client, we'll try this manager first
+const VLOE_MANAGER_ID = "9288644403";
 
 // Direct access function to fetch client data using appropriate credentials
 async function executeQueryWithBestCredentials(
@@ -276,11 +365,74 @@ async function executeQueryWithBestCredentials(
       `[google-ads/analyze] Direct access successful for customer ${customerId}`,
     );
     return response;
-  } catch (directError) {
+  } catch (directError: any) {
     console.error(`[google-ads/analyze] Direct access failed:`, directError);
 
-    // If direct access fails, try to discover manager accounts and use them
-    // First check if we have cached manager accounts
+    // Check if the error indicates a permission issue requiring a manager login_customer_id
+    const isPermissionError =
+      directError.message?.includes("User doesn't have permission") ||
+      directError.message?.includes("login-customer-id") ||
+      (directError.errors &&
+        directError.errors.some(
+          (e: any) =>
+            e.error_code?.authorization_error === "USER_PERMISSION_DENIED" ||
+            e.message?.includes("login-customer-id"),
+        ));
+
+    if (isPermissionError) {
+      // Permission error - this is likely a client account under a manager
+      console.log(
+        "[google-ads/analyze] Permission error detected - trying special optimizations",
+      );
+
+      // Special optimization for Vloe Manager accounts - try Vloe Manager first
+      try {
+        console.log(
+          `[google-ads/analyze] Trying Vloe Manager (${VLOE_MANAGER_ID}) as a shortcut`,
+        );
+        const customer = client.Customer({
+          customer_id: customerId,
+          login_customer_id: VLOE_MANAGER_ID,
+          refresh_token: refreshToken,
+        });
+
+        const response = await withTimeout(
+          customer.query(query),
+          8000, // 8 second timeout
+          `Query with Vloe Manager for ${customerId} took too long`,
+        );
+
+        console.log(
+          `[google-ads/analyze] Vloe Manager shortcut successful for ${customerId}`,
+        );
+
+        // Cache this relationship
+        if (redis) {
+          try {
+            await redis.set(
+              `google-ads:client-manager:${customerId}`,
+              VLOE_MANAGER_ID,
+              {
+                ex: 2592000, // Cache for 30 days
+              },
+            );
+
+            // Also update in-memory mapping for future use in this session
+            KNOWN_CLIENT_MANAGERS[customerId] = VLOE_MANAGER_ID;
+          } catch (e) {
+            console.error("[google-ads/analyze] Redis cache error:", e);
+          }
+        }
+
+        return response;
+      } catch (vloeError) {
+        console.log(
+          "[google-ads/analyze] Vloe Manager shortcut didn't work, continuing with discovery",
+        );
+      }
+    }
+
+    // If direct access fails or Vloe shortcut doesn't work, try to discover manager accounts and use them
     let managerIds: string[] = [];
 
     // Try to find appropriate manager account with a timeout
@@ -301,41 +453,63 @@ async function executeQueryWithBestCredentials(
             console.log(
               `[google-ads/analyze] Trying with login_customer_id: ${managerId}`,
             );
-            const customer = client.Customer({
-              customer_id: customerId,
-              login_customer_id: managerId,
-              refresh_token: refreshToken,
-            });
 
-            // Set a timeout for the query attempt
-            const response = await withTimeout(
-              customer.query(query),
-              5000, // 5 second timeout per manager attempt
-              `Query with manager ${managerId} took too long`,
+            // First, check if we already know client accounts for this manager
+            let isClientOfThisManager = false;
+
+            // Get client accounts for this manager
+            const managerClients = await getClientAccountsForManager(
+              client,
+              refreshToken,
+              managerId,
             );
 
-            // If successful, store this relationship for future use
-            console.log(
-              `[google-ads/analyze] Found working manager ${managerId} for client ${customerId}`,
-            );
-
-            // Update in-memory mapping
-            KNOWN_CLIENT_MANAGERS[customerId] = managerId;
-
-            // Cache this manager relationship
-            if (redis) {
-              try {
-                await redis.set(
-                  `google-ads:client-manager:${customerId}`,
-                  managerId,
-                  { ex: 2592000 },
-                ); // Cache for 30 days
-              } catch (e) {
-                console.error("[google-ads/analyze] Redis cache error:", e);
-              }
+            // Check if the client is in this manager's client list
+            if (managerClients.includes(customerId)) {
+              isClientOfThisManager = true;
+              console.log(
+                `[google-ads/analyze] Discovered ${customerId} is a client of manager ${managerId}`,
+              );
             }
 
-            return response;
+            // If we confirmed it's a client, or if we couldn't determine, try querying with this manager
+            if (isClientOfThisManager || managerClients.length === 0) {
+              const customer = client.Customer({
+                customer_id: customerId,
+                login_customer_id: managerId,
+                refresh_token: refreshToken,
+              });
+
+              // Set a timeout for the query attempt
+              const response = await withTimeout(
+                customer.query(query),
+                5000, // 5 second timeout per manager attempt
+                `Query with manager ${managerId} took too long`,
+              );
+
+              // If successful, store this relationship for future use
+              console.log(
+                `[google-ads/analyze] Found working manager ${managerId} for client ${customerId}`,
+              );
+
+              // Update in-memory mapping
+              KNOWN_CLIENT_MANAGERS[customerId] = managerId;
+
+              // Cache this manager relationship
+              if (redis) {
+                try {
+                  await redis.set(
+                    `google-ads:client-manager:${customerId}`,
+                    managerId,
+                    { ex: 2592000 },
+                  ); // Cache for 30 days
+                } catch (e) {
+                  console.error("[google-ads/analyze] Redis cache error:", e);
+                }
+              }
+
+              return response;
+            }
           } catch (managerError) {
             console.error(
               `[google-ads/analyze] Manager ${managerId} access failed:`,
@@ -359,7 +533,7 @@ async function executeQueryWithBestCredentials(
 
 // Set Node.js runtime and max duration
 export const runtime = "nodejs";
-export const maxDuration = 30;
+export const maxDuration = 50; // Increased to match vercel.json
 
 export async function POST(request: NextRequest) {
   console.log("[google-ads/analyze] Starting analysis request");
