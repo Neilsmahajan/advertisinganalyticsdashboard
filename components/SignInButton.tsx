@@ -19,9 +19,7 @@ export default function SignInButton() {
     setIsSigningIn(true);
     await signIn("google", {
       callbackUrl: `/${locale}/dashboard`,
-      redirect: false,
     });
-    // Note: We don't need to reset the state as the page will redirect or refresh
   };
 
   // Show a loading button during initial session check
