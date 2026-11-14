@@ -2,19 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { GoogleAdsApi } from "google-ads-api";
-import { Redis } from "@upstash/redis";
+import { redis } from "@/lib/redis";
 
-// Create Redis client if credentials are available
-let redis: Redis | null = null;
-if (
-  process.env.UPSTASH_REDIS_REST_URL &&
-  process.env.UPSTASH_REDIS_REST_TOKEN
-) {
-  redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
-  });
-}
 
 // Helper function to add timeout to a promise
 const withTimeout = (
